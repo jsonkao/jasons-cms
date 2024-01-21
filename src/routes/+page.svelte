@@ -17,7 +17,7 @@
 
 	let iframe: HTMLIFrameElement;
 
-	$: if ($base) iframe.src = $base;
+	$: if ($base && iframe) iframe.src = $base;
 </script>
 
 <div class="content">
