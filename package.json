@@ -33,6 +33,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@webcontainer/api": "^1.1.8"
+		"@replit/codemirror-lang-svelte": "^6.0.0",
+		"@webcontainer/api": "^1.1.8",
+		"svelte-codemirror-editor": "^1.2.0",
+		"thememirror": "^2.0.1"
 	}
 }

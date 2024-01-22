@@ -1,6 +1,9 @@
 <script>
 	import { codeContent } from '$lib/stores.js';
 	import { createEventDispatcher } from 'svelte';
+	import CodeMirror from 'svelte-codemirror-editor';
+	import { svelte } from '@replit/codemirror-lang-svelte';
+	import { coolGlow } from 'thememirror';
 
 	/** @type {boolean} */
 	export let showCodeEditor;
@@ -19,51 +22,43 @@
 	}
 </script>
 
-<div class="code-editor-container" class:show-editor={showCodeEditor}>
-	<textarea
-		bind:value={$codeContent}
-		use:focus={showCodeEditor}
-		on:keydown={(e) => {
-			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-				e.preventDefault();
-				dispatch('save');
-			}
-		}}
-	/>
+<div
+	class="code-editor-container"
+	class:show-editor={showCodeEditor}
+	role="none"
+	on:keydown={(e) => {
+		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+			e.preventDefault();
+			dispatch('save');
+		}
+	}}
+>
+	<CodeMirror bind:value={$codeContent} lang={svelte()} theme={coolGlow} styles={{
+		"&": {
+				padding: "12px",
+		borderRadius: "6px"
+		},
+}} />
 </div>
 
 <style>
 	.code-editor-container {
 		grid-area: 1 / 1;
 		z-index: 2;
-		background: #121212;
-		border-radius: 6px;
 		max-width: 600px;
 		max-height: 600px;
 		height: 100%;
 		width: 100%;
 		justify-self: center;
 		align-self: center;
-		padding: 1em;
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 0.15s ease-in-out;
+		transition: opacity 0.1s ease-in-out;
+		overflow-y: scroll;
 	}
 
 	.code-editor-container.show-editor {
 		opacity: 1;
 		pointer-events: all;
-	}
-
-	textarea {
-		font-family: 'Courier New', Courier, monospace;
-		color: white;
-		outline: none;
-		height: 100%;
-		width: 100%;
-		display: block;
-		padding: 0;
-		border: none;
-		background: none;
 	}
 </style>

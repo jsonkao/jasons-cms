@@ -28,7 +28,7 @@
 	let showCodeEditor = false;
 
 	function onKeyDown(e: KeyboardEvent) {
-		if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
 			showCodeEditor = !showCodeEditor;
 		}
@@ -46,7 +46,7 @@
 </script>
 
 <div class="container">
-			<CodeEditor on:save={handleSave} {showCodeEditor} />
+	<CodeEditor on:save={handleSave} {showCodeEditor} />
 	<div class="iframe-container">
 		<iframe bind:this={iframe} title="Embed" class:loading={!$base} />
 		{#if $status}

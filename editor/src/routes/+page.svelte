@@ -65,7 +65,7 @@
 	}
 
 	function onKeydown(e) {
-		if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+		if (e.metaKey && e.key === 'e') {
 			window.parent?.postMessage({ type: 'toggleEditor' }, '*');
 		} else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 			window.parent?.postMessage({ type: 'saveFile' }, '*');
