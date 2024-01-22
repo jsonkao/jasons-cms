@@ -1,29 +1,23 @@
-<script>
-	import { codeContent } from '$lib/stores.js';
+<script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { svelte } from '@replit/codemirror-lang-svelte';
 	import { coolGlow } from 'thememirror';
+	import { codeContent } from '$lib/stores.js';
 
-	/** @type {boolean} */
-	export let showCodeEditor;
+	export let showCodeEditor: boolean;
+
+	let containerElement: HTMLElement;
 
 	const dispatch = createEventDispatcher();
 
-	/** @type {import('svelte/action').Action<HTMLElement, boolean>}  */
-	function focus(node, show) {
-		node.focus();
-
-		return {
-			update(show) {
-				if (show) node.focus();
-			}
-		};
-	}
+	$: if (showCodeEditor && containerElement)
+		(containerElement.querySelector('[contenteditable=true]') as HTMLElement).focus();
 </script>
 
 <div
 	class="code-editor-container"
+	bind:this={containerElement}
 	class:show-editor={showCodeEditor}
 	role="none"
 	on:keydown={(e) => {
@@ -51,8 +45,6 @@
 		grid-area: 1 / 1;
 		z-index: 2;
 		max-width: 600px;
-		max-height: 600px;
-		height: 100%;
 		width: 100%;
 		justify-self: center;
 		align-self: center;

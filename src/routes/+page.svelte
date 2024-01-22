@@ -28,9 +28,13 @@
 	let showCodeEditor = false;
 
 	function onKeyDown(e: KeyboardEvent) {
+		// This gets called when the iframe is not in focus)
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
 			showCodeEditor = !showCodeEditor;
+			if (iframe) {
+				iframe.contentWindow?.postMessage("focusText", "*");
+			}
 		}
 	}
 

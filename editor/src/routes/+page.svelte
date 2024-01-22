@@ -1,4 +1,5 @@
 <script>
+	import { browser } from '$app/environment';
 	import Graphic from '$lib/Graphic.svelte';
 
 	const components = {
@@ -59,11 +60,6 @@
 		];
 	}
 
-	/** @type {import('svelte/action').Action}  */
-	function focus(node) {
-		node.focus();
-	}
-
 	function onKeydown(e) {
 		if (e.metaKey && e.key === 'e') {
 			window.parent?.postMessage({ type: 'toggleEditor' }, '*');
@@ -74,6 +70,16 @@
 		}
 
 		e.preventDefault();
+	}
+
+	let lastTextFocused = 0;
+
+	if (browser) {
+		window.addEventListener('message', (event) => {
+			if (event.data === 'focusText') {
+				content[lastTextFocused].element?.focus();
+			}
+		});
 	}
 </script>
 
@@ -92,7 +98,7 @@
 					}
 				}}
 				on:keyup={(e) => e.code === 'Backspace' && block.text === '' && deleteTextBlock(i)}
-				use:focus
+				on:blur={() => (lastTextFocused = i)}
 			>
 				{block.text}
 			</p>
