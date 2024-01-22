@@ -15,7 +15,8 @@ if (!!process.env.VERCEL) {
 
 const cwd = 'editor';
 
-execSync('npm ci', { cwd });
+execSync('rm package-lock.json', { cwd });
+execSync('npm i', { cwd });
 
 const zip = new AdmZip();
 
@@ -23,7 +24,7 @@ const zip = new AdmZip();
 // this is a bit ropey, but it works
 const ignored_basenames = ['.DS_Store', 'LICENSE'];
 const ignored_extensions = ['.d.ts', '.map'];
-const ignored_directories = ['.svelte-kit', 'node_modules/.bin', 'node_modules/rollup/dist/shared'];
+const ignored_directories = ['.svelte-kit', 'node_modules/.bin' /* , 'node_modules/rollup/dist/shared' */];
 
 const ignored_files = new Set(['node_modules/svelte/compiler.cjs']);
 

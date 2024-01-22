@@ -1,57 +1,63 @@
 <script lang="ts">
-	import { startWebContainer, stopWebContainer } from '$lib/webcontainer';
-	import { base, progress } from '$lib/stores.js';
+	import { startWebContainer, stopWebContainer, saveFile } from '$lib/webcontainer';
+	import { base, codeContent, status } from '$lib/stores.js';
 	import { fade } from 'svelte/transition';
 	import { onDestroy, onMount } from 'svelte';
 
+	import CodeEditor from '$lib/components/CodeEditor.svelte';
+	import { browser } from '$app/environment';
+
 	onMount(() => {
-		window.addEventListener('message', function (event) {
-			console.log('Message received from the child: ' + JSON.stringify(event.data)); // Message received from child
-		});
 		startWebContainer();
+		window.addEventListener('message', onMessage);
+		window.addEventListener('keydown', onKeyDown);
 	});
 
 	onDestroy(async () => {
 		await stopWebContainer();
+		if (browser) {
+			window.removeEventListener('message', onMessage);
+			window.removeEventListener('keydown', onKeyDown);
+		}
 	});
 
 	let iframe: HTMLIFrameElement;
 
 	$: if ($base && iframe) iframe.src = $base;
+
+	let showCodeEditor = false;
+
+	function onKeyDown(e: KeyboardEvent) {
+		if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+			e.preventDefault();
+			showCodeEditor = !showCodeEditor;
+		}
+	}
+
+	function onMessage(event) {
+		console.log('Message received from the child: ' + JSON.stringify(event.data)); // Message received from child
+		if (event.data.type === 'toggleEditor') showCodeEditor = !showCodeEditor;
+		if (event.data.type === 'saveFile') handleSave();
+	}
+
+	function handleSave() {
+		saveFile('Graphic', $codeContent);
+	}
 </script>
 
-<div class="content">
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra
-		urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel,
-		luctus ornare lacus.
-	</p>
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra
-		urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel,
-		luctus ornare lacus.
-	</p>
+<div class="container">
+			<CodeEditor on:save={handleSave} {showCodeEditor} />
 	<div class="iframe-container">
 		<iframe bind:this={iframe} title="Embed" class:loading={!$base} />
-		{#if $progress}
-			<p transition:fade>{$progress}</p>
+		{#if $status}
+			<p transition:fade class:error={$status?.startsWith('Error:')}>{$status}</p>
 		{/if}
 	</div>
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra
-		urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel,
-		luctus ornare lacus.
-	</p>
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra
-		urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel,
-		luctus ornare lacus.
-	</p>
 </div>
 
 <style>
-	.content {
-		margin-top: 100px;
+	.container {
+		display: grid;
 	}
 
 	p {
@@ -60,10 +66,14 @@
 		line-height: 1.4;
 	}
 
+	p.error {
+		color: red;
+	}
+
 	iframe {
 		display: block;
 		width: 100%;
-		height: 540px;
+		height: 100vh;
 		resize: none;
 		box-sizing: border-box;
 		border: none;
@@ -73,15 +83,11 @@
 		background: #eee;
 	}
 
-	.content > * {
-		max-width: 520px;
-		margin: 1.7rem auto;
-	}
-
 	.iframe-container {
 		display: grid;
 	}
 
+	.iframe-container,
 	.iframe-container > * {
 		grid-area: 1 / 1;
 	}

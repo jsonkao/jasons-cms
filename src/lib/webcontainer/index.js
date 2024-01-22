@@ -1,5 +1,5 @@
 import { WebContainer } from '@webcontainer/api';
-import { base, progress } from '$lib/stores.js';
+import { base, status, codeContent } from '$lib/stores.js';
 import { loadCommon, files } from './files.js';
 
 /**
@@ -10,20 +10,25 @@ import { loadCommon, files } from './files.js';
 let webcontainerInstance;
 
 export async function startWebContainer() {
-	progress.set('Booting webcontainer...');
+	status.set('Booting webcontainer...');
 	webcontainerInstance = await WebContainer.boot();
 
-	progress.set('Mounting files...');
+	status.set('Mounting files...');
 	// await webcontainerInstance.mount(files);
 	await webcontainerInstance.mount(await loadCommon());
 
-	progress.set('Unzipping files...');
+	status.set('Unzipping files...');
 	await unzipFiles();
 
-	// progress.set('Installing dependencies...');
-	// await install();
+	status.set('Installing dependencies...');
+	await install();
 	async function install() {
-		const process = await webcontainerInstance.spawn('npm', ['install']);
+		// const process = await webcontainerInstance.spawn('npm', ['install']);
+		const process = await webcontainerInstance.spawn('npm', [
+			'i',
+			'-D',
+			'@rollup/rollup-linux-x64-musl'
+		]);
 		// process.output.pipeTo(log_stream());
 		const code = await process.exit;
 		if (code !== 0) {
@@ -33,15 +38,16 @@ export async function startWebContainer() {
 
 	webcontainerInstance.on('server-ready', (port, url) => {
 		console.log('Ready!!');
-		progress.set(null);
+		status.set(null);
 		base.set(url);
 	});
 
 	webcontainerInstance.on('error', ({ message }) => {
 		console.error('ERROR', message);
+		status.set(`Error: ${message}`);
 	});
 
-	progress.set('Starting dev server...');
+	status.set('Starting dev server...');
 	await dev();
 	async function dev() {
 		const process = await webcontainerInstance.spawn('./node_modules/vite/bin/vite.js', ['dev']);
@@ -61,6 +67,8 @@ async function unzipFiles() {
 		throw new Error('Failed to unzip in WebContainer');
 	}
 	await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
+	
+	codeContent.set(await webcontainerInstance.fs.readFile(`src/lib/Graphic.svelte`, 'utf-8'));
 }
 
 function log_stream() {
@@ -72,5 +80,18 @@ function log_stream() {
 }
 
 export async function stopWebContainer() {
-	if (webcontainerInstance) await webcontainerInstance.teardown();
+	if (webcontainerInstance) {
+		base.set(null);
+		await webcontainerInstance.teardown();
+	}
+}
+
+/**
+ * @param {string} componentName 
+ * @param {string} content
+ */
+export async function saveFile(componentName, content) {
+	await webcontainerInstance.fs.writeFile(`/src/lib/${componentName}.svelte`, content);
+
+	console.log(await webcontainerInstance.fs.readFile(`/src/lib/${componentName}.svelte`, 'utf-8'));
 }
