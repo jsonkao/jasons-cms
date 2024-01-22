@@ -67,7 +67,7 @@ async function unzipFiles() {
 		throw new Error('Failed to unzip in WebContainer');
 	}
 	await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
-	
+
 	codeContent.set(await webcontainerInstance.fs.readFile(`src/lib/Graphic.svelte`, 'utf-8'));
 }
 
@@ -87,7 +87,7 @@ export async function stopWebContainer() {
 }
 
 /**
- * @param {string} componentName 
+ * @param {string} componentName
  * @param {string} content
  */
 export async function saveFile(componentName, content) {

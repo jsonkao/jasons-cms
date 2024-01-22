@@ -33,12 +33,17 @@
 		}
 	}}
 >
-	<CodeMirror bind:value={$codeContent} lang={svelte()} theme={coolGlow} styles={{
-		"&": {
-				padding: "12px",
-		borderRadius: "6px"
-		},
-}} />
+	<CodeMirror
+		bind:value={$codeContent}
+		lang={svelte()}
+		theme={coolGlow}
+		styles={{
+			'&': {
+				padding: '12px',
+				borderRadius: '6px'
+			}
+		}}
+	/>
 </div>
 
 <style>
