@@ -44,11 +44,11 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 	}
 
 	if (file.startsWith('node_modules/esbuild/') || file.startsWith('node_modules/@esbuild/')) {
-		continue;
+		// continue;
 	}
 
 	zip.addFile(
-		file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'),
+		file.replace('node_modules/esbuild/', 'node_modules/esbuild/'),
 		fs.readFileSync(`${cwd}/${file}`)
 	);
 }
@@ -59,7 +59,7 @@ if (ignored_files.size > 0) {
 
 const out = zip.toBuffer();
 
-fs.writeFileSync(`src/lib/webcontainer/common.zip`, out);
+fs.writeFileSync(`src/lib/webcontainer/files.zip`, out);
 
 // bundle adm-zip so we can use it in the webcontainer
 esbuild.buildSync({

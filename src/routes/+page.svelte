@@ -1,22 +1,23 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { onDestroy, onMount } from 'svelte';
-	import { startWebContainer, stopWebContainer, saveFile, editGraphic } from '$lib/webcontainer';
-	import { base, status } from '$lib/stores.js';
+	import { startWebContainer, stopWebContainer, saveFile } from '$lib/webcontainer/index';
+	import { base, status } from '$lib/stores';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
+	import type { PageData } from './$types';
+	import { browser } from '$app/environment';
+
+	export let data: PageData;
+	const { blocks } = data;
 
 	/**
 	 * Starting and stopping webcontainer
 	 */
 
-	let currentGraphic = '1';
+	let currentGraphic = (blocks.find((d) => d.type === 'graphic') as GraphicBlock)?.name;
 
-	onMount(() => {
-		startWebContainer(() => editGraphic(currentGraphic));
-		window.addEventListener('message', onMessage);
-		return () => window.removeEventListener('message', onMessage);
-	});
-	onDestroy(async () => await stopWebContainer());
+	onMount(() => startWebContainer(blocks));
+	onDestroy(() => browser && stopWebContainer);
 
 	/**
 	 * Handling the iframe
@@ -31,7 +32,7 @@
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
 			showCodeEditor = !showCodeEditor;
-			iframe.contentWindow?.postMessage({ type: 'focusText' });
+			iframe.contentWindow?.postMessage({ type: 'focusText' }, '*');
 		}
 	}
 
@@ -40,9 +41,9 @@
 
 		if (event.data.type === 'toggleEditor') showCodeEditor = !showCodeEditor;
 		if (event.data.type === 'saveFile') handleSave();
-		if (event.data.type === 'focusGraphic') {
-			editGraphic((currentGraphic = event.data.name));
-		}
+		if (event.data.type === 'focusGraphic') currentGraphic = event.data.name;
+		if (event.data.type === 'iframeMounted')
+			iframe.contentWindow?.postMessage({ type: 'setBlocks', blocks }, '*');
 	}
 
 	function handleSave() {
@@ -50,12 +51,12 @@
 	}
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window on:message={onMessage} on:keydown={onKeyDown} />
 
 <div class="container">
 	<CodeEditor on:save={handleSave} {showCodeEditor} {currentGraphic} />
 	<div class="iframe-container">
-		<iframe bind:this={iframe} title="Embed" class:loading={!$base} />
+		<iframe bind:this={iframe} title="Embed" class:loading={$base === null} />
 		{#if $status}
 			<p transition:fade class:error={$status?.startsWith('Error:')}>{$status}</p>
 		{/if}

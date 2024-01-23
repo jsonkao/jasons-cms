@@ -1,7 +1,7 @@
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 
-const zip = new AdmZip('common.zip');
+const zip = new AdmZip('files.zip');
 zip.extractAllTo('.');
 
 if (!fs.existsSync('node_modules/.bin')) {

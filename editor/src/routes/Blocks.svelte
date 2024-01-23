@@ -1,23 +1,33 @@
 <script>
-	import Component1 from '$lib/1.svelte';
-	import Component2 from '$lib/2.svelte';
 	import { onMount } from 'svelte';
+	import components from '$lib/index.js';
 
-	const components = {
-		'1': Component1,
-		'2': Component2
-	};
+	/**
+	 * @param {MessageEvent} event
+	 */
+	function onMessage(event) {
+		console.log('child received data', event.data);
+		if (event.data.type === 'setBlocks') {
+			rawBlocks = event.data.blocks;
+		}
+		if (event.data.type === 'focusText') {
+			content[lastTextFocused].element?.focus();
+		}
+	}
 
 	/**
 	 * Getting content and hydrating it with id's and such
 	 */
 
-	export let rawContent;
+	/** @type {Block[]} */
+	let rawBlocks = [];
+
+	$: console.log('rawBlocks', rawBlocks);
 
 	let uid = 0;
 
-	/** @type {{ type: 'text' | 'graphic', text?: string, component?: string, id: number, element: HTMLElement | null }[]} */
-	let content = rawContent.map((d) => ({
+	/** @type {RenderedBlock[]} */
+	$: content = rawBlocks.map((d) => ({
 		...d,
 		id: uid++,
 		element: null
@@ -80,10 +90,13 @@
 			(entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting && entry.intersectionRatio === 1) {
-						window.parent.postMessage({
-							type: 'focusGraphic',
-							name: entry.target.getAttribute('data-name')
-						}, '*');
+						window.parent.postMessage(
+							{
+								type: 'focusGraphic',
+								name: entry.target.getAttribute('data-name')
+							},
+							'*'
+						);
 					}
 				});
 			},
@@ -91,18 +104,21 @@
 		);
 		contentEl.querySelectorAll('.graphic').forEach((e) => observer.observe(e));
 
-		return () => observer && observer.disconnect();
+		const testMsgFn = (event) => {
+			console.log('Message received from the parent: ' + event);
+		};
+		window.addEventListener('message', testMsgFn);
+
+		window.parent.postMessage({ type: 'iframeMounted' }, '*');
+
+		return () => {
+			observer && observer.disconnect();
+			window.removeEventListener('message', testMsgFn);
+		};
 	});
 </script>
 
-<svelte:window
-	on:message={(event) => {
-		if (event.data.type === 'focusText') {
-			content[lastTextFocused].element?.focus();
-		}
-	}}
-	on:keydown={onKeydown}
-/>
+<svelte:window on:message={onMessage} on:keydown={onKeydown} />
 
 <div class="content" bind:this={contentEl}>
 	{#each content as block, i (block.id)}
@@ -129,9 +145,9 @@
 			>
 				{block.text}
 			</p>
-		{:else if block.type === 'graphic' && block.component}
-			<div class="graphic" data-name={block.component}>
-				<svelte:component this={components[block.component]} />
+		{:else if block.type === 'graphic' && block.name}
+			<div class="graphic" data-name={block.name}>
+				<svelte:component this={components[block.name]} />
 			</div>
 		{/if}
 	{/each}

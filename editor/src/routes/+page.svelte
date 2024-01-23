@@ -1,10 +1,5 @@
 <script>
-	import Content from './Content.svelte';
-
-	/** @type {import('./$types').PageData} */
-	export let data;
-
-	const { rawContent } = data;
+	import Blocks from './Blocks.svelte';
 </script>
 
-<Content {rawContent} />
+<Blocks />
