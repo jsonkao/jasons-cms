@@ -2,7 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import { onDestroy, onMount } from 'svelte';
 	import { startWebContainer, stopWebContainer, saveFile, editGraphic } from '$lib/webcontainer';
-	import { base, codeContent, status } from '$lib/stores.js';
+	import { base, status } from '$lib/stores.js';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 
 	/**
@@ -13,6 +13,8 @@
 
 	onMount(() => {
 		startWebContainer(() => editGraphic(currentGraphic));
+		window.addEventListener('message', onMessage);
+		return () => window.removeEventListener('message', onMessage);
 	});
 	onDestroy(async () => await stopWebContainer());
 
@@ -38,7 +40,9 @@
 
 		if (event.data.type === 'toggleEditor') showCodeEditor = !showCodeEditor;
 		if (event.data.type === 'saveFile') handleSave();
-		if (event.data.type === 'focusGraphic') currentGraphic = event.data.name;
+		if (event.data.type === 'focusGraphic') {
+			editGraphic((currentGraphic = event.data.name));
+		}
 	}
 
 	function handleSave() {
@@ -46,7 +50,7 @@
 	}
 </script>
 
-<svelte:window on:message={onMessage} on:keydown={onKeyDown} />
+<svelte:window on:keydown={onKeyDown} />
 
 <div class="container">
 	<CodeEditor on:save={handleSave} {showCodeEditor} {currentGraphic} />

@@ -59,11 +59,10 @@
 	function onKeydown(e) {
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
-			console.log("IM HERE")
-			window.parent.postMessage({ type: 'toggleEditor' });
+			window.parent.postMessage({ type: 'toggleEditor' }, '*');
 		} else if (e.metaKey && e.key === 's') {
 			e.preventDefault();
-			window.parent.postMessage({ type: 'saveFile' });
+			window.parent.postMessage({ type: 'saveFile' }, '*');
 		}
 	}
 
@@ -85,7 +84,7 @@
 						window.parent.postMessage({
 							type: 'focusGraphic',
 							name: entry.target.getAttribute('data-name')
-						});
+						}, '*');
 					}
 				});
 			},
