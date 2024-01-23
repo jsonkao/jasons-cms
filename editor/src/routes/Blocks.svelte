@@ -1,15 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
-	import components from '$lib/index.js';
+	import { createObserver } from './observer.js';
+
+	/** @type {Block[]} */
+	import rawBlocks from '$lib/generated/data.json';
+	import components from '$lib/generated/index.js';
 
 	/**
 	 * @param {MessageEvent} event
 	 */
 	function onMessage(event) {
-		console.log('child received data', event.data);
-		if (event.data.type === 'setBlocks') {
-			rawBlocks = event.data.blocks;
-		}
 		if (event.data.type === 'focusText') {
 			content[lastTextFocused].element?.focus();
 		}
@@ -18,11 +18,6 @@
 	/**
 	 * Getting content and hydrating it with id's and such
 	 */
-
-	/** @type {Block[]} */
-	let rawBlocks = [];
-
-	$: console.log('rawBlocks', rawBlocks);
 
 	let uid = 0;
 
@@ -79,42 +74,14 @@
 	let lastTextFocused = 0;
 
 	/** @type {import('svelte/action').Action}  */
-	function focus(node) {
-		node.focus();
-	}
+	const focus = (node) => node.focus();
 
 	/** @type {HTMLElement} */
 	let contentEl;
+
 	onMount(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting && entry.intersectionRatio === 1) {
-						window.parent.postMessage(
-							{
-								type: 'focusGraphic',
-								name: entry.target.getAttribute('data-name')
-							},
-							'*'
-						);
-					}
-				});
-			},
-			{ threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] }
-		);
-		contentEl.querySelectorAll('.graphic').forEach((e) => observer.observe(e));
-
-		const testMsgFn = (event) => {
-			console.log('Message received from the parent: ' + event);
-		};
-		window.addEventListener('message', testMsgFn);
-
-		window.parent.postMessage({ type: 'iframeMounted' }, '*');
-
-		return () => {
-			observer && observer.disconnect();
-			window.removeEventListener('message', testMsgFn);
-		};
+		const observer = createObserver(contentEl.querySelectorAll('.graphic'));
+		return () => observer && observer.disconnect();
 	});
 </script>
 

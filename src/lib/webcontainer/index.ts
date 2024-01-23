@@ -1,5 +1,5 @@
 import { WebContainer } from '@webcontainer/api';
-import { base, status, codeContent } from '$lib/stores';
+import { base, progress, codeContent } from '$lib/stores';
 import { get } from 'svelte/store';
 import { loadFiles } from './files.js';
 import type { WebContainer as WebContainerType } from '@webcontainer/api';
@@ -9,18 +9,18 @@ let webcontainerInstance: WebContainerType;
 export async function startWebContainer(blocks: Block[]) {
 	// Boot webcontainer and load files concurrently
 
-	status.set('Booting webcontainer...');
+	progress.push('Booting webcontainer...');
 	let files;
 	[webcontainerInstance, files] = await Promise.all([WebContainer.boot(), loadFiles()]);
 
 	// Mount files
 
-	status.set('Mounting files...');
+	progress.push('Mounting files...');
 	await webcontainerInstance.mount(files);
 
 	// Unzip files
 
-	status.set('Unzipping files...');
+	progress.push('Unzipping files...');
 	await unzipFiles();
 	async function unzipFiles() {
 		const unzip = await webcontainerInstance.spawn('node', ['unzip.cjs']);
@@ -31,9 +31,11 @@ export async function startWebContainer(blocks: Block[]) {
 		await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
 	}
 
-	// THIS IS A HACK STEP to fix an incdecipherable error. Should be removed soon. (We already have node_modules installed in files.zip)
+	// Since rollup and esbuild are written with native code, we need to reinstall them
+	// (Jason uses a mac, so the binaries in the editor/package-lock.json created for him
+	// are not compatible with the webcontainer platform, Linux)
 
-	status.set('Installing dependencies...');
+	progress.push('Installing dependencies...');
 	await install();
 	async function install() {
 		await webcontainerInstance.spawn('rm', ['-rf', 'node_modules']);
@@ -53,22 +55,29 @@ export async function startWebContainer(blocks: Block[]) {
 
 	// Populate webcontainer with files from blocks data
 
-	status.set('Writing files...');
+	progress.push('Generating files...');
 
 	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
-	await Promise.all(
-		graphicBlocks.map(({ name, code }) =>
-			webcontainerInstance.fs.writeFile(`/src/lib/${name}.svelte`, code)
-		)
-	);
 
-	// Write a lib/index.js file to export all the graphic components
+	await generateFiles();
+	async function generateFiles() {
+		await Promise.all([
+			// Graphics Svelte files
+			...graphicBlocks.map(({ name, code }) => createFile(`${name}.svelte`, code)),
+			// A lib/index.js file to export all the graphic components
+			createFile(
+				'index.js',
+				graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
+					`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
+			),
+			// A data.json file with blocks data
+			createFile('data.json', JSON.stringify(blocks))
+		]);
 
-	await webcontainerInstance.fs.writeFile(
-		`src/lib/index.js`,
-		graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
-			`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
-	);
+		function createFile(filename: string, content: string) {
+			return webcontainerInstance.fs.writeFile(`src/lib/generated/${filename}`, content);
+		}
+	}
 
 	// Populate codeContent store with code from blocks data
 
@@ -85,16 +94,15 @@ export async function startWebContainer(blocks: Block[]) {
 	// Start dev server
 
 	webcontainerInstance.on('server-ready', (port, url) => {
-		status.set(null);
+		progress.clear();
 		base.set(url);
 	});
 
 	webcontainerInstance.on('error', ({ message }) => {
-		console.error('ERROR', message);
-		status.set(`Error: ${message}`);
+		// TODO: handle errors
 	});
 
-	status.set('Starting dev server...');
+	progress.push('Starting dev server...');
 	await dev();
 	async function dev() {
 		const process = await webcontainerInstance.spawn('./node_modules/vite/bin/vite.js', ['dev']);
@@ -109,6 +117,7 @@ export async function startWebContainer(blocks: Block[]) {
 export async function stopWebContainer() {
 	base.set(null);
 	try {
+		console.log('Tearing down webcontainer...', webcontainerInstance);
 		if (webcontainerInstance) await webcontainerInstance.teardown();
 		else console.warn('webcontainerInstance is not there', webcontainerInstance);
 	} catch (e) {

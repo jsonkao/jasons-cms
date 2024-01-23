@@ -29,35 +29,101 @@
 		}
 	}}
 >
-	<CodeMirror
-		bind:value={$codeContent[currentGraphic]}
-		lang={svelte()}
-		theme={coolGlow}
-		styles={{
-			'&': {
-				padding: '12px',
-				borderRadius: '6px'
-			}
-		}}
-	/>
+	<div class="codemirror-container">
+		<CodeMirror
+			bind:value={$codeContent[currentGraphic]}
+			lang={svelte()}
+			theme={coolGlow}
+			tabSize={4}
+			styles={{
+				'&': {
+					padding: '12px',
+					borderRadius: '6px'
+				}
+			}}
+		/>
+	</div>
+
+	<div class="tabs">
+		{#each ['center', 'left', 'bottom'] as position}
+			<button class="position-{position}" on:click={() => dispatch('changePosition', position)} />
+		{/each}
+	</div>
 </div>
 
 <style>
 	.code-editor-container {
-		grid-area: 1 / 1;
-		z-index: 2;
-		max-width: 600px;
-		width: 100%;
-		justify-self: center;
-		align-self: center;
+		height: 100%;
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.1s ease-in-out;
-		overflow-y: scroll;
+		position: relative;
 	}
 
 	.code-editor-container.show-editor {
 		opacity: 1;
 		pointer-events: all;
+	}
+
+	.codemirror-container {
+		height: 100%;
+		max-height: 600px;
+		overflow-y: scroll;
+	}
+
+	.tabs {
+		position: absolute;
+		bottom: 10px;
+		right: 9px;
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+	}
+
+	button {
+		--size: 20px;
+		width: var(--size);
+		height: var(--size);
+		display: block;
+		cursor: pointer;
+		border: 1px solid white;
+		background: none;
+		position: relative;
+		padding: 0;
+		opacity: 0.5;
+		transition: opacity 0.3s;
+		border-radius: none;
+	}
+
+	button:hover {
+		opacity: 1;
+	}
+
+	button::after {
+		content: ' ';
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+
+	button.position-center::after {
+		top: 50%;
+		left: 50%;
+		width: 50%;
+		height: 50%;
+		border: 1px solid white;
+		transform: translate(-50%, -50%);
+	}
+
+	button.position-left::after {
+		width: 30%;
+		height: 100%;
+		border-right: 1px solid white;
+	}
+
+	button.position-bottom::after {
+		width: 100%;
+		height: 60%;
+		border-bottom: 1px solid white;
 	}
 </style>
