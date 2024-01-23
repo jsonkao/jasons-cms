@@ -1,22 +1,27 @@
 <script lang="ts">
-	import { saveFile } from '$lib/webcontainer/index';
-	import { base } from '$lib/stores';
+	import { base, codeEditorPosition } from '$lib/stores';
+	import { saveFile } from '$lib/webcontainer';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import LoadingMask from '$lib/components/LoadingMask.svelte';
 
 	export let blocks: Block[];
 
+	/**
+	 * The graphic in focus (and whose code is in the CodeEditor)
+	 */
 	let currentGraphic = (blocks.find((d) => d.type === 'graphic') as GraphicBlock)?.name;
+
+	let showCodeEditor = false;
 
 	/**
 	 * Handling the iframe
 	 */
-
 	let iframe: HTMLIFrameElement;
 	$: if ($base && iframe) iframe.src = $base;
 
-	let showCodeEditor = false;
-
+	/**
+	 * Pressing Cmd+# toggles the editor
+	 */
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
@@ -25,27 +30,38 @@
 		}
 	}
 
+	/**
+	 * Handles all messages from the iframe
+	 */
 	function onMessage(event: MessageEvent) {
-		console.log('Message from child: ', event.data);
-
-		if (event.data.type === 'toggleEditor') showCodeEditor = !showCodeEditor;
-		if (event.data.type === 'saveFile') handleSave();
-		if (event.data.type === 'focusGraphic') currentGraphic = event.data.name;
+		// console.log('Message from child: ', event.data);
+		switch (event.data.type) {
+			case 'toggleEditor':
+				showCodeEditor = !showCodeEditor;
+				break;
+			case 'saveFile':
+				handleSave();
+				break;
+			case 'focusGraphic':
+				currentGraphic = event.data.name;
+				break;
+		}
 	}
 
+	/**
+	 * Handles saving the file. Eventually, will probably communicate with a database.
+	 */
 	function handleSave() {
 		saveFile(currentGraphic);
 	}
-
-	let editorPosition = 'center';
 </script>
 
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
 
-<div class="container editor-{editorPosition}" class:showing-editor={showCodeEditor}>
+<div class="container editor-{$codeEditorPosition}" class:showing-editor={showCodeEditor}>
 	<div class="code-editor">
 		<CodeEditor
-			on:changePosition={(p) => (editorPosition = p.detail)}
+			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
 			on:save={handleSave}
 			{showCodeEditor}
 			{currentGraphic}
@@ -101,19 +117,17 @@
 	}
 
 	.editor-left {
+		grid-template-columns: 0fr 1fr;
+	}
+	.editor-left.showing-editor {
 		grid-template-columns: 1fr 390px;
 	}
 
-	.editor-left:not(.showing-editor) {
-		grid-template-columns: 0fr 1fr;
-	}
-
 	.editor-bottom {
-		grid-template-rows: 50% 50%;
-	}
-
-	.editor-bottom:not(.showing-editor) {
 		grid-template-rows: 1fr 0;
+	}
+	.editor-bottom.showing-editor {
+		grid-template-rows: 50% 50%;
 	}
 
 	.editor-left .iframe-container {

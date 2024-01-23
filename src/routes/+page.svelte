@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { startWebContainer, stopWebContainer, saveFile } from '$lib/webcontainer/index';
 	import { browser } from '$app/environment';
+	import { startWebContainer, stopWebContainer } from '$lib/webcontainer/index';
 	import Editor from './Editor.svelte';
 	import type { PageData } from './$types';
 

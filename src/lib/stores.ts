@@ -7,6 +7,8 @@ export const codeContent: Writable<{ [key: string]: string }> = writable({});
 
 export const progress = createProgressStore();
 
+export const codeEditorPosition: Writable<string> = writable('center');
+
 function createProgressStore() {
 	const { subscribe, set, update } = writable([]);
 

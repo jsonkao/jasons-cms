@@ -24,6 +24,6 @@
 	}
 
 	p {
-		transition-duration: .2s;
+		transition-duration: 0.2s;
 	}
 </style>

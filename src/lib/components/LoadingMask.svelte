@@ -35,7 +35,7 @@
 		color: #121212;
 	}
 
-  span {
-    display: block;
-  }
+	span {
+		display: block;
+	}
 </style>
