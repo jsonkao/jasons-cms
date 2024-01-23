@@ -6,13 +6,17 @@
 	import { codeContent } from '$lib/stores.js';
 
 	export let showCodeEditor: boolean;
+	export let currentGraphic: string;
 
 	let containerElement: HTMLElement;
 
 	const dispatch = createEventDispatcher();
 
+	// If the editor gets shown, focus the contenteditable element
 	$: if (showCodeEditor && containerElement)
 		(containerElement.querySelector('[contenteditable=true]') as HTMLElement).focus();
+	
+	$: console.log($codeContent[currentGraphic]);
 </script>
 
 <div
@@ -28,7 +32,7 @@
 	}}
 >
 	<CodeMirror
-		bind:value={$codeContent}
+		bind:value={$codeContent[currentGraphic]}
 		lang={svelte()}
 		theme={coolGlow}
 		styles={{

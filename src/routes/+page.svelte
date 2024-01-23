@@ -1,56 +1,55 @@
 <script lang="ts">
-	import { startWebContainer, stopWebContainer, saveFile } from '$lib/webcontainer';
-	import { base, codeContent, status } from '$lib/stores.js';
 	import { fade } from 'svelte/transition';
 	import { onDestroy, onMount } from 'svelte';
-
+	import { startWebContainer, stopWebContainer, saveFile, editGraphic } from '$lib/webcontainer';
+	import { base, codeContent, status } from '$lib/stores.js';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
-	import { browser } from '$app/environment';
+
+	/**
+	 * Starting and stopping webcontainer
+	 */
+
+	let currentGraphic = '1';
 
 	onMount(() => {
-		startWebContainer();
-		window.addEventListener('message', onMessage);
-		window.addEventListener('keydown', onKeyDown);
+		startWebContainer(() => editGraphic(currentGraphic));
 	});
+	onDestroy(async () => await stopWebContainer());
 
-	onDestroy(async () => {
-		await stopWebContainer();
-		if (browser) {
-			window.removeEventListener('message', onMessage);
-			window.removeEventListener('keydown', onKeyDown);
-		}
-	});
+	/**
+	 * Handling the iframe
+	 */
 
 	let iframe: HTMLIFrameElement;
-
 	$: if ($base && iframe) iframe.src = $base;
 
 	let showCodeEditor = false;
 
 	function onKeyDown(e: KeyboardEvent) {
-		// This gets called when the iframe is not in focus)
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
 			showCodeEditor = !showCodeEditor;
-			if (iframe) {
-				iframe.contentWindow?.postMessage("focusText", "*");
-			}
+			iframe.contentWindow?.postMessage({ type: 'focusText' });
 		}
 	}
 
-	function onMessage(event) {
+	function onMessage(event: MessageEvent) {
 		console.log('Message received from the child: ' + JSON.stringify(event.data)); // Message received from child
+
 		if (event.data.type === 'toggleEditor') showCodeEditor = !showCodeEditor;
 		if (event.data.type === 'saveFile') handleSave();
+		if (event.data.type === 'focusGraphic') currentGraphic = event.data.name;
 	}
 
 	function handleSave() {
-		saveFile('Graphic', $codeContent);
+		saveFile(currentGraphic);
 	}
 </script>
 
+<svelte:window on:message={onMessage} on:keydown={onKeyDown} />
+
 <div class="container">
-	<CodeEditor on:save={handleSave} {showCodeEditor} />
+	<CodeEditor on:save={handleSave} {showCodeEditor} {currentGraphic} />
 	<div class="iframe-container">
 		<iframe bind:this={iframe} title="Embed" class:loading={!$base} />
 		{#if $status}

@@ -1,6 +1,6 @@
 import { WebContainer } from '@webcontainer/api';
 import { base, status, codeContent } from '$lib/stores.js';
-import { loadCommon, files } from './files.js';
+import { loadCommon } from './files.js';
 
 /**
  * Maybe I just need a REPL, not a webcontainer
@@ -9,7 +9,7 @@ import { loadCommon, files } from './files.js';
 /** @type {import('@webcontainer/api').WebContainer} Web container singleton */
 let webcontainerInstance;
 
-export async function startWebContainer() {
+export async function startWebContainer(callback) {
 	status.set('Booting webcontainer...');
 	webcontainerInstance = await WebContainer.boot();
 
@@ -40,6 +40,7 @@ export async function startWebContainer() {
 		console.log('Ready!!');
 		status.set(null);
 		base.set(url);
+		callback();
 	});
 
 	webcontainerInstance.on('error', ({ message }) => {
@@ -67,8 +68,17 @@ async function unzipFiles() {
 		throw new Error('Failed to unzip in WebContainer');
 	}
 	await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
+}
 
-	codeContent.set(await webcontainerInstance.fs.readFile(`src/lib/Graphic.svelte`, 'utf-8'));
+/**
+ * @param {string} componentName - Name of the graphic
+ */
+export async function editGraphic(componentName) {
+	const fileContent = await webcontainerInstance.fs.readFile(`src/lib/${componentName}.svelte`, 'utf-8');
+	codeContent.update((content) => ({
+		...content,
+		[componentName]: fileContent
+	}));
 }
 
 function log_stream() {
@@ -88,10 +98,9 @@ export async function stopWebContainer() {
 
 /**
  * @param {string} componentName
- * @param {string} content
  */
-export async function saveFile(componentName, content) {
-	await webcontainerInstance.fs.writeFile(`/src/lib/${componentName}.svelte`, content);
+export async function saveFile(componentName) {
+	await webcontainerInstance.fs.writeFile(`/src/lib/${componentName}.svelte`, codeContent[componentName]);
 
 	console.log(await webcontainerInstance.fs.readFile(`/src/lib/${componentName}.svelte`, 'utf-8'));
 }

@@ -6,5 +6,5 @@ export const base = writable(null);
 /** @type {import('svelte/store').Writable<string | null>} */
 export const status = writable(null);
 
-/** @type {import('svelte/store').Writable<string>} */
-export const codeContent = writable('');
+/** @type {import('svelte/store').Writable<Object.<string, string>>} */
+export const codeContent = writable({});
