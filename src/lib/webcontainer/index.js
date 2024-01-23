@@ -1,5 +1,6 @@
 import { WebContainer } from '@webcontainer/api';
 import { base, status, codeContent } from '$lib/stores.js';
+import { get } from 'svelte/store';
 import { loadCommon } from './files.js';
 
 /**
@@ -100,7 +101,5 @@ export async function stopWebContainer() {
  * @param {string} componentName
  */
 export async function saveFile(componentName) {
-	await webcontainerInstance.fs.writeFile(`/src/lib/${componentName}.svelte`, codeContent[componentName]);
-
-	console.log(await webcontainerInstance.fs.readFile(`/src/lib/${componentName}.svelte`, 'utf-8'));
+	await webcontainerInstance.fs.writeFile(`/src/lib/${componentName}.svelte`, get(codeContent)[componentName]);
 }

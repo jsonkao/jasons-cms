@@ -80,7 +80,6 @@
 			(entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting && entry.intersectionRatio === 1) {
-						console.log("Posting focus graphic");
 						window.parent.postMessage({
 							type: 'focusGraphic',
 							name: entry.target.getAttribute('data-name')

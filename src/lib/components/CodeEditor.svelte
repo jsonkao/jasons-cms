@@ -15,8 +15,6 @@
 	// If the editor gets shown, focus the contenteditable element
 	$: if (showCodeEditor && containerElement)
 		(containerElement.querySelector('[contenteditable=true]') as HTMLElement).focus();
-	
-	$: console.log($codeContent[currentGraphic]);
 </script>
 
 <div
