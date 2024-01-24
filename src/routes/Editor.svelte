@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base, codeEditorPosition, progress } from '$lib/stores';
+	import { base, codeEditorPosition, codeContent, progress } from '$lib/stores';
 	import { writeFile } from '$lib/webcontainer';
 
 	import CodeMirror from '$lib/components/CodeMirror.svelte';
@@ -59,6 +59,7 @@
 	function handleSave() {
 		writeFile(currentGraphic);
 	}
+	$: console.log(currentGraphic);
 </script>
 
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
@@ -100,6 +101,7 @@
 	.code-container {
 		min-width: 0;
 		width: 100%;
+		height: 100%;
 		justify-self: center;
 		align-self: center;
 	}
@@ -126,8 +128,6 @@
 
 	.layout-bottom .code-container {
 		min-height: 0;
-		height: 100%;
-		max-height: auto;
 	}
 
 	.layout-bottom .iframe-container {
@@ -152,5 +152,11 @@
 
 	.layout-left.showing-editor iframe {
 		width: 390px;
+	}
+
+	@media (min-width: 780px) {
+		.layout-left.showing-editor iframe {
+			width: 50vw;
+		}
 	}
 </style>

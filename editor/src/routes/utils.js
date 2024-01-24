@@ -9,6 +9,8 @@ export async function placeCaretAtEnd(el) {
 	document.getSelection()?.modify('move', 'forward', 'documentboundary');
 }
 
+const DEBUG = true;
+
 /**
  * @param {NodeListOf<HTMLElement>} elements - List of graphics to observe
  * @returns {IntersectionObserver}
@@ -16,25 +18,46 @@ export async function placeCaretAtEnd(el) {
 export function createObserver(elements) {
 	const observer = new IntersectionObserver(
 		(entries) => {
-			entries.forEach(
-				({ rootBounds, intersectionRect, target, intersectionRatio, isIntersecting }) => {
-					const rootHeight = rootBounds.height;
-					const intersectingHeight = intersectionRect.height;
+			entries.forEach((entry) => {
+				const {
+					rootBounds,
+					intersectionRect,
+					target,
+					intersectionRatio,
+					isIntersecting,
+					boundingClientRect
+				} = entry;
 
-					// If graphic takes up a majority of the viewport, focus it
-					if (isIntersecting && (intersectionRatio === 1 || intersectingHeight >= rootHeight / 2)) {
-						window.parent.postMessage(
-							{
-								type: 'focusGraphic',
-								name: target.getAttribute('data-name')
-							},
-							'*'
-						);
-					}
+				if (DEBUG) {
+					console.log({
+						intersectionRatio,
+						ibRatio: intersectionRect.height / boundingClientRect.height,
+						irRatio: intersectionRect.height / rootBounds.height,
+						name: target.getAttribute('data-name'),
+						entry
+					});
 				}
-			);
+
+				// If graphic takes up a majority of the viewport, focus it
+				if (
+					isIntersecting &&
+					(intersectionRect.height / boundingClientRect.height > 0.5 ||
+						intersectionRect.height / rootBounds.height > 0.5)
+				) {
+					if (DEBUG) {
+						console.log('choosing graphic', target.getAttribute('data-name'));
+					}
+					window.parent.postMessage(
+						{
+							type: 'focusGraphic',
+							name: target.getAttribute('data-name')
+						},
+						'*'
+					);
+				}
+			});
 		},
-		{ threshold: [0, 0.2, 0.4, 0.6, 0.8, 1], root: document }
+		{ root: document, threshold: [0, 0.5, 1] }
 	);
 	elements.forEach((e) => observer.observe(e));
 	return observer;

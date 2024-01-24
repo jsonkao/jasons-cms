@@ -16,7 +16,11 @@ if (!!process.env.VERCEL) {
 
 const cwd = 'editor';
 
-execSync('npm ci', { cwd });
+console.time('npm ci');
+if (!fs.existsSync(cwd + '/node_modules')) {
+	execSync('npm ci', { cwd });
+}
+console.timeEnd('npm ci');
 
 const zip = new AdmZip();
 
@@ -28,6 +32,7 @@ const ignored_directories = ['.svelte-kit', 'node_modules/.bin', 'node_modules/r
 
 const ignored_files = new Set(['node_modules/svelte/compiler.cjs']);
 
+console.time('zip.addFile');
 for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 	file.replaceAll('\\', '/')
 )) {
@@ -49,15 +54,19 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 		fs.readFileSync(`${cwd}/${file}`)
 	);
 }
+console.timeEnd('zip.addFile');
 
 if (ignored_files.size > 0) {
 	throw new Error(`expected to find ${Array.from(ignored_files).join(', ')}`);
 }
 
+console.time('writing zip');
 const out = zip.toBuffer();
 
 fs.writeFileSync(`src/lib/webcontainer/files.zip`, out);
+console.timeEnd('writing zip');
 
+console.time('bundle unzip');
 // bundle adm-zip so we can use it in the webcontainer
 esbuild.buildSync({
 	entryPoints: [fileURLToPath(new URL('./unzip.js', import.meta.url))],
@@ -67,3 +76,4 @@ esbuild.buildSync({
 	outfile: 'src/lib/webcontainer/unzip.cjs',
 	format: 'cjs'
 });
+console.timeEnd('bundle unzip');

@@ -19,10 +19,9 @@
 </script>
 
 <div
-	class="code-editor"
+	class="code-editor position-{$codeEditorPosition}"
 	bind:this={containerElement}
 	class:show-editor={$codeEditorPosition !== 'center' || showCodeEditor}
-	class:full-bleed={$codeEditorPosition === 'bottom'}
 	role="none"
 	on:keydown={(e) => {
 		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -35,18 +34,19 @@
 		<CodeMirror
 			bind:value={$codeContent[currentGraphic]}
 			lang={svelte()}
+			nodebounce
 			theme={coolGlow}
 			tabSize={4}
 			styles={{
 				'&': {
 					padding: '12px',
-					borderRadius: '6px'
+					borderRadius: '6px',
+					height: '100%'
 				}
 			}}
 		/>
+		<Tabs />
 	</div>
-
-	<Tabs />
 </div>
 
 <style>
@@ -57,6 +57,11 @@
 		margin: 0 auto;
 		opacity: 0;
 		pointer-events: none;
+		display: grid;
+	}
+
+	:global(.codemirror-wrapper) {
+		height: 100%;
 	}
 
 	.code-editor.show-editor {
@@ -65,12 +70,17 @@
 	}
 
 	.code-mirror-container {
-		height: 100%;
 		max-height: 720px;
 		overflow-y: scroll;
+		position: relative;
+		align-self: center;
 	}
 
-	.code-editor:not(.full-bleed) {
+	.code-editor:not(.position-center) .code-mirror-container {
+		height: 100%;
+	}
+
+	.code-editor:not(.position-bottom) {
 		max-width: calc(100% - 40px);
 	}
 </style>

@@ -18,6 +18,11 @@
 				</p>
 			{/key}
 		</div>
+
+		<div class="tips">
+			<p>cmd+e opens the code editor</p>
+			<p>cmd+s saves files</p>
+		</div>
 	</div>
 {/if}
 
@@ -49,14 +54,18 @@
 	}
 
 	p {
-		margin: 0.6rem 0 0;
 		-webkit-font-smoothing: antialiased;
 		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 		font-size: 1.1rem;
 		line-height: 1.5;
 		color: #121212;
+		margin: 0;
+	}
+
+	.label p {
 		grid-area: 1 / 1;
 		justify-self: center;
+		margin-top: 0.6rem;
 	}
 
 	.progress-container {
@@ -71,5 +80,10 @@
 		background: #ccc;
 		border-radius: 2.5px;
 		transition: width 0.2s ease-out;
+	}
+
+	.tips p {
+		color: #bbb;
+		text-align: center;
 	}
 </style>

@@ -149,7 +149,7 @@ function log_stream() {
 
 export async function writeFile(componentName: string) {
 	await webcontainerInstance.fs.writeFile(
-		`/src/lib/${componentName}.svelte`,
+		`/src/lib/generated/${componentName}.svelte`,
 		get(codeContent)[componentName]
 	);
 }
