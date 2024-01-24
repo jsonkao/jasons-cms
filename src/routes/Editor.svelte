@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { base, codeEditorPosition } from '$lib/stores';
 	import { saveFile } from '$lib/webcontainer';
-	import GridLayout from './GridLayout.svelte';
+
+	import Panes from '$lib/components/Panes.svelte';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
-	import LoadingMask from '$lib/components/LoadingMask.svelte';
+	import Loading from '$lib/components/Loading.svelte';
 
 	export let blocks: Block[];
 
@@ -59,7 +60,7 @@
 
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
 
-<GridLayout {showCodeEditor}>
+<Panes {showCodeEditor}>
 	<div slot="code-editor-container">
 		<CodeEditor
 			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
@@ -71,9 +72,9 @@
 
 	<div slot="iframe-container">
 		<iframe bind:this={iframe} title="Content" />
-		<LoadingMask />
+		<Loading />
 	</div>
-</GridLayout>
+</Panes>
 
 <style>
 	iframe {

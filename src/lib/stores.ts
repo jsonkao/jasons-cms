@@ -3,9 +3,11 @@ import type { Writable } from 'svelte/store';
 
 export const base: Writable<string | null> = writable(null);
 
-export const codeContent: Writable<{ [key: string]: string }> = writable({});
-
 export const progress = createProgressStore();
+
+export const error: Writable<Error | null> = writable(null);
+
+export const codeContent: Writable<{ [key: string]: string }> = writable({});
 
 export const codeEditorPosition: Writable<string> = writable('center');
 

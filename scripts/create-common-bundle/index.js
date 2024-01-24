@@ -1,5 +1,6 @@
 /**
- * Directly copied from learn.svelte.dev, except changed input and output location
+ * Directly copied from learn.svelte.dev, except changed input and output location,
+ * and also git clean path
  */
 
 import fs from 'fs';
@@ -10,13 +11,12 @@ import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 
 if (!!process.env.VERCEL) {
-	execSync('git clean -d -f content/tutorial');
+	execSync('git clean -d -f editor');
 }
 
 const cwd = 'editor';
 
-execSync('rm package-lock.json', { cwd });
-execSync('npm i', { cwd });
+execSync('npm ci', { cwd });
 
 const zip = new AdmZip();
 
@@ -24,10 +24,7 @@ const zip = new AdmZip();
 // this is a bit ropey, but it works
 const ignored_basenames = ['.DS_Store', 'LICENSE'];
 const ignored_extensions = ['.d.ts', '.map'];
-const ignored_directories = [
-	'.svelte-kit',
-	'node_modules/.bin' /* , 'node_modules/rollup/dist/shared' */
-];
+const ignored_directories = ['.svelte-kit', 'node_modules/.bin', 'node_modules/rollup/dist/shared'];
 
 const ignored_files = new Set(['node_modules/svelte/compiler.cjs']);
 
@@ -44,11 +41,11 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 	}
 
 	if (file.startsWith('node_modules/esbuild/') || file.startsWith('node_modules/@esbuild/')) {
-		// continue;
+		continue;
 	}
 
 	zip.addFile(
-		file.replace('node_modules/esbuild/', 'node_modules/esbuild/'),
+		file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'),
 		fs.readFileSync(`${cwd}/${file}`)
 	);
 }
