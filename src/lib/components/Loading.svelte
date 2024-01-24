@@ -6,7 +6,7 @@
 	const numberOfSteps = Object.keys(steps).length - 1;
 </script>
 
-{#if $progress && $progress.number !== steps.SERVER_READY.number}
+{#if $progress && $progress.number !== steps.EDITOR_READY.number}
 	<div class="loading-container" transition:fade>
 		<div class="progress-container">
 			<div class="progress-bar" style="width: {($progress.number / numberOfSteps) * 100}%" />
@@ -15,7 +15,6 @@
 			{#key $progress.label}
 				<p out:fade in:slide>
 					{$progress.label}
-					<span class="emoji" style:--speed="{2 * (1 - $progress.number / numberOfSteps)}s">💃</span>
 				</p>
 			{/key}
 		</div>
@@ -45,27 +44,12 @@
 		}
 	}
 
-	.emoji {
-		display: inline-block;
-		transform: translateY(-3px);
-		animation: dance var(--speed, 1s) infinite;
-	}
-
-	@keyframes dance {
-		0%, 100% {
-			transform: translateY(-3px);
-		}
-		50% {
-			transform: translateY(3px);
-		}
-	}
-
 	.label {
 		display: grid;
 	}
 
 	p {
-		margin: 0.8rem 0 0;
+		margin: 0.6rem 0 0;
 		-webkit-font-smoothing: antialiased;
 		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 		font-size: 1.1rem;
