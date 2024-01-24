@@ -2,6 +2,7 @@ import { WebContainer } from '@webcontainer/api';
 import { base, progress, codeContent } from '$lib/stores';
 import { get } from 'svelte/store';
 import { loadFiles } from './files.js';
+import { steps } from '$lib/constants';
 import type { WebContainer as WebContainerType } from '@webcontainer/api';
 
 let webcontainerInstance: WebContainerType;
@@ -24,18 +25,18 @@ if (import.meta.hot) {
 export async function startWebContainer(blocks: Block[]) {
 	// Boot webcontainer and load files concurrently
 
-	progress.push('Booting test webcontainer...');
+	progress.set(steps.BOOTING);
 	let files = {};
 	[webcontainerInstance, files] = await Promise.all([WebContainer.boot(), loadFiles()]);
 
 	// Mount files
 
-	progress.push('Mounting files...');
+	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(files);
 
 	// Unzip files
 
-	progress.push('Unzipping files...');
+	progress.set(steps.UNZIPPING);
 	await unzipFiles();
 	async function unzipFiles() {
 		const unzip = await webcontainerInstance.spawn('node', ['unzip.cjs']);
@@ -49,9 +50,13 @@ export async function startWebContainer(blocks: Block[]) {
 	// Since rollup and esbuild are written with native code, we need to reinstall them
 	// (Jason uses a mac, so the binaries in the editor/package-lock.json created for him
 	// are not compatible with the webcontainer platform, Linux)
+	// In parallel, generate the Svelte code files we need.
 
-	progress.push('Installing dependencies...');
-	await install();
+	progress.set(steps.INSTALLING);
+	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
+
+	await Promise.all([install(), generateFiles()]);
+
 	async function install() {
 		await webcontainerInstance.spawn('rm', ['-rf', 'node_modules']);
 		await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
@@ -68,13 +73,6 @@ export async function startWebContainer(blocks: Block[]) {
 		}
 	}
 
-	// Populate webcontainer with files from blocks data
-
-	progress.push('Generating files...');
-
-	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
-
-	await generateFiles();
 	async function generateFiles() {
 		await Promise.all([
 			// Graphics Svelte files
@@ -109,7 +107,7 @@ export async function startWebContainer(blocks: Block[]) {
 	// Start dev server
 
 	webcontainerInstance.on('server-ready', (port, url) => {
-		progress.clear();
+		progress.set(steps.SERVER_READY);
 		base.set(url);
 	});
 
@@ -117,7 +115,7 @@ export async function startWebContainer(blocks: Block[]) {
 		// TODO: handle errors
 	});
 
-	progress.push('Starting dev server...');
+	progress.set(steps.RUNNING);
 	await dev();
 	async function dev() {
 		const process = await webcontainerInstance.spawn('./node_modules/vite/bin/vite.js', ['dev']);
@@ -131,7 +129,7 @@ export async function startWebContainer(blocks: Block[]) {
 
 export async function stopWebContainer() {
 	base.set(null);
-	progress.clear();
+	progress.set(null);
 	try {
 		console.log('Tearing down webcontainer...', webcontainerInstance);
 		if (webcontainerInstance) await webcontainerInstance.teardown();
