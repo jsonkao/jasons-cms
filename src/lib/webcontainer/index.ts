@@ -6,11 +6,26 @@ import type { WebContainer as WebContainerType } from '@webcontainer/api';
 
 let webcontainerInstance: WebContainerType;
 
+if (import.meta.hot) {
+	import.meta.hot.on('vite:beforeUpdate', async (event) => {
+		if (event.updates.some((u) => u.acceptedPath === '/src/routes/+page.svelte')) {
+			console.log('page.svelte changed, stopping webcontainer');
+			try {
+				await stopWebContainer();
+				await new Promise((resolve) => setTimeout(resolve, 1000));
+			} catch (e) {
+				console.log('there was an error in the promise', e);
+			}
+			console.log('it stopped');
+		}
+	});
+}
+
 export async function startWebContainer(blocks: Block[]) {
 	// Boot webcontainer and load files concurrently
 
-	progress.push('Booting webcontainer...');
-	let files;
+	progress.push('Booting test webcontainer...');
+	let files = {};
 	[webcontainerInstance, files] = await Promise.all([WebContainer.boot(), loadFiles()]);
 
 	// Mount files
@@ -116,6 +131,7 @@ export async function startWebContainer(blocks: Block[]) {
 
 export async function stopWebContainer() {
 	base.set(null);
+	progress.clear();
 	try {
 		console.log('Tearing down webcontainer...', webcontainerInstance);
 		if (webcontainerInstance) await webcontainerInstance.teardown();
@@ -133,7 +149,7 @@ function log_stream() {
 	});
 }
 
-export async function saveFile(componentName: string) {
+export async function writeFile(componentName: string) {
 	await webcontainerInstance.fs.writeFile(
 		`/src/lib/${componentName}.svelte`,
 		get(codeContent)[componentName]

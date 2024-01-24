@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { base, codeEditorPosition } from '$lib/stores';
-	import { saveFile } from '$lib/webcontainer';
+	import { writeFile } from '$lib/webcontainer';
 
 	import Panes from '$lib/components/Panes.svelte';
-	import CodeEditor from '$lib/components/CodeEditor.svelte';
+	import CodeMirror from '$lib/components/CodeMirror.svelte';
 	import Loading from '$lib/components/Loading.svelte';
 
 	export let blocks: Block[];
@@ -54,7 +54,7 @@
 	 * Handles saving the file. Eventually, will probably communicate with a database.
 	 */
 	function handleSave() {
-		saveFile(currentGraphic);
+		writeFile(currentGraphic);
 	}
 </script>
 
@@ -62,7 +62,7 @@
 
 <Panes {showCodeEditor}>
 	<div slot="code-editor-container">
-		<CodeEditor
+		<CodeMirror
 			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
 			on:save={handleSave}
 			{showCodeEditor}
@@ -81,7 +81,6 @@
 		display: block;
 		width: 100%;
 		height: 100%;
-		box-sizing: border-box;
 		border: none;
 		grid-area: 1 / 1;
 	}

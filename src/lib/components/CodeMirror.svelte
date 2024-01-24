@@ -3,7 +3,7 @@
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { svelte } from '@replit/codemirror-lang-svelte';
 	import { coolGlow } from 'thememirror';
-	import { codeContent } from '$lib/stores';
+	import { codeContent, codeEditorPosition } from '$lib/stores';
 	import Tabs from './Tabs.svelte';
 
 	export let showCodeEditor: boolean;
@@ -22,6 +22,7 @@
 	class="code-editor"
 	bind:this={containerElement}
 	class:show-editor={showCodeEditor}
+	class:full-bleed={$codeEditorPosition === 'bottom'}
 	role="none"
 	on:keydown={(e) => {
 		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -39,8 +40,7 @@
 			styles={{
 				'&': {
 					padding: '12px',
-					borderRadius: '6px',
-					height: '100%'
+					borderRadius: '6px'
 				}
 			}}
 		/>
@@ -56,6 +56,7 @@
 		height: 100%;
 		opacity: 0;
 		pointer-events: none;
+		margin: 0 auto;
 	}
 
 	.code-editor.show-editor {
@@ -67,5 +68,9 @@
 		height: 100%;
 		max-height: 720px;
 		overflow-y: scroll;
+	}
+
+	.code-editor:not(.full-bleed) {
+		max-width: calc(100% - 40px);
 	}
 </style>

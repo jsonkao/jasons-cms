@@ -21,9 +21,9 @@
 		height: 100vh;
 	}
 
-  .code-editor-container > div, .iframe-container > div {
-    display: contents;
-  }
+	.container > div > :global([slot]) {
+		display: contents;
+	}
 
 	.code-editor-container {
 		min-width: 0;

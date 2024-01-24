@@ -1,18 +1,25 @@
 <script>
 	import { onMount } from 'svelte';
-	import { createObserver } from './observer.js';
+	import { placeCaretAtEnd, createObserver } from './utils.js';
 
 	/** @type {Block[]} */
 	import rawBlocks from '$lib/generated/data.json';
 	import components from '$lib/generated/index.js';
+	import { browser } from '$app/environment';
+
+	/**
+	 * Focuses a block by index
+	 * @param {number} index
+	 */
+	function focusBlock(index) {
+		content[index].element?.focus();
+	}
 
 	/**
 	 * @param {MessageEvent} event
 	 */
 	function onMessage(event) {
-		if (event.data.type === 'focusText') {
-			content[lastTextFocused].element?.focus();
-		}
+		if (event.data.type === 'focusText') focusBlock(lastTextFocused);
 	}
 
 	/**
@@ -22,7 +29,7 @@
 	let uid = 0;
 
 	/** @type {RenderedBlock[]} */
-	$: content = rawBlocks.map((d) => ({
+	let content = rawBlocks.map((d) => ({
 		...d,
 		id: uid++,
 		element: null
@@ -34,16 +41,7 @@
 	 */
 	async function deleteTextBlock(index) {
 		content = content.filter((_, i) => i !== index);
-		const el = content[index === 0 ? index : index - 1].element;
-
-		if (el) {
-			el.focus();
-			let sel = window.getSelection();
-			if (sel) {
-				sel.selectAllChildren(el);
-				sel.collapseToEnd();
-			}
-		}
+		placeCaretAtEnd(content[index === 0 ? index : index - 1].element);
 	}
 
 	/**
@@ -71,18 +69,28 @@
 		}
 	}
 
-	let lastTextFocused = 0;
-
-	/** @type {import('svelte/action').Action}  */
-	const focus = (node) => node.focus();
-
 	/** @type {HTMLElement} */
 	let contentEl;
+	let lastTextFocused = 0;
+	let mounted = false;
+
+	if (browser) window.addEventListener('keydown', onKeydown);
 
 	onMount(() => {
+		mounted = true;
+		window.parent.postMessage({ type: 'editorMounted' }, '*');
+		placeCaretAtEnd(content[0]?.element);
 		const observer = createObserver(contentEl.querySelectorAll('.graphic'));
-		return () => observer && observer.disconnect();
+		return () => {
+			observer && observer.disconnect();
+			window.removeEventListener('keydown', onKeydown);
+		};
 	});
+
+	/** @type {import('svelte/action').Action}  */
+	const focusIfMounted = (node) => {
+		if (mounted) node.focus();
+	};
 </script>
 
 <svelte:window on:message={onMessage} on:keydown={onKeydown} />
@@ -95,7 +103,7 @@
 				spellcheck="false"
 				bind:textContent={block.text}
 				bind:this={block.element}
-				use:focus
+				use:focusIfMounted
 				on:blur={() => (lastTextFocused = i)}
 				on:keypress={(e) => {
 					if (e.code === 'Enter') {
@@ -124,7 +132,6 @@
 	.content {
 		margin: 0 auto;
 		padding: 60px 0;
-		max-width: calc(100% - 40px);
 	}
 
 	p:empty:before {
@@ -142,6 +149,7 @@
 		color: #121212;
 		outline: none;
 		max-width: 520px;
+		width: calc(100% - 40px);
 	}
 
 	.content > * {
