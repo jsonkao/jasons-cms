@@ -30,11 +30,11 @@
 		padding: 0;
 		opacity: 0.5;
 		transition: opacity 0.3s;
-		border-radius: none;
+		border-radius: 1px;
 	}
 
 	button:hover {
-		opacity: 1;
+		opacity: 0.9;
 	}
 
 	button::after {

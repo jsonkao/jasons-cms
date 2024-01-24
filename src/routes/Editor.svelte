@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { base, codeEditorPosition } from '$lib/stores';
 	import { saveFile } from '$lib/webcontainer';
+	import GridLayout from './GridLayout.svelte';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import LoadingMask from '$lib/components/LoadingMask.svelte';
 
@@ -58,8 +59,8 @@
 
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
 
-<div class="container editor-{$codeEditorPosition}" class:showing-editor={showCodeEditor}>
-	<div class="code-editor">
+<GridLayout {showCodeEditor}>
+	<div slot="code-editor-container">
 		<CodeEditor
 			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
 			on:save={handleSave}
@@ -68,75 +69,19 @@
 		/>
 	</div>
 
-	<div class="iframe-container">
+	<div slot="iframe-container">
 		<iframe bind:this={iframe} title="Content" />
 		<LoadingMask />
 	</div>
-</div>
+</GridLayout>
 
 <style>
-	.container {
-		display: grid;
-		width: 100%;
-		height: 100vh;
-	}
-
 	iframe {
 		display: block;
 		width: 100%;
 		height: 100%;
-		resize: none;
 		box-sizing: border-box;
 		border: none;
 		grid-area: 1 / 1;
-	}
-
-	.iframe-container {
-		display: grid;
-	}
-
-	.editor-center > :global(*) {
-		grid-row: 1;
-		grid-column: 1;
-	}
-
-	.code-editor {
-		min-width: 0;
-		width: 100%;
-		justify-self: center;
-		align-self: center;
-	}
-
-	.editor-center .code-editor {
-		max-width: 600px;
-	}
-
-	.editor-bottom .code-editor {
-		height: 100%;
-		max-height: auto;
-	}
-
-	.editor-left {
-		grid-template-columns: 0fr 1fr;
-	}
-	.editor-left.showing-editor {
-		grid-template-columns: 1fr 390px;
-	}
-
-	.editor-bottom {
-		grid-template-rows: 1fr 0;
-	}
-	.editor-bottom.showing-editor {
-		grid-template-rows: 50% 50%;
-	}
-
-	.editor-left .iframe-container {
-		grid-row: 1;
-		grid-column: 2;
-	}
-
-	.editor-bottom .iframe-container {
-		grid-row: 1;
-		grid-column: 1;
 	}
 </style>

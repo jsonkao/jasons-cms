@@ -19,7 +19,7 @@
 </script>
 
 <div
-	class="code-editor-container"
+	class="code-editor"
 	bind:this={containerElement}
 	class:show-editor={showCodeEditor}
 	role="none"
@@ -39,7 +39,8 @@
 			styles={{
 				'&': {
 					padding: '12px',
-					borderRadius: '6px'
+					borderRadius: '6px',
+					height: '100%'
 				}
 			}}
 		/>
@@ -49,22 +50,22 @@
 </div>
 
 <style>
-	.code-editor-container {
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.1s ease-in-out;
+	.code-editor {
+		transition: opacity 0.1s;
 		position: relative;
 		height: 100%;
+		opacity: 0;
+		pointer-events: none;
 	}
 
-	.code-editor-container.show-editor {
+	.code-editor.show-editor {
 		opacity: 1;
 		pointer-events: all;
 	}
 
 	.code-mirror-container {
 		height: 100%;
-		max-height: 600px;
+		max-height: 720px;
 		overflow-y: scroll;
 	}
 </style>
