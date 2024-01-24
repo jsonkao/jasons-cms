@@ -64,7 +64,7 @@
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
 
 <div class="container layout-{$codeEditorPosition}" class:showing-editor={showCodeEditor}>
-	<div class="code-editor-container">
+	<div class="code-container">
 		<CodeMirror
 			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
 			on:save={handleSave}
@@ -82,10 +82,13 @@
 <style>
 	iframe {
 		display: block;
-		width: 100%;
-		height: 100%;
+		width: 100vw;
+		height: 100vh;
 		border: none;
 		grid-area: 1 / 1;
+		transition:
+			width 0.2s,
+			height 0.2s;
 	}
 
 	.container {
@@ -94,11 +97,7 @@
 		height: 100vh;
 	}
 
-	.container > div > :global([slot]) {
-		display: contents;
-	}
-
-	.code-editor-container {
+	.code-container {
 		min-width: 0;
 		width: 100%;
 		justify-self: center;
@@ -109,32 +108,41 @@
 		display: grid;
 	}
 
-	.layout-center > :global(*) {
-		grid-row: 1;
-		grid-column: 1;
+	/* Styles for layout-center */
+
+	.layout-center > div {
+		grid-area: 1 / 1;
 	}
 
-	.layout-center .code-editor-container {
+	.layout-center .code-container {
 		max-width: 720px;
 	}
 
-	.layout-bottom .code-editor-container {
+	/* Styles for layout-bottom */
+
+	.layout-bottom {
+		grid-template-rows: min-content 1fr;
+	}
+
+	.layout-bottom .code-container {
+		min-height: 0;
 		height: 100%;
 		max-height: auto;
 	}
 
-	.layout-left {
-		grid-template-columns: 0fr 1fr;
-	}
-	.layout-left.showing-editor {
-		grid-template-columns: 1fr 390px;
+	.layout-bottom .iframe-container {
+		grid-row: 1;
+		grid-column: 1;
 	}
 
-	.layout-bottom {
-		grid-template-rows: 1fr 0;
+	.layout-bottom.showing-editor iframe {
+		height: 50vh;
 	}
-	.layout-bottom.showing-editor {
-		grid-template-rows: 50% 50%;
+
+	/* Styles for layout-left */
+
+	.layout-left {
+		grid-template-columns: 1fr min-content;
 	}
 
 	.layout-left .iframe-container {
@@ -142,8 +150,7 @@
 		grid-column: 2;
 	}
 
-	.layout-bottom .iframe-container {
-		grid-row: 1;
-		grid-column: 1;
+	.layout-left.showing-editor iframe {
+		width: 390px;
 	}
 </style>

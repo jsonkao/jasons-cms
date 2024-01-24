@@ -21,7 +21,7 @@
 <div
 	class="code-editor"
 	bind:this={containerElement}
-	class:show-editor={showCodeEditor}
+	class:show-editor={$codeEditorPosition !== 'center' || showCodeEditor}
 	class:full-bleed={$codeEditorPosition === 'bottom'}
 	role="none"
 	on:keydown={(e) => {
@@ -54,9 +54,9 @@
 		transition: opacity 0.1s;
 		position: relative;
 		height: 100%;
+		margin: 0 auto;
 		opacity: 0;
 		pointer-events: none;
-		margin: 0 auto;
 	}
 
 	.code-editor.show-editor {
