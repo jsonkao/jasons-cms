@@ -2,7 +2,7 @@
 	import { base, codeEditorPosition, openComponent, openGlobalFile, progress } from '$lib/stores';
 	import { writeFile } from '$lib/webcontainer';
 
-	import CodeMirror from '$lib/components/CodeMirror.svelte';
+	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';
 	import { steps } from '$lib/constants';
 
@@ -65,7 +65,7 @@
 
 <div class="container layout-{$codeEditorPosition}" class:showing-editor={showCodeEditor}>
 	<div class="code-container">
-		<CodeMirror
+		<CodeEditor
 			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
 			on:save={handleSave}
 			{showCodeEditor}
