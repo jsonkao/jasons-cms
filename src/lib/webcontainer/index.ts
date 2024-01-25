@@ -144,6 +144,6 @@ export async function writeFile(filename: string, contents: string) {
 	const path = Object.values(globalFiles).includes(filename)
 		? `/src/routes/${filename}`
 		: `/src/lib/generated/${filename}.svelte`;
-	console.log(path, get(codeContent)[filename])
+	console.log(path, get(codeContent)[filename]);
 	await webcontainerInstance.fs.writeFile(path, contents);
 }

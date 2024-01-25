@@ -11,7 +11,7 @@
 	import { yCollab } from 'y-codemirror.next';
 	import { WebrtcProvider } from 'y-webrtc';
 
-	import { codeContent, codeEditorPosition, openComponent, openGlobalFile } from '$lib/stores';
+	import { codeContent, codeEditorPosition, openComponent } from '$lib/stores';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import Tabs from './Tabs.svelte';
 	import { userName, userColor } from '$lib/constants';
@@ -85,13 +85,13 @@
 				tabSize={4}
 				styles={{
 					'&': {
-						padding: '24px 12px 12px',
+						padding: '12px 12px 12px',
 						borderRadius: '6px',
 						height: '100%'
 					}
 				}}
 			/>
-			<Tabs />
+			<!-- <Tabs /> -->
 			<PlacementButtons />
 		{/if}
 	</div>

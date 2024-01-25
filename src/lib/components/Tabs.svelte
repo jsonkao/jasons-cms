@@ -1,4 +1,8 @@
 <script>
+	/**
+	 * This component is currently unused. Need to figure out how to integrate global files
+	 * with YDoc.
+	*/
 	import { globalFiles } from '$lib/constants';
 	import { openComponent, openGlobalFile } from '$lib/stores';
 

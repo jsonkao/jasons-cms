@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base, codeEditorPosition, openComponent, openGlobalFile, progress } from '$lib/stores';
+	import { base, codeEditorPosition, openComponent, progress } from '$lib/stores';
 	import { writeFile } from '$lib/webcontainer';
 
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
@@ -55,10 +55,10 @@
 
 	/**
 	 * Handles saving the file. Eventually, will probably communicate with a database.
+	 * TODO: Incorporate $openGlobalFile
 	 */
 	function handleSave(event: CustomEvent) {
-		console.log(event.detail);
-		writeFile($openGlobalFile || $openComponent, event.detail);
+		writeFile($openComponent, event.detail);
 	}
 </script>
 
