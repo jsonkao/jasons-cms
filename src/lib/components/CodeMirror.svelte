@@ -12,7 +12,6 @@
   import { EditorState, StateEffect, type Extension } from "@codemirror/state";
   import { indentWithTab } from "@codemirror/commands";
   import { indentUnit, type LanguageSupport } from "@codemirror/language";
-  import { debounce } from "./util";
 
   let classes = "";
   export { classes as class };
@@ -54,7 +53,7 @@
   $: view && update(value);
   $: view && state_extensions && reconfigure();
 
-  $: on_change = nodebounce ? handle_change : debounce(handle_change, 300);
+  $: on_change = handle_change;
 
   onMount(() => (view = create_editor_view()));
   onDestroy(() => view?.destroy());
