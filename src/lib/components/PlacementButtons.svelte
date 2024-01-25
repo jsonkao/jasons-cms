@@ -49,7 +49,7 @@
 		left: 50%;
 		width: 50%;
 		height: 50%;
-		border: 1px solid white;
+		box-shadow: 0 0 0 1px white;
 		transform: translate(-50%, -50%);
 	}
 

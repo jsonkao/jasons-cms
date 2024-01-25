@@ -56,8 +56,9 @@
 	/**
 	 * Handles saving the file. Eventually, will probably communicate with a database.
 	 */
-	function handleSave() {
-		writeFile($openGlobalFile || $openComponent);
+	function handleSave(event: CustomEvent) {
+		console.log(event.detail);
+		writeFile($openGlobalFile || $openComponent, event.detail);
 	}
 </script>
 

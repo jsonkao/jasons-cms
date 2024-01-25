@@ -1,11 +1,52 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { svelte } from '@replit/codemirror-lang-svelte';
+	import type { Extension } from '@codemirror/state';
 	import { coolGlow } from 'thememirror';
+
+	import * as Y from 'yjs';
+	// @ts-ignore
+	import { yCollab } from 'y-codemirror.next';
+	import { WebrtcProvider } from 'y-webrtc';
+
 	import { codeContent, codeEditorPosition, openComponent, openGlobalFile } from '$lib/stores';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import Tabs from './Tabs.svelte';
+	import { userName, userColor } from '$lib/constants';
+
+	/**
+	 * Create Y.Text
+	 */
+
+	let ytext: Y.Text;
+	let yExtension: Extension;
+
+	onMount(() => {
+		const ydoc = new Y.Doc();
+		const provider = new WebrtcProvider('codemirror6-demo-room', ydoc);
+		ytext = ydoc.getText('codemirror');
+
+		const undoManager = new Y.UndoManager(ytext);
+
+		provider.awareness.setLocalStateField('user', {
+			name: userName,
+			color: userColor,
+			colorLight: '#000'
+		});
+
+		yExtension = yCollab(ytext, provider.awareness, { undoManager });
+
+		return () => provider.destroy();
+	});
+
+	$: if ($codeContent[$openComponent] && ytext.toString() === '')
+		ytext.insert(0, $codeContent[$openComponent]);
+
+	/**
+	 * Set up elements and dispatchers
+	 */
 
 	export let showCodeEditor: boolean;
 
@@ -14,8 +55,16 @@
 	const dispatch = createEventDispatcher();
 
 	// If the editor gets shown, focus the contenteditable element
+	// TODO: This is null for some reason
 	$: if (showCodeEditor && containerElement)
-		(containerElement.querySelector('[contenteditable=true]') as HTMLElement).focus();
+		(containerElement.querySelector('[contenteditable=true]') as HTMLElement)?.focus();
+
+	function onKeyDown(e: KeyboardEvent) {
+		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+			e.preventDefault();
+			dispatch('save', ytext.toString());
+		}
+	}
 </script>
 
 <div
@@ -23,30 +72,28 @@
 	bind:this={containerElement}
 	class:show-editor={$codeEditorPosition !== 'center' || showCodeEditor}
 	role="none"
-	on:keydown={(e) => {
-		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-			e.preventDefault();
-			dispatch('save');
-		}
-	}}
+	on:keydown={onKeyDown}
 >
 	<div class="code-mirror-container">
-		<CodeMirror
-			bind:value={$codeContent[$openGlobalFile || $openComponent]}
-			lang={svelte()}
-			nodebounce
-			theme={coolGlow}
-			tabSize={4}
-			styles={{
-				'&': {
-					padding: '24px 12px 12px',
-					borderRadius: '6px',
-					height: '100%'
-				}
-			}}
-		/>
-		<Tabs />
-		<PlacementButtons />
+		{#if ytext && yExtension}
+			<CodeMirror
+				value={ytext.toString()}
+				lang={svelte()}
+				nodebounce
+				theme={coolGlow}
+				extensions={[yExtension]}
+				tabSize={4}
+				styles={{
+					'&': {
+						padding: '24px 12px 12px',
+						borderRadius: '6px',
+						height: '100%'
+					}
+				}}
+			/>
+			<Tabs />
+			<PlacementButtons />
+		{/if}
 	</div>
 </div>
 
@@ -63,6 +110,11 @@
 
 	:global(.codemirror-wrapper) {
 		height: 100%;
+	}
+
+	:global(.cm-ySelectionCaret .cm-ySelectionInfo) {
+		-webkit-font-smoothing: antialiased;
+		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	}
 
 	.code-editor.show-editor {
