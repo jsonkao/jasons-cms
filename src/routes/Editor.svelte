@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base, codeEditorPosition, codeContent, progress } from '$lib/stores';
+	import { base, codeEditorPosition, openComponent, openGlobalFile, progress } from '$lib/stores';
 	import { writeFile } from '$lib/webcontainer';
 
 	import CodeMirror from '$lib/components/CodeMirror.svelte';
@@ -11,7 +11,7 @@
 	/**
 	 * The graphic in focus (and whose code is in the CodeEditor)
 	 */
-	let currentGraphic = (blocks.find((d) => d.type === 'graphic') as GraphicBlock)?.name;
+	openComponent.set((blocks.find((d) => d.type === 'graphic') as GraphicBlock)?.name);
 
 	let showCodeEditor = false;
 
@@ -45,7 +45,7 @@
 				handleSave();
 				break;
 			case 'focusGraphic':
-				currentGraphic = event.data.name;
+				openComponent.set(event.data.name);
 				break;
 			case 'editorMounted':
 				progress.set(steps.EDITOR_READY);
@@ -57,9 +57,8 @@
 	 * Handles saving the file. Eventually, will probably communicate with a database.
 	 */
 	function handleSave() {
-		writeFile(currentGraphic);
+		writeFile($openGlobalFile || $openComponent);
 	}
-	$: console.log(currentGraphic);
 </script>
 
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
@@ -70,7 +69,6 @@
 			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
 			on:save={handleSave}
 			{showCodeEditor}
-			{currentGraphic}
 		/>
 	</div>
 

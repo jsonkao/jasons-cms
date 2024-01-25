@@ -3,11 +3,11 @@
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { svelte } from '@replit/codemirror-lang-svelte';
 	import { coolGlow } from 'thememirror';
-	import { codeContent, codeEditorPosition } from '$lib/stores';
+	import { codeContent, codeEditorPosition, openComponent, openGlobalFile } from '$lib/stores';
+	import PlacementButtons from './PlacementButtons.svelte';
 	import Tabs from './Tabs.svelte';
 
 	export let showCodeEditor: boolean;
-	export let currentGraphic: string;
 
 	let containerElement: HTMLElement;
 
@@ -32,20 +32,21 @@
 >
 	<div class="code-mirror-container">
 		<CodeMirror
-			bind:value={$codeContent[currentGraphic]}
+			bind:value={$codeContent[$openGlobalFile || $openComponent]}
 			lang={svelte()}
 			nodebounce
 			theme={coolGlow}
 			tabSize={4}
 			styles={{
 				'&': {
-					padding: '12px',
+					padding: '24px 12px 12px',
 					borderRadius: '6px',
 					height: '100%'
 				}
 			}}
 		/>
 		<Tabs />
+		<PlacementButtons />
 	</div>
 </div>
 
@@ -70,7 +71,7 @@
 	}
 
 	.code-mirror-container {
-		max-height: 720px;
+		max-height: calc(100vh - 30px);
 		overflow-y: scroll;
 		position: relative;
 		align-self: center;
@@ -81,6 +82,6 @@
 	}
 
 	.code-editor:not(.position-bottom) {
-		max-width: calc(100% - 40px);
+		max-width: calc(100% - 30px);
 	}
 </style>

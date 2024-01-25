@@ -2,23 +2,15 @@ import { WebContainer } from '@webcontainer/api';
 import { base, progress, codeContent } from '$lib/stores';
 import { get } from 'svelte/store';
 import { loadFiles } from './files.js';
-import { steps } from '$lib/constants';
+import { steps, globalFiles } from '$lib/constants';
 import type { WebContainer as WebContainerType } from '@webcontainer/api';
 
 let webcontainerInstance: WebContainerType;
 
 if (import.meta.hot) {
-	import.meta.hot.on('vite:beforeUpdate', async (event) => {
-		if (event.updates.some((u) => u.acceptedPath === '/src/routes/+page.svelte')) {
-			console.log('page.svelte changed, stopping webcontainer');
-			try {
-				await stopWebContainer();
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-			} catch (e) {
-				console.log('there was an error in the promise', e);
-			}
-			console.log('it stopped');
-		}
+	// In dev, with HMR, reuse the same WebContainer
+	import.meta.hot.accept(() => {
+		// Module reloaded
 	});
 }
 
@@ -53,6 +45,7 @@ export async function startWebContainer(blocks: Block[]) {
 	// In parallel, generate the Svelte code files we need.
 
 	progress.set(steps.INSTALLING);
+
 	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
 
 	await Promise.all([install(), generateFiles()]);
@@ -76,18 +69,18 @@ export async function startWebContainer(blocks: Block[]) {
 	async function generateFiles() {
 		await Promise.all([
 			// Graphics Svelte files
-			...graphicBlocks.map(({ name, code }) => createFile(`${name}.svelte`, code)),
+			...graphicBlocks.map(({ name, code }) => writeFile(`${name}.svelte`, code)),
 			// A lib/index.js file to export all the graphic components
-			createFile(
+			writeFile(
 				'index.js',
 				graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
 					`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
 			),
 			// A data.json file with blocks data
-			createFile('data.json', JSON.stringify(blocks))
+			writeFile('data.json', JSON.stringify(blocks))
 		]);
 
-		function createFile(filename: string, content: string) {
+		function writeFile(filename: string, content: string) {
 			return webcontainerInstance.fs.writeFile(`src/lib/generated/${filename}`, content);
 		}
 	}
@@ -100,7 +93,7 @@ export async function startWebContainer(blocks: Block[]) {
 				acc[block.name] = block.code;
 				return acc;
 			},
-			{} as { [key: string]: string }
+			{ '+page.server.js': '', 'styles.css': '' } as { [key: string]: string }
 		)
 	);
 
@@ -147,9 +140,10 @@ function log_stream() {
 	});
 }
 
-export async function writeFile(componentName: string) {
-	await webcontainerInstance.fs.writeFile(
-		`/src/lib/generated/${componentName}.svelte`,
-		get(codeContent)[componentName]
-	);
+export async function writeFile(filename: string) {
+	const path = Object.values(globalFiles).includes(filename)
+		? `/src/routes/${filename}`
+		: `/src/lib/generated/${filename}.svelte`;
+	console.log(path, get(codeContent)[filename])
+	await webcontainerInstance.fs.writeFile(path, get(codeContent)[filename]);
 }

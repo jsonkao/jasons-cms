@@ -11,3 +11,11 @@ export const steps = {
 	SERVER_READY: { number: 6, label: 'mounting editor' },
 	EDITOR_READY: { number: 7, label: 'editor ready' }
 };
+
+/**
+ * Global files
+ */
+export const globalFiles = {
+	DATA: '+page.server.js',
+	STYLES: 'styles.css'
+}

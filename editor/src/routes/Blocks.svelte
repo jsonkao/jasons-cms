@@ -7,6 +7,8 @@
 	import components from '$lib/generated/index.js';
 	import { browser } from '$app/environment';
 
+	export let data;
+
 	/**
 	 * Focuses a block by index
 	 * @param {number} index
@@ -122,7 +124,7 @@
 			</p>
 		{:else if block.type === 'graphic' && block.name}
 			<div class="graphic" data-name={block.name}>
-				<svelte:component this={components[block.name]} />
+				<svelte:component this={components[block.name]} {data} />
 			</div>
 		{/if}
 	{/each}
@@ -149,7 +151,7 @@
 		color: #121212;
 		outline: none;
 		max-width: 520px;
-		width: calc(100% - 40px);
+		width: calc(100% - 30px);
 	}
 
 	.content > * {
