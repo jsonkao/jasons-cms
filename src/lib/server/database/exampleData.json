@@ -1,7 +1,7 @@
 [
 	{
 		"type": "text",
-		"text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus.\nInteger orci sapien, bibendum at dui vel, luctus ornare lacus."
+		"text": "<p>Hundreds of thousands of people poured into the streets of Hong Kong on Sunday, June 16, and marched almost two miles (three kilometers), protesting a proposed extradition bill and calling for the city’s leader to step down.</p><p>It was the largest of three major protests against the bill that were held over eight days. More demonstrations are <a href=\"https://www.nytimes.com/aponline/2019/06/24/world/asia/ap-as-hong-kong-protests.html\">scheduled for Wednesday</a>, ahead of the Group of 20 summit meeting in Osaka, Japan. The composite images below help show the enormous scale of the June 16 demonstrations.</p>"
 	},
 	{
 		"type": "graphic",
@@ -10,7 +10,7 @@
 	},
 	{
 		"type": "text",
-		"text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus.\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus."
+		"text": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus.</p>"
 	},
 	{
 		"type": "graphic",

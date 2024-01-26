@@ -10,6 +10,11 @@
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 	import Component from './Component.svelte';
 
+	import * as Y from 'yjs';
+	import { WebsocketProvider } from 'y-websocket';
+	import { ySyncPlugin, yCursorPlugin, yUndoPlugin, undo, redo } from 'y-prosemirror';
+	import { keymap } from 'prosemirror-keymap';
+
 	type BlockWithState =
 		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
 		| GraphicBlock;
@@ -31,18 +36,6 @@
 		}
 	});
 
-	let blocksWithState: BlockWithState[] = !browser
-		? []
-		: (rawBlocks as Block[]).map((d) => {
-				if (d.type === 'text') {
-					return {
-						...d,
-						state: createEditor(d.text, [blockDeletionPlugin]),
-						editor: undefined
-					};
-				}
-				return d;
-			});
 	let lastTextFocused = 0;
 
 	/**
@@ -72,11 +65,49 @@
 		}
 	}
 
+	let yPlugins: Plugin[] = [];
+	let provider: WebsocketProvider;
+	if (browser) {
+		const ydoc = new Y.Doc();
+		provider = new WebsocketProvider('wss://demos.yjs.dev/ws', 'prosemirror-us-cms-demo', ydoc);
+		const yXmlFragment = ydoc.getXmlFragment('prosemirror');
+
+		provider.awareness.setLocalStateField('user', { color: '#008833', name: 'My real name' });
+
+		yPlugins = [
+			ySyncPlugin(yXmlFragment),
+			yCursorPlugin(provider.awareness),
+			yUndoPlugin(),
+			keymap({
+				'Mod-z': undo,
+				'Mod-y': redo,
+				'Mod-Shift-z': redo
+			})
+		];
+	}
+
+	let blocksWithState: BlockWithState[] = !browser
+		? []
+		: (rawBlocks as Block[]).map((d, i) => {
+				if (d.type === 'text') {
+					return {
+						...d,
+						state: createEditor(d.text, [blockDeletionPlugin, ...(i === 0 ? yPlugins : [])]),
+						editor: undefined
+					};
+				}
+				return d;
+			});
+
 	let contentEl: HTMLElement;
 	onMount(() => {
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
 		const observer = createObserver(contentEl.querySelectorAll('.graphic'));
-		return () => observer && observer.disconnect();
+
+		return () => {
+			observer && observer.disconnect();
+			provider && provider.destroy();
+		};
 	});
 </script>
 
@@ -116,6 +147,10 @@
 
 	:global(.ui-editor p) {
 		margin: 1.5em auto;
+	}
+
+	:global(.ui-editor a) {
+		color: #121212;
 	}
 
 	:global(.ui-editor),
