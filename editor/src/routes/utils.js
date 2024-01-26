@@ -9,7 +9,7 @@ export async function placeCaretAtEnd(el) {
 	document.getSelection()?.modify('move', 'forward', 'documentboundary');
 }
 
-const DEBUG = true;
+const DEBUG = false;
 
 /**
  * @param {NodeListOf<HTMLElement>} elements - List of graphics to observe
