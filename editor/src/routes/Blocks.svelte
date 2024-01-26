@@ -77,9 +77,6 @@
 
 	if (browser) {
 		const ydoc = new Y.Doc();
-		const ymap = ydoc.getMap('map');
-		const yxml = new Y.XmlFragment();
-		ymap.set('nested', yxml);
 
 		provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
 		provider.awareness.setLocalStateField('user', { color, name });
@@ -88,35 +85,17 @@
 			// TODO: Check whether d.uid is already in the documentMap
 			// TODO: populate with initial data
 			if (d.type === 'text') {
-				function createXmlFragment() {
-					return ydoc.getXmlFragment(d.uid);
-					return yxml;
-					ydoc.getMap().set('docname', new Y.XmlFragment());
-					return ydoc.getMap().get('docname');
-					const yXmlFragment = ydoc.getXmlFragment('my-text-block');
-					ydoc.getMap('text-blocks').set(d.uid, new Y.XmlFragment());
-					console.log('from map', documentMap.get(d.uid));
-					console.log('top level', yXmlFragment);
-					console.log('map', documentMap);
-					return yXmlFragment;
-				}
-				const state = createEditor(
-					undefined,
-					i === 0
-						? [
-								blockDeletionPlugin,
-								// ySyncPlugin(documentMap.get(d.uid)!),
-								ySyncPlugin(createXmlFragment()),
-								yCursorPlugin(provider.awareness, { cursorBuilder }),
-								yUndoPlugin(),
-								keymap({
-									'Mod-z': undo,
-									'Mod-y': redo,
-									'Mod-Shift-z': redo
-								})
-							]
-						: []
-				);
+				const state = createEditor(undefined, [
+					blockDeletionPlugin,
+					ySyncPlugin(ydoc.getXmlFragment(d.uid)),
+					yCursorPlugin(provider.awareness, { cursorBuilder }),
+					yUndoPlugin(),
+					keymap({
+						'Mod-z': undo,
+						'Mod-y': redo,
+						'Mod-Shift-z': redo
+					})
+				]);
 				return {
 					...d,
 					state,
@@ -126,8 +105,6 @@
 			return d;
 		});
 	}
-
-	$: console.log(blocksWithState);
 
 	let contentEl: HTMLElement;
 	onMount(() => {

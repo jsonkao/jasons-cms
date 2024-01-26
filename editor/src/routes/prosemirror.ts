@@ -142,6 +142,16 @@ export const cursorBuilder = (user: { name: string; color: string }): HTMLElemen
 	divSelectionInfo.classList.add('cm-ySelectionInfo');
 	divSelectionInfo.insertBefore(document.createTextNode(user.name), null);
 
+	// Show the cursor on hover; hide the cursor after 2 seconds of not hovering
+	let timeout: ReturnType<typeof setTimeout>;
+	cursor.addEventListener('mouseover', () => {
+		clearTimeout(timeout);
+		cursor.classList.add('caret-hover');
+	});
+	cursor.addEventListener('mouseout', () => {
+		timeout = setTimeout(() => cursor.classList.remove('caret-hover'), 2000);
+	});
+
 	cursor.insertBefore(document.createTextNode('\u2060'), null);
 	cursor.insertBefore(divCaretDot, null);
 	cursor.insertBefore(document.createTextNode('\u2060'), null);
