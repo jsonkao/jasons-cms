@@ -2,8 +2,7 @@
  * This file contains helper functions for creating ProseMirror state and schema
  */
 
-import { EditorState, TextSelection } from 'prosemirror-state';
-import { type Plugin } from 'prosemirror-state';
+import { EditorState, TextSelection, type Plugin } from 'prosemirror-state';
 import { Schema, type MarkSpec, type DOMOutputSpec, DOMParser } from 'prosemirror-model';
 import { richTextPlugins, corePlugins } from 'prosemirror-svelte/helpers/plugins';
 
