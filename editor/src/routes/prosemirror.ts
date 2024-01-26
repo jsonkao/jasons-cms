@@ -5,7 +5,7 @@
 import { EditorState, TextSelection, Plugin } from 'prosemirror-state';
 import { Schema, DOMParser } from 'prosemirror-model';
 import type { MarkSpec, DOMOutputSpec, Node } from 'prosemirror-model';
-import { richTextPlugins, corePlugins } from 'prosemirror-svelte/helpers/plugins';
+import { richTextKeyMap } from './keymap';
 import type { EditorProps } from 'prosemirror-view';
 
 /*
@@ -46,7 +46,7 @@ export const toPlainText = (editorState: EditorState): string => {
 const emDOM: DOMOutputSpec = ['em', 0];
 const strongDOM: DOMOutputSpec = ['strong', 0];
 
-const richTextSchema = new Schema({
+export const richTextSchema = new Schema({
 	nodes: {
 		doc: {
 			content: 'paragraph+'
@@ -129,7 +129,7 @@ export const createEditor = (doc: Node | undefined, plugins: Plugin[] = []): Edi
 		schema: richTextSchema,
 		doc,
 		selection: doc ? TextSelection.atStart(doc) : undefined,
-		plugins: [...plugins, ...corePlugins, ...richTextPlugins]
+		plugins: [...plugins, richTextKeyMap(richTextSchema)]
 	});
 
 /**
