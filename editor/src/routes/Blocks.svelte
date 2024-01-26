@@ -1,67 +1,68 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
-	import { placeCaretAtEnd, createObserver } from './utils.js';
-
-	/** @type {Block[]} */
-	import rawBlocks from '$lib/generated/data.json';
-	import components from '$lib/generated/index.js';
 	import { browser } from '$app/environment';
+	import { createObserver } from './utils.js';
+	import rawBlocks from '$lib/generated/data.json';
 
-	export let data;
+	import { Plugin, type EditorState } from 'prosemirror-state';
+	import { toPlainText } from 'prosemirror-svelte/state';
+	import { createEditor } from './prosemirror';
+	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
+	import Component from './Component.svelte';
+
+	type BlockWithState =
+		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
+		| GraphicBlock;
 
 	/**
-	 * Focuses a block by index
-	 * @param {number} index
+	 * When Backspace is pressed on an empty prosemirror state,
+	 * delete the entire block, unmounting the ProsemirrorEditor component.
 	 */
-	function focusBlock(index) {
-		content[index].element?.focus();
+	const blockDeletionPlugin = new Plugin({
+		props: {
+			handleKeyDown(view, event) {
+				if (event.key === 'Backspace' && toPlainText(view.state) === '') {
+					blocksWithState = blocksWithState.filter(
+						(b) => !(b.type === 'text' && b.state && toPlainText(b.state) === '')
+					);
+				}
+				return false;
+			}
+		}
+	});
+
+	let blocksWithState: BlockWithState[] = !browser
+		? []
+		: (rawBlocks as Block[]).map((d) => {
+				if (d.type === 'text') {
+					return {
+						...d,
+						state: createEditor(d.text, [blockDeletionPlugin]),
+						editor: undefined
+					};
+				}
+				return d;
+			});
+	let lastTextFocused = 0;
+
+	/**
+	 * Listen for messages from the parent window
+	 */
+	function onMessage(event: MessageEvent) {
+		if (event.data.type === 'focusText') {
+			const lastBlock = blocksWithState[lastTextFocused];
+			if (lastBlock.type === 'text') {
+				const editor = lastBlock.editor;
+				console.log('Trying to focus text with', editor);
+				editor?.focus();
+			}
+		}
 	}
 
 	/**
-	 * @param {MessageEvent} event
+	 * Listen for Cmd+E to toggle the editor or Cmd+S to save the file
 	 */
-	function onMessage(event) {
-		if (event.data.type === 'focusText') focusBlock(lastTextFocused);
-	}
-
-	/**
-	 * Getting content and hydrating it with id's and such
-	 */
-
-	let uid = 0;
-
-	/** @type {RenderedBlock[]} */
-	let content = rawBlocks.map((d) => ({
-		...d,
-		id: uid++,
-		element: null
-	}));
-
-	/**
-	 * Delete a text block. Called when the user presses backspace on an empty text block.
-	 * @param {number} index
-	 */
-	async function deleteTextBlock(index) {
-		content = content.filter((_, i) => i !== index);
-		placeCaretAtEnd(content[index === 0 ? index : index - 1].element);
-	}
-
-	/**
-	 * Create a new text block. Called when the user presses enter in a text block.
-	 * @param {number} index
-	 */
-	async function newTextBlock(index) {
-		content = [
-			...content.slice(0, index + 1),
-			{ type: 'text', text: '', id: uid++, element: null },
-			...content.slice(index + 1)
-		];
-	}
-
-	/**
-	 * @param {KeyboardEvent} e
-	 */
-	function onKeydown(e) {
+	function onKeydown(e: KeyboardEvent) {
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
 			window.parent.postMessage({ type: 'toggleEditor' }, '*');
@@ -71,90 +72,66 @@
 		}
 	}
 
-	/** @type {HTMLElement} */
-	let contentEl;
-	let lastTextFocused = 0;
-	let mounted = false;
-
-	if (browser) window.addEventListener('keydown', onKeydown);
-
+	let contentEl: HTMLElement;
 	onMount(() => {
-		mounted = true;
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
-		placeCaretAtEnd(content[0]?.element);
 		const observer = createObserver(contentEl.querySelectorAll('.graphic'));
-		return () => {
-			observer && observer.disconnect();
-			window.removeEventListener('keydown', onKeydown);
-		};
+		return () => observer && observer.disconnect();
 	});
-
-	/** @type {import('svelte/action').Action}  */
-	const focusIfMounted = (node) => {
-		if (mounted) node.focus();
-	};
 </script>
 
 <svelte:window on:message={onMessage} on:keydown={onKeydown} />
 
 <div class="content" bind:this={contentEl}>
-	{#each content as block, i (block.id)}
-		{#if block.type === 'text'}
-			<p
-				contenteditable
-				spellcheck="false"
-				bind:textContent={block.text}
-				bind:this={block.element}
-				use:focusIfMounted
+	{#each blocksWithState as b, i}
+		{#if b.type === 'text'}
+			<ProsemirrorEditor
+				bind:this={b.editor}
+				editorState={b.state}
+				on:change={(e) => (blocksWithState[i].state = e.detail.editorState)}
 				on:blur={() => (lastTextFocused = i)}
-				on:keypress={(e) => {
-					if (e.code === 'Enter') {
-						newTextBlock(i);
-						e.preventDefault();
-					}
-				}}
-				on:keydown={(e) => {
-					if (e.code === 'Backspace' && block.text === '') {
-						e.preventDefault();
-						deleteTextBlock(i);
-					}
-				}}
-			>
-				{block.text}
-			</p>
-		{:else if block.type === 'graphic' && block.name}
-			<div class="graphic" data-name={block.name}>
-				<svelte:component this={components[block.name]} {data} />
-			</div>
+				debounceChangeEventsInterval={0}
+			/>
+		{:else if b.type === 'graphic'}
+			<Component block={b} />
 		{/if}
 	{/each}
 </div>
 
 <style>
-	.content {
+	:global(.ui-editor:first-child) {
+		margin-top: 60px;
+	}
+
+	:global(.ui-editor:last-child) {
+		padding-bottom: 60px;
+	}
+
+	:global(.ui-editor) {
+		outline: none;
+		max-width: 520px;
+		width: calc(100% - 30px);
 		margin: 0 auto;
-		padding: 60px 0;
 	}
 
-	p:empty:before {
-		content: '...';
-		pointer-events: none;
-		display: block;
-		color: #aaa;
+	:global(.ui-editor p) {
+		margin: 1.5em auto;
 	}
 
-	p {
+	:global(.ui-editor),
+	:global(.ui-editor p) {
 		-webkit-font-smoothing: antialiased;
 		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 		font-size: 1.1rem;
 		line-height: 1.5;
 		color: #121212;
-		outline: none;
-		max-width: 520px;
-		width: calc(100% - 30px);
 	}
 
-	.content > * {
-		margin: 1.5em auto;
+	/* Use this instead of Prosemirror's built in placeholder to account for multiline content */
+	:global(.ui-editor p:has(br:only-child):last-child:before) {
+		position: absolute;
+		content: 'Write something...';
+		pointer-events: none;
+		color: #aaa;
 	}
 </style>
