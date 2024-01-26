@@ -2,10 +2,39 @@
  * This file contains helper functions for creating ProseMirror state and schema
  */
 
-import { EditorState, TextSelection, type Plugin } from 'prosemirror-state';
+import { EditorState, TextSelection, Plugin } from 'prosemirror-state';
 import { Schema, DOMParser } from 'prosemirror-model';
 import type { MarkSpec, DOMOutputSpec, Node } from 'prosemirror-model';
 import { richTextPlugins, corePlugins } from 'prosemirror-svelte/helpers/plugins';
+import type { EditorProps } from 'prosemirror-view';
+
+/*
+ * When Backspace is pressed on an empty prosemirror state,
+ * delete the entire block, unmounting the ProsemirrorEditor component.
+ */
+export const makePlugin = (handleKeyDown: EditorProps['handleKeyDown']) =>
+	new Plugin({
+		props: {
+			handleKeyDown
+		}
+	});
+
+/**
+ * Converts the editor state to plain text. Taken from prosemirror-svelte
+ */
+export const toPlainText = (editorState: EditorState): string => {
+	if (editorState.doc.childCount === 0) {
+		return '';
+	} else if (editorState.doc.childCount === 1) {
+		return editorState.doc.textContent;
+	} else {
+		let paragraphs: string[] = [];
+		for (let i = 0; i < editorState.doc.childCount; i++) {
+			paragraphs.push(editorState.doc.child(i).textContent);
+		}
+		return paragraphs.join('\n');
+	}
+};
 
 /**
  * Schema to represent multiple lines of minimally rich text. Based on

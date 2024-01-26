@@ -65,11 +65,12 @@ if (ignored_files.size > 0) {
 
 console.time('writing zip');
 const out = zip.toBuffer();
-
+// console log the file size of out in kilobytes
 fs.writeFileSync(`src/lib/webcontainer/files.zip`, out);
 console.timeEnd('writing zip');
 
-console.time('bundle unzip');
+console.log(`Zip file is ${Math.round(fs.statSync('src/lib/webcontainer/files.zip').size / 1024)}KB`);
+
 // bundle adm-zip so we can use it in the webcontainer
 esbuild.buildSync({
 	entryPoints: [fileURLToPath(new URL('./unzip.js', import.meta.url))],
@@ -79,4 +80,3 @@ esbuild.buildSync({
 	outfile: 'src/lib/webcontainer/unzip.cjs',
 	format: 'cjs'
 });
-console.timeEnd('bundle unzip');

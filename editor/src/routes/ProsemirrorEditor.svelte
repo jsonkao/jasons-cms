@@ -1,14 +1,13 @@
 <script>
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { EditorView } from 'prosemirror-view';
-	import { EditorState } from 'prosemirror-state';
 
 	const dispatch = createEventDispatcher();
 
 	/** @type {string} */
 	export let className = 'ui-editor';
 
-	/** @type {EditorState} */
+	/** @type {import('prosemirror-state').EditorState} */
 	export let editorState;
 
 	/** @type {string} */

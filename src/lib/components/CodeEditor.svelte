@@ -20,11 +20,12 @@
 	 * Create Y.Text
 	 */
 
+	let ydoc: Y.Doc;
 	let ytext: Y.Text;
 	let yExtension: Extension;
 
 	onMount(() => {
-		const ydoc = new Y.Doc();
+		ydoc = new Y.Doc();
 		const provider = new WebrtcProvider('codemirror6-demo-room', ydoc);
 		ytext = ydoc.getText('codemirror');
 
@@ -41,8 +42,10 @@
 		return () => provider.destroy();
 	});
 
-	$: if ($codeContent[$openComponent] && ytext.toString() === '')
+	$: if ($codeContent[$openComponent] && ytext?.toString() === '')
 		ytext.insert(0, $codeContent[$openComponent]);
+
+	$: console.log(ydoc, ydoc && Y.encodeStateAsUpdate(ydoc));
 
 	/**
 	 * Set up elements and dispatchers
