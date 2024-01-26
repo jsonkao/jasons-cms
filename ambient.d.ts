@@ -11,8 +11,3 @@ interface GraphicBlock {
 }
 
 type Block = TextBlock | GraphicBlock;
-
-type RenderedBlock = Block & {
-	id: number;
-	element: HTMLElement | null;
-};
