@@ -6,7 +6,7 @@
 
 	import { Plugin, type EditorState } from 'prosemirror-state';
 	import { toPlainText } from 'prosemirror-svelte/state';
-	import { createEditor } from './prosemirror';
+	import { createEditor, cursorBuilder } from './prosemirror';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 	import Component from './Component.svelte';
 
@@ -72,11 +72,15 @@
 		provider = new WebsocketProvider('wss://demos.yjs.dev/ws', 'prosemirror-us-cms-demo', ydoc);
 		const yXmlFragment = ydoc.getXmlFragment('prosemirror');
 
-		provider.awareness.setLocalStateField('user', { color: '#008833', name: 'My real name' });
+		const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
+		const name = names[Math.floor(Math.random() * names.length)];
+		const colors = ['#A32251', 'rgb(7, 7, 126)', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
+		const color = colors[Math.floor(Math.random() * colors.length)];
+		provider.awareness.setLocalStateField('user', { color, name });
 
 		yPlugins = [
 			ySyncPlugin(yXmlFragment),
-			yCursorPlugin(provider.awareness),
+			yCursorPlugin(provider.awareness, { cursorBuilder }),
 			yUndoPlugin(),
 			keymap({
 				'Mod-z': undo,

@@ -99,7 +99,7 @@ export const createEditor = (html: string = '', plugins: Plugin[] = []): EditorS
 
 	if (html) {
 		doc = createDocumentFromHtml(richTextSchema, html);
-		selection = TextSelection.atEnd(doc);
+		selection = TextSelection.atStart(doc);
 	}
 
 	return EditorState.create({
@@ -122,4 +122,28 @@ const createDocumentFromHtml = (schema, html) => {
 	const node = document.createElement('div');
 	node.innerHTML = html;
 	return parser.parse(node);
+};
+
+/**
+ * Generator for a cursor element. Based off y-prosemirror cursor-plugin.js, but really
+ * is copying structure from y-codemirror.next/src/y-remote-selections.js
+ */
+export const cursorBuilder = (user: { name: string; color: string }): HTMLElement => {
+	const cursor = document.createElement('span');
+	cursor.classList.add('cm-ySelectionCaret');
+	cursor.setAttribute('style', `border-color: ${user.color}; background-color: ${user.color}`);
+
+	const divCaretDot = document.createElement('div');
+	divCaretDot.classList.add('cm-ySelectionCaretDot');
+
+	const divSelectionInfo = document.createElement('div');
+	divSelectionInfo.classList.add('cm-ySelectionInfo');
+	divSelectionInfo.insertBefore(document.createTextNode(user.name), null);
+
+	cursor.insertBefore(document.createTextNode('\u2060'), null);
+	cursor.insertBefore(divCaretDot, null);
+	cursor.insertBefore(document.createTextNode('\u2060'), null);
+	cursor.insertBefore(divSelectionInfo, null);
+	cursor.insertBefore(document.createTextNode('\u2060'), null);
+	return cursor;
 };

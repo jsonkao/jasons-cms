@@ -1,34 +1,33 @@
-/* this is a rough fix for the first cursor position when the first paragraph is empty */
-.ProseMirror > .ProseMirror-yjs-cursor:first-child {
-	margin-top: 16px;
-}
-.ProseMirror p:first-child,
-.ProseMirror h1:first-child,
-.ProseMirror h2:first-child,
-.ProseMirror h3:first-child,
-.ProseMirror h4:first-child,
-.ProseMirror h5:first-child,
-.ProseMirror h6:first-child {
-	margin-top: 16px;
-}
-/* This gives the remote user caret. The colors are automatically overwritten*/
-.ProseMirror-yjs-cursor {
+.cm-ySelectionCaret {
 	position: relative;
-	margin-left: -1px;
-	margin-right: -1px;
 	border-left: 1px solid black;
 	border-right: 1px solid black;
-	border-color: orange;
-	word-break: normal;
-	pointer-events: none;
+	margin-left: -1px;
+	margin-right: -1px;
+	box-sizing: border-box;
+	display: inline;
 }
-/* This renders the username above the caret */
-.ProseMirror-yjs-cursor > div {
+.cm-ySelectionCaretDot {
+	border-radius: 50%;
+	position: absolute;
+	width: 0.4em;
+	height: 0.4em;
+	top: -0.2em;
+	left: -0.2em;
+	background-color: inherit;
+	transition: transform 0.3s ease-in-out;
+	box-sizing: border-box;
+}
+
+.cm-ySelectionCaret:hover > .cm-ySelectionCaretDot {
+	transform-origin: bottom center;
+	transform: scale(0);
+}
+.cm-ySelectionInfo {
 	position: absolute;
 	top: -1.05em;
 	left: -1px;
-	font-size: 13px;
-	background-color: rgb(250, 129, 0);
+	font-size: 0.75em;
 	font-family: serif;
 	font-style: normal;
 	font-weight: normal;
@@ -37,5 +36,17 @@
 	color: white;
 	padding-left: 2px;
 	padding-right: 2px;
+	z-index: 101;
+	transition: opacity 0.3s ease-in-out;
+	background-color: inherit;
+	opacity: 0;
+	transition-delay: 0s;
 	white-space: nowrap;
+
+	-webkit-font-smoothing: antialiased;
+	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+}
+.cm-ySelectionCaret:hover > .cm-ySelectionInfo {
+	opacity: 1;
+	transition-delay: 0s;
 }
