@@ -11,7 +11,7 @@
 	import Component from './Component.svelte';
 
 	import * as Y from 'yjs';
-	import { WebsocketProvider } from 'y-websocket';
+	import { WebrtcProvider } from 'y-webrtc';
 	import { ySyncPlugin, yCursorPlugin, yUndoPlugin, undo, redo } from 'y-prosemirror';
 	import { keymap } from 'prosemirror-keymap';
 
@@ -66,10 +66,10 @@
 	}
 
 	let yPlugins: Plugin[] = [];
-	let provider: WebsocketProvider;
+	let provider: WebrtcProvider;
 	if (browser) {
 		const ydoc = new Y.Doc();
-		provider = new WebsocketProvider('wss://demos.yjs.dev/ws', 'prosemirror-us-cms-demo', ydoc);
+		const provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
 		const yXmlFragment = ydoc.getXmlFragment('prosemirror');
 
 		const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];

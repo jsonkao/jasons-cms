@@ -20,7 +20,7 @@
 		"prosemirror-svelte": "^0.2.4",
 		"prosemirror-view": "^1.32.7",
 		"y-prosemirror": "^1.2.2",
-		"y-websocket": "^1.5.3",
+		"y-webrtc": "^10.3.0",
 		"yjs": "^13.6.11"
 	}
 }
