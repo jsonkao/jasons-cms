@@ -5,25 +5,25 @@
 
 	const dispatch = createEventDispatcher();
 
-	/** @type string */
+	/** @type {string} */
 	export let className = 'ui-editor';
 
 	/** @type {EditorState} */
 	export let editorState;
 
-	/** @type string */
+	/** @type {string} */
 	export let placeholder = '';
 
 	/** Reference to the editor view
-	 *  @type EditorView|null */
+	 *  @type {EditorView | null} */
 	export let view = null;
 
 	/** Debounce change events (set to zero for immediate updates) */
 	export let debounceChangeEventsInterval = 50;
 
 	/** Reference to the editor component
-	 *  @type {HTMLDivElement | null} */
-	export let editor = null;
+	 *  @type {HTMLDivElement} */
+	let editor;
 
 	/** Initial EditorView props */
 	export let editorViewProps = {};
@@ -38,7 +38,9 @@
 		editor && editor.blur();
 	}
 
-	/** Tracks the timeout id of the last time the change event was dispatched */
+	/** Tracks the timeout id of the last time the change event was dispatched
+	 * @type {number}
+	 */
 	let dispatchLastEditTimeout;
 
 	/** Tracks whether changes to editor state were not yet dispatched */
@@ -48,7 +50,9 @@
 		view.updateState(editorState); // necessary to keep the DOM in sync with the editor state on external updates
 	}
 
-	/** Tracks whether the editor is empty (i.e. has a content size of 0) */
+	/** Tracks whether the editor is empty (i.e. has a content size of 0)
+	 * @type {boolean}
+	 */
 	let editorIsEmpty;
 	$: editorIsEmpty = editorState
 		? editorState.doc.content.size === 0 ||
@@ -81,6 +85,8 @@
 				...editorViewProps,
 				state: editorState,
 				dispatchTransaction: (transaction) => {
+					if (view === null) return;
+
 					editorState = view.state.apply(transaction);
 
 					const contentHasChanged = !editorState.doc.eq(view.state.doc);
@@ -135,11 +141,11 @@
 		font-variant-ligatures: none;
 	}
 
-	:global(.ProseMirror) pre {
+	:global(.ProseMirror pre) {
 		white-space: pre-wrap;
 	}
 
-	:global(.ProseMirror) li {
+	:global(.ProseMirror li) {
 		position: relative;
 	}
 
