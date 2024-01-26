@@ -1,3 +1,10 @@
+<script context="module">
+	const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
+	const name = names[Math.floor(Math.random() * names.length)];
+	const colors = ['#A32251', 'rgb(7, 7, 126)', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
+	const color = colors[Math.floor(Math.random() * colors.length)];
+</script>
+
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
@@ -65,47 +72,47 @@
 		}
 	}
 
-	let yPlugins: Plugin[] = [];
+	let blocksWithState: BlockWithState[] = [];
 	let provider: WebrtcProvider;
+
 	if (browser) {
 		const ydoc = new Y.Doc();
-		const provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
-		const yXmlFragment = ydoc.getXmlFragment('prosemirror');
+		const documentMap: Y.Map<Y.XmlFragment> = ydoc.getMap('text-blocks');
 
-		const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
-		const name = names[Math.floor(Math.random() * names.length)];
-		const colors = ['#A32251', 'rgb(7, 7, 126)', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
-		const color = colors[Math.floor(Math.random() * colors.length)];
+		provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
 		provider.awareness.setLocalStateField('user', { color, name });
 
-		yPlugins = [
-			ySyncPlugin(yXmlFragment),
-			yCursorPlugin(provider.awareness, { cursorBuilder }),
-			yUndoPlugin(),
-			keymap({
-				'Mod-z': undo,
-				'Mod-y': redo,
-				'Mod-Shift-z': redo
-			})
-		];
+		blocksWithState = (rawBlocks as Block[]).map((d) => {
+			// TODO: Check whether d.uid is already in the documentMap
+			// TODO: populate with initial data
+			if (d.type === 'text') {
+				documentMap.set(d.uid, new Y.XmlFragment());
+				const state = createEditor(undefined, [
+					blockDeletionPlugin,
+					ySyncPlugin(documentMap.get(d.uid)!),
+					yCursorPlugin(provider.awareness, { cursorBuilder }),
+					yUndoPlugin(),
+					keymap({
+						'Mod-z': undo,
+						'Mod-y': redo,
+						'Mod-Shift-z': redo
+					})
+				]);
+				return {
+					...d,
+					state,
+					editor: undefined
+				};
+			}
+			return d;
+		});
 	}
 
-	let blocksWithState: BlockWithState[] = !browser
-		? []
-		: (rawBlocks as Block[]).map((d, i) => {
-				if (d.type === 'text') {
-					return {
-						...d,
-						state: createEditor(d.text, [blockDeletionPlugin, ...(i === 0 ? yPlugins : [])]),
-						editor: undefined
-					};
-				}
-				return d;
-			});
+	$: console.log(blocksWithState);
 
 	let contentEl: HTMLElement;
 	onMount(() => {
-		window.parent.postMessage({ type: 'editorMounted' }, '*');
+		window.parent?.postMessage({ type: 'editorMounted' }, '*');
 		const observer = createObserver(contentEl.querySelectorAll('.graphic'));
 
 		return () => {
@@ -123,7 +130,7 @@
 			<ProsemirrorEditor
 				bind:this={b.editor}
 				editorState={b.state}
-				on:change={(e) => (blocksWithState[i].state = e.detail.editorState)}
+				on:change={(e) => (b.state = e.detail.editorState)}
 				on:blur={() => (lastTextFocused = i)}
 				debounceChangeEventsInterval={0}
 			/>

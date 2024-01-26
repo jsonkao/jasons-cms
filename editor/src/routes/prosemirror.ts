@@ -3,7 +3,8 @@
  */
 
 import { EditorState, TextSelection, type Plugin } from 'prosemirror-state';
-import { Schema, type MarkSpec, type DOMOutputSpec, DOMParser } from 'prosemirror-model';
+import { Schema, DOMParser } from 'prosemirror-model';
+import type { MarkSpec, DOMOutputSpec, Node } from 'prosemirror-model';
 import { richTextPlugins, corePlugins } from 'prosemirror-svelte/helpers/plugins';
 
 /**
@@ -91,23 +92,24 @@ const richTextSchema = new Schema({
 });
 
 /**
- * A function that creates a minimal rich text editor.
+ * A function that creates a minimal rich text editor with a starter doc.
  * Based on the createRichTextEditor function from prosemirror-svelte.
  */
-export const createEditor = (html: string = '', plugins: Plugin[] = []): EditorState => {
-	let doc, selection;
-
-	if (html) {
-		doc = createDocumentFromHtml(richTextSchema, html);
-		selection = TextSelection.atStart(doc);
-	}
-
-	return EditorState.create({
+export const createEditor = (doc: Node | undefined, plugins: Plugin[] = []): EditorState =>
+	EditorState.create({
 		schema: richTextSchema,
 		doc,
-		selection,
+		selection: doc ? TextSelection.atStart(doc) : undefined,
 		plugins: [...plugins, ...corePlugins, ...richTextPlugins]
 	});
+
+/**
+ * A function that creates a minimal rich text editor with string HTML.
+ * Based on the createRichTextEditor function from prosemirror-svelte.
+ */
+export const createEditorFromHTML = (html: string = '', plugins: Plugin[] = []): EditorState => {
+	const doc = createDocumentFromHtml(richTextSchema, html);
+	return createEditor(doc, plugins);
 };
 
 /**
