@@ -104,6 +104,7 @@
 		justify-self: center;
 		align-self: center;
 		z-index: 10;
+		pointer-events: none;
 	}
 
 	.iframe-container {

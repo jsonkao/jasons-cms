@@ -170,5 +170,6 @@
 		content: 'Write something...';
 		pointer-events: none;
 		color: #aaa;
+		z-index: -1;
 	}
 </style>

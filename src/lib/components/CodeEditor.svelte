@@ -45,8 +45,6 @@
 	$: if ($codeContent[$openComponent] && ytext?.toString() === '')
 		ytext.insert(0, $codeContent[$openComponent]);
 
-	$: console.log(ydoc, ydoc && Y.encodeStateAsUpdate(ydoc));
-
 	/**
 	 * Set up elements and dispatchers
 	 */
@@ -106,7 +104,6 @@
 		position: relative;
 		height: 100%;
 		margin: 0 auto;
-		opacity: 0;
 		pointer-events: none;
 		display: grid;
 	}
@@ -120,16 +117,18 @@
 		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	}
 
-	.code-editor.show-editor {
-		opacity: 1;
-		pointer-events: all;
-	}
-
 	.code-mirror-container {
 		max-height: calc(100vh - 30px);
 		overflow-y: scroll;
 		position: relative;
 		align-self: center;
+		pointer-events: none;
+		opacity: 0;
+	}
+
+	.code-editor.show-editor .code-mirror-container {
+		opacity: 1;
+		pointer-events: all;
 	}
 
 	.code-editor:not(.position-center) .code-mirror-container {
