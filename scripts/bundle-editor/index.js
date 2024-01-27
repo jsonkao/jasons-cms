@@ -16,13 +16,13 @@ if (!!process.env.VERCEL) {
 
 const cwd = 'editor';
 
-console.time('install')
+console.time('install');
 execSync('rm -rf node_modules package-lock.json', { cwd });
 /* execSync('npm i --cpu x64 --os linux', { cwd });
 execSync('ls node_modules/@rollup', { cwd });
 execSync('npm i --no-save @rollup/rollup-linux-x64-musl', { cwd });
 execSync('ls node_modules/@rollup', { cwd });*/
-execSync('yarn install', { cwd })
+execSync('yarn install', { cwd });
 console.timeEnd('install');
 
 const zip = new AdmZip();
@@ -31,7 +31,12 @@ const zip = new AdmZip();
 // this is a bit ropey, but it works
 const ignored_basenames = ['.DS_Store', 'LICENSE'];
 const ignored_extensions = ['.d.ts', '.map'];
-const ignored_directories = ['.svelte-kit', 'node_modules/.bin', /* 'node_modules/rollup/dist/shared', */ 'node_modules/y-leveldb'];
+const ignored_directories = [
+	'.svelte-kit',
+	'node_modules/.bin',
+	'node_modules/rollup/dist/shared',
+	'node_modules/y-leveldb'
+];
 
 const ignored_files = new Set(['node_modules/svelte/compiler.cjs']);
 
@@ -48,12 +53,16 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 		continue;
 	}
 
-	if (file.startsWith('node_modules/esbuild/') || file.startsWith('node_modules/@esbuild/') || file.startsWith('node_modules/yjs/dist/') && file.endsWith('.map')) {
+	if (
+		file.startsWith('node_modules/esbuild/') ||
+		file.startsWith('node_modules/@esbuild/') ||
+		(file.startsWith('node_modules/yjs/dist/') && file.endsWith('.map'))
+	) {
 		// continue;
 	}
 
 	zip.addFile(
-		file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'),
+		file, // file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'),
 		fs.readFileSync(`${cwd}/${file}`)
 	);
 }
@@ -69,7 +78,9 @@ const out = zip.toBuffer();
 fs.writeFileSync(`src/lib/webcontainer/files.zip`, out);
 console.timeEnd('writing zip');
 
-console.log(`Zip file is ${Math.round(fs.statSync('src/lib/webcontainer/files.zip').size / 1024)}KB`);
+console.log(
+	`Zip file is ${Math.round(fs.statSync('src/lib/webcontainer/files.zip').size / 1024)}KB`
+);
 
 // bundle adm-zip so we can use it in the webcontainer
 esbuild.buildSync({

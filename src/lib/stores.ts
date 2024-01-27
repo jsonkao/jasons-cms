@@ -11,8 +11,6 @@ export const progress: Writable<(typeof Steps)[keyof typeof Steps] | null> = wri
 
 export const error: Writable<Error | null> = writable(null);
 
-export const codeContent: Writable<{ [key: string]: string }> = writable({});
-
 export const openComponent: Writable<string | null> = writable(null);
 
 export const openGlobalFile: Writable<string | null> = writable(null);

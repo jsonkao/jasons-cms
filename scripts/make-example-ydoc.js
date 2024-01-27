@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 import { writeFileSync } from 'fs';
-import exampleData from '../src/lib/server/database/example-data.json' assert { type: "json" };
+import exampleData from '../src/lib/server/database/example-data.json' assert { type: 'json' };
 
 const ydoc = new Y.Doc();
 
@@ -10,6 +10,9 @@ exampleData.forEach((block) => {
 		ytext.insert(0, block.code);
 	}
 });
+
+ydoc.getText('+page.server.js').insert(0, '');
+ydoc.getText('styles.css').insert(0, '');
 
 // const yxml = ydoc.getXmlFragment('test');
 // const el = new Y.XmlElement('p');

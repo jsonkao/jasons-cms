@@ -11,9 +11,10 @@
 	import { yCollab } from 'y-codemirror.next';
 	import { WebrtcProvider } from 'y-webrtc';
 
-	import { codeContent, codeEditorPosition, openComponent } from '$lib/stores';
+	import { codeEditorPosition, openComponent } from '$lib/stores';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import { userName, userColor } from '$lib/constants';
+	import { getYdocState } from '$lib/yjs';
 
 	/**
 	 * Create Y.Text
@@ -25,8 +26,7 @@
 	let provider: WebrtcProvider;
 
 	onMount(async () => {
-		const ydocState = new Uint8Array(await (await fetch(`/yjs`)).arrayBuffer());
-		console.log({ ydocState });
+		const ydocState = await getYdocState();
 
 		ydoc = new Y.Doc();
 		Y.applyUpdate(ydoc, ydocState);
@@ -41,12 +41,16 @@
 		});
 
 		yExtension = yCollab(ytext, provider.awareness);
-
-		console.log;
 	});
 	onDestroy(() => provider?.destroy());
 
-	// $: if ($codeContent[$openComponent] && ytext?.toString() === '') ytext.insert(0, $codeContent[$openComponent]);
+	$: if (ydoc && yExtension && $openComponent) updateYdoc($openComponent);
+
+	function updateYdoc(openComponent: string) {
+		console.log({ openComponent, yExtension });
+		ytext = ydoc.getText(openComponent);
+		yExtension = yCollab(ytext, provider.awareness);
+	}
 
 	/**
 	 * Set up elements and dispatchers
@@ -67,6 +71,14 @@
 		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 			e.preventDefault();
 			dispatch('save', ytext.toString());
+		}
+		if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+			e.preventDefault();
+			openComponent.set('b');
+		}
+		if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+			e.preventDefault();
+			openComponent.set('a');
 		}
 	}
 </script>

@@ -7,7 +7,6 @@
 	import { steps } from '$lib/constants';
 
 	export let blocks: Block[];
-	export let ydocState: Uint8Array;
 
 	/**
 	 * The graphic in focus (and whose code is in the CodeEditor)
@@ -37,7 +36,7 @@
 	 * Handles all messages from the iframe
 	 */
 	function onMessage(event: MessageEvent) {
-		// console.log('Message from child: ', event.data);
+		console.log('Message from child: ', event.data);
 		switch (event.data.type) {
 			case 'toggleEditor':
 				showCodeEditor = !showCodeEditor;

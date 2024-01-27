@@ -1,6 +1,5 @@
 import { WebContainer } from '@webcontainer/api';
-import { base, progress, codeContent } from '$lib/stores';
-import { get } from 'svelte/store';
+import { base, progress } from '$lib/stores';
 import { loadFiles } from './files.js';
 import { steps, globalFiles } from '$lib/constants';
 import type { WebContainer as WebContainerType } from '@webcontainer/api';
@@ -91,18 +90,6 @@ export async function startWebContainer(blocks: Block[]) {
 		}
 	}
 
-	// Populate codeContent store with code from blocks data
-
-	codeContent.set(
-		graphicBlocks.reduce(
-			(acc, block) => {
-				acc[block.name] = block.code;
-				return acc;
-			},
-			{ '+page.server.js': '', 'styles.css': '' } as { [key: string]: string }
-		)
-	);
-
 	// Start dev server
 
 	webcontainerInstance.on('server-ready', (port, url) => {
@@ -150,6 +137,5 @@ export async function writeFile(filename: string, contents: string) {
 	const path = Object.values(globalFiles).includes(filename)
 		? `/src/routes/${filename}`
 		: `/src/lib/generated/${filename}.svelte`;
-	console.log(path, get(codeContent)[filename]);
 	await webcontainerInstance.fs.writeFile(path, contents);
 }
