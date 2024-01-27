@@ -6,7 +6,7 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const { blocks } = data;
+	const { blocks, ydocState } = data;
 
 	/**
 	 * Starting and stopping webcontainer
@@ -15,4 +15,4 @@
 	onDestroy(() => browser && stopWebContainer);
 </script>
 
-<Editor {blocks} />
+<Editor {blocks} {ydocState} />

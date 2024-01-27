@@ -13,7 +13,6 @@
 
 	import { codeContent, codeEditorPosition, openComponent } from '$lib/stores';
 	import PlacementButtons from './PlacementButtons.svelte';
-	import Tabs from './Tabs.svelte';
 	import { userName, userColor } from '$lib/constants';
 
 	/**
@@ -23,13 +22,17 @@
 	let ydoc: Y.Doc;
 	let ytext: Y.Text;
 	let yExtension: Extension;
+	let provider: WebrtcProvider;
 
-	onMount(() => {
+	onMount(async () => {
+		const ydocState = new Uint8Array(await (await fetch(`/yjs`)).arrayBuffer());
+		console.log({ ydocState });
+
 		ydoc = new Y.Doc();
-		const provider = new WebrtcProvider('codemirror6-demo-room', ydoc);
-		ytext = ydoc.getText('codemirror');
+		Y.applyUpdate(ydoc, ydocState);
 
-		const undoManager = new Y.UndoManager(ytext);
+		provider = new WebrtcProvider('codemirror6-demo-room', ydoc);
+		ytext = ydoc.getText('a');
 
 		provider.awareness.setLocalStateField('user', {
 			name: userName,
@@ -37,13 +40,13 @@
 			colorLight: '#000'
 		});
 
-		yExtension = yCollab(ytext, provider.awareness, { undoManager });
+		yExtension = yCollab(ytext, provider.awareness);
 
-		return () => provider.destroy();
+		console.log;
 	});
+	onDestroy(() => provider?.destroy());
 
-	$: if ($codeContent[$openComponent] && ytext?.toString() === '')
-		ytext.insert(0, $codeContent[$openComponent]);
+	// $: if ($codeContent[$openComponent] && ytext?.toString() === '') ytext.insert(0, $codeContent[$openComponent]);
 
 	/**
 	 * Set up elements and dispatchers
@@ -92,7 +95,6 @@
 					}
 				}}
 			/>
-			<!-- <Tabs /> -->
 			<PlacementButtons />
 		{/if}
 	</div>
@@ -100,7 +102,6 @@
 
 <style>
 	.code-editor {
-		transition: opacity 0.1s;
 		position: relative;
 		height: 100%;
 		margin: 0 auto;
@@ -123,6 +124,7 @@
 		position: relative;
 		align-self: center;
 		pointer-events: none;
+		transition: opacity 0.1s;
 		opacity: 0;
 	}
 

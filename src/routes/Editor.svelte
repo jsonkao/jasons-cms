@@ -7,6 +7,7 @@
 	import { steps } from '$lib/constants';
 
 	export let blocks: Block[];
+	export let ydocState: Uint8Array;
 
 	/**
 	 * The graphic in focus (and whose code is in the CodeEditor)
