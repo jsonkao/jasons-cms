@@ -48,11 +48,17 @@ export async function startWebContainer(blocks: Block[]) {
 
 	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
 
-	await Promise.all([install(), generateFiles()]);
+	await Promise.all([chmod(), generateFiles()]);
+
+	console.log(await webcontainerInstance.fs.readFile(`node_modules/@rollup/rollup-linux-x64-musl/package.json`, 'utf-8'));
+
+	async function chmod() {
+		await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
+	}
 
 	async function install() {
 		await webcontainerInstance.spawn('rm', ['-rf', 'node_modules']);
-		await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
+		await chmod();
 		const process = await webcontainerInstance.spawn('npm', [
 			'i',
 			'-D',
