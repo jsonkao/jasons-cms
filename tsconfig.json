@@ -24,6 +24,12 @@
 		"tests/**/*.js",
 		"tests/**/*.ts",
 		"tests/**/*.svelte"
+	],
+	"exclude": [
+		"node_modules/**",
+		".git/**",
+		".sveltekit-kit/generated/**",
+		".sveltekit-kit/output/**"
 	]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//

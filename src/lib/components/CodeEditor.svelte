@@ -47,7 +47,7 @@
 	$: if (ydoc && yExtension && $openComponent) updateYdoc($openComponent);
 
 	function updateYdoc(openComponent: string) {
-		console.log({ openComponent, yExtension });
+		// Do I need to manually destroy the old yCollab?
 		ytext = ydoc.getText(openComponent);
 		yExtension = yCollab(ytext, provider.awareness);
 	}
