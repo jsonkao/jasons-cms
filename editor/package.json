@@ -15,6 +15,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@liveblocks/client": "^1.9.7",
+		"@liveblocks/yjs": "^1.9.7",
 		"prosemirror-commands": "^1.5.2",
 		"prosemirror-keymap": "^1.2.2",
 		"prosemirror-model": "^1.19.4",

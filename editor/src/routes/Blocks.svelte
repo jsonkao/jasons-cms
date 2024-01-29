@@ -14,6 +14,13 @@
 	import { ySyncPlugin, yCursorPlugin, yUndoPlugin, undo, redo } from 'y-prosemirror';
 	import { keymap } from 'prosemirror-keymap';
 
+	import { createClient } from '@liveblocks/client';
+	import LiveblocksProvider from '@liveblocks/yjs';
+
+	const client = createClient({
+		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
+	});
+
 	type BlockWithState =
 		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
 		| GraphicBlock;
@@ -63,19 +70,26 @@
 
 	let blocksWithState: BlockWithState[] = [];
 	let provider: WebrtcProvider;
+	let destroy = () => {};
 
 	if (browser) {
+		const { room, leave } = client.enterRoom('my-room', {
+			initialPresence: {}
+		});
+
+		destroy = leave;
+
 		const ydoc = new Y.Doc();
 
-		provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
-		provider.awareness.setLocalStateField('user', { color, name });
+		const yProvider = new LiveblocksProvider(room, ydoc); // provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
+		yProvider.awareness.setLocalStateField('user', { color, name });
 
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
 			if (d.type === 'text') {
 				const state = createEditor(undefined, [
 					blockDeletionPlugin,
 					ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
-					yCursorPlugin(provider.awareness, { cursorBuilder }),
+					yCursorPlugin(yProvider.awareness, { cursorBuilder }),
 					yUndoPlugin(),
 					keymap({
 						'Mod-z': undo,
@@ -101,6 +115,7 @@
 		return () => {
 			observer && observer.disconnect();
 			provider && provider.destroy();
+			destroy();
 		};
 	});
 </script>
