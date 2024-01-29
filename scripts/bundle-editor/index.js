@@ -18,11 +18,10 @@ const cwd = 'editor';
 
 console.time('install');
 execSync('rm -rf node_modules package-lock.json', { cwd });
-/* execSync('npm i --cpu x64 --os linux', { cwd });
+execSync('npm i --cpu x64 --os linux', { cwd });
 execSync('ls node_modules/@rollup', { cwd });
-execSync('npm i --no-save @rollup/rollup-linux-x64-musl', { cwd });
-execSync('ls node_modules/@rollup', { cwd });*/
-execSync('yarn install', { cwd });
+// execSync('npm i --no-save @rollup/rollup-linux-x64-musl', { cwd });
+// execSync('ls node_modules/@rollup', { cwd });
 console.timeEnd('install');
 
 const zip = new AdmZip();
@@ -34,7 +33,7 @@ const ignored_extensions = ['.d.ts', '.map'];
 const ignored_directories = [
 	'.svelte-kit',
 	'node_modules/.bin',
-	'node_modules/rollup/dist/shared',
+	// 'node_modules/rollup/dist/shared',
 	'node_modules/y-leveldb'
 ];
 

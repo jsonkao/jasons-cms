@@ -1,6 +1,6 @@
 import { WebContainer } from '@webcontainer/api';
 import { base, progress } from '$lib/stores';
-import { loadFiles } from './files.js';
+import { type loadFiles } from './files.js';
 import { steps, globalFiles } from '$lib/constants';
 import type { WebContainer as WebContainerType } from '@webcontainer/api';
 
@@ -9,16 +9,19 @@ let webcontainerInstance: WebContainerType;
 if (import.meta.hot) {
 	// In dev, with HMR, reuse the same WebContainer
 	import.meta.hot.accept(() => {
-		// Module reloaded
+		// Module reloaded: TODO: kill current process, redo the whole thing
 	});
 }
 
-export async function startWebContainer(blocks: Block[]) {
-	// Boot webcontainer and load files concurrently
-
+export async function create() {
 	progress.set(steps.BOOTING);
-	let files = {};
-	[webcontainerInstance, files] = await Promise.all([WebContainer.boot(), loadFiles()]);
+	webcontainerInstance = await WebContainer.boot();
+	return { startWebContainer, stopWebContainer };
+}
+
+async function startWebContainer(blocks: Block[], files: BundleFiles) {
+	// Boot webcontainer and load files concurrently
+	console.log({ blocks, files })
 
 	// Mount files
 
@@ -49,7 +52,12 @@ export async function startWebContainer(blocks: Block[]) {
 
 	await Promise.all([chmod(), generateFiles()]);
 
-	console.log(await webcontainerInstance.fs.readFile(`node_modules/@rollup/rollup-linux-x64-musl/package.json`, 'utf-8'));
+	console.log(
+		await webcontainerInstance.fs.readFile(
+			`node_modules/@rollup/rollup-linux-x64-musl/package.json`,
+			'utf-8'
+		)
+	);
 
 	async function chmod() {
 		await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
