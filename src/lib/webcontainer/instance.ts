@@ -2,56 +2,89 @@ import { WebContainer, type WebContainerProcess } from '@webcontainer/api';
 import { browser } from '$app/environment';
 import { base, progress } from '$lib/stores.ts';
 import { steps } from '$lib/constants.ts';
+import { loadFiles } from './files.ts';
 
 let webcontainerInstance: WebContainer;
-let lastUsedBlocks: Block[];
-let lastUsedFiles: Awaited<BundleFiles>;
+let templateFiles: Awaited<BundleFiles>;
+
 let currentProcess: WebContainerProcess | undefined;
 
-let ready = new Promise(() => {});
-if (browser) {
-	// Only initialize on the client side
-	ready = initialize();
-}
-
+console.log('module3');
 if (import.meta.hot) {
-	// In dev HMR, kill current process and do starting steps again
-	import.meta.hot.accept(() => {
-		startWebContainer(lastUsedBlocks, new Promise((fulfill) => fulfill(lastUsedFiles)));
+	import.meta.hot.on('vite:beforeUpdate', ({ updates }) => {
+		if (updates.some((u) => u.path === '/src/routes/+page.svelte' && u.type === 'js-update')) {
+			console.log('vite:beforeUpdate', updates);
+			killCurrentProcess();
+		}
 	});
 
-	import.meta.hot.on('vite:beforeUpdate', (updatePayload) => {
-		if (updatePayload.updates.some((update) => update.path === '/src/lib/webcontainer/instance.ts'))
-			killCurrentProcess(); // not rlly working
+	// On HMR, first clean up the current process
+	import.meta.hot.dispose(() => {
+		console.log('dispose');
+		killCurrentProcess();
 	});
+	// Second, the new module is executed
+	// Third, this accept handler (from the old module) is called
+	// import.meta.hot.accept(() => { console.log('accept'); startWebContainer(lastUsedBlocks); });
 }
+
+/**
+ * In the browser, this promise resolves when the WebContainer is ready to be used and template files have been fetched.
+ */
+let ready = browser ? initialize() : new Promise(() => {});
 
 export async function initialize() {
 	progress.set(steps.BOOTING);
+
+	const promises = [];
 
 	// Reuse the same webcontainer in dev HMR
 	if (import.meta.hot && import.meta.hot.data.webcontainerInstance) {
 		webcontainerInstance = import.meta.hot.data.webcontainerInstance;
 	} else {
-		webcontainerInstance = await WebContainer.boot();
-		if (import.meta.hot) import.meta.hot.data.webcontainerInstance = webcontainerInstance;
+		promises.push(
+			WebContainer.boot().then((instance) => {
+				webcontainerInstance = instance;
+				if (import.meta.hot) import.meta.hot.data.webcontainerInstance = instance;
+
+				webcontainerInstance.on('server-ready', (port, url) => {
+					progress.set(steps.SERVER_READY);
+					base.set(url);
+				});
+
+				webcontainerInstance.on('error', ({ message }) => {
+					// TODO: handle errors
+				});
+			})
+		);
 	}
+
+	// Reuse the same template files in dev HMR
+	if (import.meta.hot && import.meta.hot.data.templateFiles) {
+		templateFiles = import.meta.hot.data.templateFiles;
+	} else {
+		promises.push(
+			loadFiles().then((files) => {
+				if (import.meta.hot) import.meta.hot.data.templateFiles = templateFiles = files;
+			})
+		);
+	}
+
+	await Promise.all(promises);
 }
 
-export async function startWebContainer(blocks: Block[], filesPromise: BundleFiles) {
+export async function startWebContainer(blocks: Block[]) {
+	console.log('startWebContainer', blocks.length);
+	console.log('test3');
+
 	// Wait for the WebContainer to be initialized and for files to be fetched
-	const [_, files] = await Promise.all([ready, filesPromise]);
+	await ready;
 
-	// Store for HMR
-	lastUsedFiles = files;
-	lastUsedBlocks = blocks;
-
-	// Mount and unzip files if needed
-
-	const rootFiles = await webcontainerInstance.fs.readdir('/');
+	// Mount and unzip files
+	// TODO LATER: diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
 
 	progress.set(steps.MOUNTING);
-	await webcontainerInstance.mount(files);
+	await webcontainerInstance.mount(templateFiles);
 
 	progress.set(steps.UNZIPPING);
 	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
@@ -78,17 +111,6 @@ export async function startWebContainer(blocks: Block[], filesPromise: BundleFil
 			return webcontainerInstance.fs.writeFile(`src/lib/generated/${filename}`, content);
 		}
 	}
-
-	// Start dev server
-
-	webcontainerInstance.on('server-ready', (port, url) => {
-		progress.set(steps.SERVER_READY);
-		base.set(url);
-	});
-
-	webcontainerInstance.on('error', ({ message }) => {
-		// TODO: handle errors
-	});
 
 	progress.set(steps.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
@@ -120,11 +142,10 @@ export async function writeFile(path: string, contents: string) {
 
 function killCurrentProcess() {
 	if (currentProcess) {
-		console.log('Trying to kill', currentProcess);
+		console.log('Killing', currentProcess);
 		currentProcess.kill();
 		currentProcess = undefined;
 	}
-	console.log('Did the kill work?');
 }
 
 async function spawn(command: string, args: string[], errorMessage: string, logOutput = false) {
@@ -140,7 +161,6 @@ async function spawn(command: string, args: string[], errorMessage: string, logO
 
 	const process = await webcontainerInstance.spawn(command, args);
 	currentProcess = process;
-	console.log(`Just spawned ${command} ${args} with currentProcess ${currentProcess}`);
 
 	if (logOutput) process.output.pipeTo(log_stream());
 

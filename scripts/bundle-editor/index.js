@@ -61,7 +61,7 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 	}
 
 	if (file.endsWith('.md') && !file.includes('/@sveltejs/kit/src/types/synthetic/')) {
-		continue
+		continue;
 	}
 
 	zip.addFile(

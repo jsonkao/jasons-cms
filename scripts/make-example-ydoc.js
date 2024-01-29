@@ -15,7 +15,9 @@ exampleData.forEach((block) => {
 
 ydoc.getText('/src/routes/+page.server.js').insert(0, '');
 ydoc.getText('/src/routes/styles.css').insert(0, '');
-ydoc.getText('/src/routes/Blocks.svelte').insert(0, readFileSync('editor/src/routes/Blocks.svelte', 'utf8'));
+ydoc
+	.getText('/src/routes/Blocks.svelte')
+	.insert(0, readFileSync('editor/src/routes/Blocks.svelte', 'utf8'));
 
 let docState = Y.encodeStateAsUpdate(ydoc);
 writeFileSync('./src/lib/yjs/example-ydoc.bin', Buffer.from(docState));

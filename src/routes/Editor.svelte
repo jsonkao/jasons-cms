@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { base, codeEditorPosition, openComponent, progress } from '$lib/stores';
-	import { writeFile } from '$lib/webcontainer/instance.ts';
 
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';
@@ -11,7 +10,9 @@
 	/**
 	 * The graphic in focus (and whose code is in the CodeEditor)
 	 */
-	openComponent.set(`/src/lib/generated/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`);
+	openComponent.set(
+		`/src/lib/generated/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`
+	);
 
 	let showCodeEditor = false;
 
@@ -36,6 +37,7 @@
 	 * Handles all messages from the iframe
 	 */
 	function onMessage(event: MessageEvent) {
+		console.log('child', event);
 		switch (event.data.type) {
 			case 'toggleEditor':
 				showCodeEditor = !showCodeEditor;
@@ -48,18 +50,6 @@
 				break;
 		}
 	}
-
-	/**
-	 * Handles saving the file. Eventually, will probably communicate with a database.
-	 * TODO: Incorporate $openGlobalFile
-	 */
-	function handleSave(event: CustomEvent) {
-		if (!$openComponent) {
-			console.error('Attempted to save but openComponent is null', event);
-			return;
-		}
-		writeFile($openComponent, event.detail);
-	}
 </script>
 
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
@@ -68,7 +58,7 @@
 	<div class="code-container">
 		<CodeEditor
 			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
-			on:save={handleSave}
+			on:save
 			{showCodeEditor}
 		/>
 	</div>

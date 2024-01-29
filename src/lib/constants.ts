@@ -13,14 +13,6 @@ export const steps = {
 };
 
 /**
- * Global files
- */
-export const globalFiles = {
-	DATA: '/src/routes/+page.server.js',
-	STYLES: '/src/routes/styles.css'
-};
-
-/**
  * User attributes
  */
 

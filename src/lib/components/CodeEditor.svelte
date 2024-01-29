@@ -69,15 +69,15 @@
 		(containerElement.querySelector('[contenteditable=true]') as HTMLElement)?.focus();
 
 	function onKeyDown(e: KeyboardEvent) {
-		if ((e.metaKey) && e.key === 's') {
+		if (e.metaKey && e.key === 's') {
 			e.preventDefault();
 			dispatch('save', ytext.toString());
 		}
-		if ((e.metaKey) && ['a', 'b'].includes(e.key)) {
+		if (e.metaKey && ['a', 'b'].includes(e.key)) {
 			e.preventDefault();
 			openComponent.set(`/src/lib/generated/${e.key}.svelte`);
 		}
-		if ((e.metaKey) && e.key === 'x') {
+		if (e.metaKey && e.key === 'x') {
 			e.preventDefault();
 			openComponent.set('/src/routes/Blocks.svelte');
 		}

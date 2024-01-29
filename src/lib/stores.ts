@@ -1,11 +1,10 @@
 import { writable } from 'svelte/store';
 import { steps } from './constants';
 import type { Writable } from 'svelte/store';
-import type { steps as Steps } from './constants';
 
 export const base: Writable<string | null> = writable(null);
 
-export const progress: Writable<(typeof Steps)[keyof typeof Steps] | null> = writable(
+export const progress: Writable<(typeof steps)[keyof typeof steps] | null> = writable(
 	steps.INITIALIZING
 );
 

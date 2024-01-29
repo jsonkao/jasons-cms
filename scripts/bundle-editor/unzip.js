@@ -7,7 +7,7 @@ import fs from 'fs';
 import AdmZip from 'adm-zip';
 
 const zip = new AdmZip('files.zip');
-zip.extractAllTo('.');
+zip.extractAllTo('.', true);
 
 if (!fs.existsSync('node_modules/.bin')) {
 	fs.mkdirSync('node_modules/.bin');

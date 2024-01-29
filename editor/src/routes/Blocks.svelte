@@ -12,6 +12,7 @@
 	import * as Y from 'yjs';
 	import { ySyncPlugin, yCursorPlugin, yUndoPlugin, undo, redo } from 'y-prosemirror';
 	import { keymap } from 'prosemirror-keymap';
+	import type { Awareness } from 'y-protocols/awareness';
 
 	import { createClient } from '@liveblocks/client';
 	import LiveblocksProvider from '@liveblocks/yjs';
@@ -87,7 +88,7 @@
 				const state = createEditor(undefined, [
 					blockDeletionPlugin,
 					ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
-					yCursorPlugin(yProvider.awareness, { cursorBuilder }),
+					yCursorPlugin(yProvider.awareness as Awareness, { cursorBuilder }),
 					yUndoPlugin(),
 					keymap({
 						'Mod-z': undo,

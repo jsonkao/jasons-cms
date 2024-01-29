@@ -1,26 +1,30 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { loadFiles } from '$lib/webcontainer/files.ts';
-	import { startWebContainer, stopWebContainer } from '$lib/webcontainer/instance.ts';
-	import Editor from './Editor.svelte';
+	import { openComponent } from '$lib/stores';
+	import { startWebContainer, writeFile } from '$lib/webcontainer/instance.ts';
 	import type { PageData } from './$types';
+	import Editor from './Editor.svelte';
 
 	export let data: PageData;
 	const { blocks } = data;
 
-	let files: ReturnType<typeof loadFiles>;
-
-	// Start loading files while webcontainer is booting
-	if (browser) {
-		files = loadFiles();
-	}
-
 	/**
 	 * Starting and stopping webcontainer
 	 */
-	onMount(() => startWebContainer(blocks, files));
-	onDestroy(async () => browser && (await stopWebContainer()));
+	console.log('+page.svelte');
+	if (browser) startWebContainer(blocks);
+
+	/**
+	 * Handles saving the file. Eventually, will probably communicate with a database.
+	 * TODO: Incorporate $openGlobalFile
+	 */
+	function handleSave(event: CustomEvent) {
+		if (!$openComponent) {
+			console.error('Attempted to save but openComponent is null', event);
+			return;
+		}
+		writeFile($openComponent, event.detail);
+	}
 </script>
 
-<Editor {blocks} />
+<Editor {blocks} on:save={handleSave} />
