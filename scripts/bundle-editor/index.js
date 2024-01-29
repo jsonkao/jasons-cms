@@ -17,11 +17,7 @@ if (!!process.env.VERCEL) {
 const cwd = 'editor';
 
 console.time('install');
-execSync('rm -rf node_modules package-lock.json', { cwd });
-execSync('npm i --cpu x64 --os linux', { cwd });
-execSync('ls node_modules/@rollup', { cwd });
-// execSync('npm i --no-save @rollup/rollup-linux-x64-musl', { cwd });
-// execSync('ls node_modules/@rollup', { cwd });
+if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
 console.timeEnd('install');
 
 const zip = new AdmZip();
@@ -33,11 +29,16 @@ const ignored_extensions = ['.d.ts', '.map'];
 const ignored_directories = [
 	'.svelte-kit',
 	'node_modules/.bin',
-	// 'node_modules/rollup/dist/shared',
-	'node_modules/y-leveldb'
+	'node_modules/rollup/dist/shared',
+	'lib0/coverage'
+	// 'node_modules/y-leveldb'
 ];
 
-const ignored_files = new Set(['node_modules/svelte/compiler.cjs']);
+const ignored_files = new Set([
+	'node_modules/svelte/compiler.cjs',
+	'node_modules/y-webrtc/dist/demo.js',
+	'node_modules/y-protocols/dist/test.js'
+]);
 
 console.time('zip.addFile');
 for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
@@ -55,13 +56,17 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 	if (
 		file.startsWith('node_modules/esbuild/') ||
 		file.startsWith('node_modules/@esbuild/') ||
-		(file.startsWith('node_modules/yjs/dist/') && file.endsWith('.map'))
+		(false && file.startsWith('node_modules/yjs/dist/') && file.endsWith('.map'))
 	) {
-		// continue;
+		continue;
+	}
+
+	if (file.endsWith('.md') && !file.includes('/@sveltejs/kit/src/types/synthetic/')) {
+		continue
 	}
 
 	zip.addFile(
-		file, // file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'),
+		file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'),
 		fs.readFileSync(`${cwd}/${file}`)
 	);
 }
@@ -77,8 +82,9 @@ const out = zip.toBuffer();
 fs.writeFileSync(`src/lib/webcontainer/files.zip`, out);
 console.timeEnd('writing zip');
 
+console.log();
 console.log(
-	`Zip file is ${Math.round(fs.statSync('src/lib/webcontainer/files.zip').size / 1024)}KB`
+	`Zip file is ${Math.round((fs.statSync('src/lib/webcontainer/files.zip').size / 1024 / 1024) * 100) / 100}MB`
 );
 
 // bundle adm-zip so we can use it in the webcontainer

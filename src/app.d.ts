@@ -11,7 +11,7 @@ declare global {
 		// interface Platform {}
 	}
 
-	type BundleFiles = Awaited<ReturnType<typeof loadFiles>>;
+	type BundleFiles = ReturnType<typeof loadFiles>;
 
 	interface WebcontainerModule {
 		startWebContainer(blocks: Block[], files: BundleFiles): Promise<void>;

@@ -2,6 +2,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { loadFiles } from '$lib/webcontainer/files.ts';
+	import { startWebContainer, stopWebContainer } from '$lib/webcontainer/index.ts';
 	import Editor from './Editor.svelte';
 	import type { PageData } from './$types';
 
@@ -12,22 +13,15 @@
 	let files: ReturnType<typeof loadFiles>;
 
 	if (browser) {
-		webcontainerModule = new Promise(async (fulfill, reject) => {
-			try {
-				const module = await (await import('$lib/webcontainer/index.ts')).create();
-				fulfill(module);
-			} catch (e) {
-				reject(e);
-			}
-		});
+		// Start loading files while webcontainer is booting
 		files = loadFiles();
 	}
 
 	/**
 	 * Starting and stopping webcontainer
 	 */
-	onMount(async () => (await webcontainerModule).startWebContainer(blocks, await files));
-	onDestroy(async () => webcontainerModule && (await webcontainerModule).stopWebContainer());
+	onMount(() => startWebContainer(blocks, files));
+	onDestroy(async () => browser && await stopWebContainer());
 </script>
 
 <Editor {blocks} />

@@ -1,83 +1,72 @@
 import { WebContainer } from '@webcontainer/api';
 import { base, progress } from '$lib/stores';
-import { type loadFiles } from './files.js';
 import { steps, globalFiles } from '$lib/constants';
-import type { WebContainer as WebContainerType } from '@webcontainer/api';
+import type { WebContainer as WebContainerType, WebContainerProcess } from '@webcontainer/api';
+import { browser } from '$app/environment';
 
 let webcontainerInstance: WebContainerType;
+let lastUsedBlocks: Block[];
+let lastUsedFiles: Awaited<BundleFiles>;
+let currentProcess: WebContainerProcess | undefined;
+
+let ready = new Promise(() => {});
+if (browser) {
+	// Only initialize on the client side
+	ready = initialize();
+}
 
 if (import.meta.hot) {
 	// In dev, with HMR, reuse the same WebContainer
-	import.meta.hot.accept(() => {
-		// Module reloaded: TODO: kill current process, redo the whole thing
+	import.meta.hot.accept(async () => {
+		killCurrentProcess();
+		await startWebContainer(lastUsedBlocks, new Promise((fulfill) => fulfill(lastUsedFiles)));
 	});
 }
 
-export async function create() {
+async function initialize() {
 	progress.set(steps.BOOTING);
 	webcontainerInstance = await WebContainer.boot();
-	return { startWebContainer, stopWebContainer };
 }
 
-async function startWebContainer(blocks: Block[], files: BundleFiles) {
-	// Boot webcontainer and load files concurrently
-	console.log({ blocks, files })
+export async function startWebContainer(blocks: Block[], filesPromise: BundleFiles) {
+	// Wait for the WebContainer to be initialized and for files to be fetched
+	const [_, files] = await Promise.all([ready, filesPromise]);
+
+	// Store for HMR
+	lastUsedFiles = files;
+	lastUsedBlocks = blocks;
 
 	// Mount files
 
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(files);
 
+	async function spawn(command: string, args: string[], errorMessage: string, logOutput = false) {
+		if (currentProcess) throw new Error('A process is already running');
+		const process = await webcontainerInstance.spawn(command, args);
+		currentProcess = process;
+
+		if (logOutput) process.output.pipeTo(log_stream());
+
+		return process.exit.then((code) => {
+			if (currentProcess === process) currentProcess = undefined;
+			if (code !== 0) {
+				throw new Error(errorMessage);
+			}
+		});
+	}
+
 	// Unzip files
 
 	progress.set(steps.UNZIPPING);
-	await unzipFiles();
-	async function unzipFiles() {
-		const unzip = await webcontainerInstance.spawn('node', ['unzip.cjs']);
-		unzip.output.pipeTo(log_stream());
-		if ((await unzip.exit) !== 0) {
-			throw new Error('Failed to unzip in WebContainer');
-		}
-		await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
-	}
-
-	// Since rollup and esbuild are written with native code, we need to reinstall them
-	// (Jason uses a mac, so the binaries in the editor/package-lock.json created for him
-	// are not compatible with the webcontainer platform, Linux)
-	// In parallel, generate the Svelte code files we need.
-
-	progress.set(steps.INSTALLING);
+	await spawn('node', ['unzip.cjs'], 'Failed to unzip files');
 
 	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
 
-	await Promise.all([chmod(), generateFiles()]);
-
-	console.log(
-		await webcontainerInstance.fs.readFile(
-			`node_modules/@rollup/rollup-linux-x64-musl/package.json`,
-			'utf-8'
-		)
-	);
-
-	async function chmod() {
-		await webcontainerInstance.spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js']);
-	}
-
-	async function install() {
-		await webcontainerInstance.spawn('rm', ['-rf', 'node_modules']);
-		await chmod();
-		const process = await webcontainerInstance.spawn('npm', [
-			'i',
-			'-D',
-			'@rollup/rollup-linux-x64-musl',
-			'esbuild'
-		]);
-		// process.output.pipeTo(log_stream());
-		const code = await process.exit;
-		if (code !== 0) {
-			throw new Error('Failed to install dependencies');
-		}
-	}
+	await Promise.all([
+		spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js'], 'Failed to chmod'),
+		generateFiles()
+	]);
 
 	async function generateFiles() {
 		await Promise.all([
@@ -110,15 +99,7 @@ async function startWebContainer(blocks: Block[], files: BundleFiles) {
 	});
 
 	progress.set(steps.RUNNING);
-	await dev();
-	async function dev() {
-		const process = await webcontainerInstance.spawn('./node_modules/vite/bin/vite.js', ['dev']);
-		process.output.pipeTo(log_stream());
-		const code = await process.exit;
-		if (code !== 0) {
-			throw new Error('Failed to start dev server');
-		}
-	}
+	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
 }
 
 export async function stopWebContainer() {
@@ -146,4 +127,11 @@ export async function writeFile(filename: string, contents: string) {
 		? `/src/routes/${filename}`
 		: `/src/lib/generated/${filename}.svelte`;
 	await webcontainerInstance.fs.writeFile(path, contents);
+}
+
+function killCurrentProcess() {
+	if (currentProcess) {
+		currentProcess.kill();
+		currentProcess = undefined;
+	}
 }
