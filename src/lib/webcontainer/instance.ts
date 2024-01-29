@@ -1,10 +1,9 @@
-import { WebContainer } from '@webcontainer/api';
-import { base, progress } from '$lib/stores';
-import { steps, globalFiles } from '$lib/constants';
-import type { WebContainer as WebContainerType, WebContainerProcess } from '@webcontainer/api';
+import { WebContainer, type WebContainerProcess } from '@webcontainer/api';
 import { browser } from '$app/environment';
+import { base, progress } from '$lib/stores.ts';
+import { steps } from '$lib/constants.ts';
 
-let webcontainerInstance: WebContainerType;
+let webcontainerInstance: WebContainer;
 let lastUsedBlocks: Block[];
 let lastUsedFiles: Awaited<BundleFiles>;
 let currentProcess: WebContainerProcess | undefined;
@@ -21,8 +20,9 @@ if (import.meta.hot) {
 		startWebContainer(lastUsedBlocks, new Promise((fulfill) => fulfill(lastUsedFiles)));
 	});
 
-	import.meta.hot.on('vite:beforeUpdate', () => {
-		killCurrentProcess(); // not working
+	import.meta.hot.on('vite:beforeUpdate', (updatePayload) => {
+		if (updatePayload.updates.some((update) => update.path === '/src/lib/webcontainer/instance.ts'))
+			killCurrentProcess(); // not rlly working
 	});
 }
 
@@ -114,10 +114,7 @@ function log_stream() {
 	});
 }
 
-export async function writeFile(filename: string, contents: string) {
-	const path = Object.values(globalFiles).includes(filename)
-		? `/src/routes/${filename}`
-		: `/src/lib/generated/${filename}.svelte`;
+export async function writeFile(path: string, contents: string) {
 	await webcontainerInstance.fs.writeFile(path, contents);
 }
 

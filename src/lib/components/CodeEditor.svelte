@@ -68,17 +68,17 @@
 		(containerElement.querySelector('[contenteditable=true]') as HTMLElement)?.focus();
 
 	function onKeyDown(e: KeyboardEvent) {
-		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+		if ((e.metaKey) && e.key === 's') {
 			e.preventDefault();
 			dispatch('save', ytext.toString());
 		}
-		if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+		if ((e.metaKey) && ['a', 'b'].includes(e.key)) {
 			e.preventDefault();
-			openComponent.set('b');
+			openComponent.set(`/src/lib/generated/${e.key}.svelte`);
 		}
-		if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+		if ((e.metaKey) && e.key === 'x') {
 			e.preventDefault();
-			openComponent.set('a');
+			openComponent.set('/src/routes/Blocks.svelte');
 		}
 	}
 </script>
@@ -131,13 +131,17 @@
 	}
 
 	.code-mirror-container {
+		display: grid;
 		max-height: calc(100vh - 30px);
 		overflow-y: scroll;
-		position: relative;
 		align-self: center;
-		pointer-events: none;
 		transition: opacity 0.1s;
 		opacity: 0;
+		pointer-events: none;
+	}
+
+	.code-mirror-container > :global(*) {
+		grid-area: 1 / 1;
 	}
 
 	.code-editor.show-editor .code-mirror-container {

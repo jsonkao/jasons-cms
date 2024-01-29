@@ -1,23 +1,19 @@
 import * as Y from 'yjs';
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import exampleData from '../src/lib/server/database/example-data.json' assert { type: 'json' };
 
 const ydoc = new Y.Doc();
 
 exampleData.forEach((block) => {
 	if (block.type === 'graphic') {
-		const ytext = ydoc.getText(block.name);
+		const ytext = ydoc.getText(`/src/lib/generated/${block.name}.svelte`);
 		ytext.insert(0, block.code);
 	}
 });
 
-ydoc.getText('+page.server.js').insert(0, '');
-ydoc.getText('styles.css').insert(0, '');
-
-// const yxml = ydoc.getXmlFragment('test');
-// const el = new Y.XmlElement('p');
-// el.insert(0, [new Y.XmlText('example ydoc test text')]);
-// yxml.insert(0, [el]);
+ydoc.getText('/src/routes/+page.server.js').insert(0, '');
+ydoc.getText('/src/routes/styles.css').insert(0, '');
+ydoc.getText('/src/routes/Blocks.svelte').insert(0, readFileSync('editor/src/routes/Blocks.svelte', 'utf8'));
 
 let docState = Y.encodeStateAsUpdate(ydoc);
 writeFileSync('./src/lib/yjs/example-ydoc.bin', Buffer.from(docState));

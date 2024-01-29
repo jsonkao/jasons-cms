@@ -16,8 +16,8 @@ export const steps = {
  * Global files
  */
 export const globalFiles = {
-	DATA: '+page.server.js',
-	STYLES: 'styles.css'
+	DATA: '/src/routes/+page.server.js',
+	STYLES: '/src/routes/styles.css'
 };
 
 /**

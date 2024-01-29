@@ -10,12 +10,14 @@
 
 <style>
 	.placement-buttons {
-		position: absolute;
-		bottom: 10px;
-		right: 9px;
+		margin-bottom: 10px;
+		margin-right: 9px;
 		display: flex;
 		flex-direction: column;
 		gap: 5px;
+		z-index: 3;
+		align-self: flex-end;
+		justify-self: flex-end;
 	}
 
 	button {

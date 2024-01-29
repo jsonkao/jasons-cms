@@ -13,11 +13,15 @@ if (!fs.existsSync('node_modules/.bin')) {
 	fs.mkdirSync('node_modules/.bin');
 }
 
-fs.symlinkSync('../@sveltejs/kit/svelte-kit.js', 'node_modules/.bin/svelte-kit');
-fs.chmodSync('node_modules/.bin/svelte-kit', 0o777);
+if (!fs.existsSync('node_modules/.bin/svelte-kit')) {
+	fs.symlinkSync('../@sveltejs/kit/svelte-kit.js', 'node_modules/.bin/svelte-kit');
+	fs.chmodSync('node_modules/.bin/svelte-kit', 0o777);
+}
 
-fs.symlinkSync('../esbuild/bin/esbuild', 'node_modules/.bin/esbuild');
-fs.chmodSync('node_modules/.bin/esbuild', 0o777);
+if (!fs.existsSync('node_modules/.bin/esbuild')) {
+	fs.symlinkSync('../esbuild/bin/esbuild', 'node_modules/.bin/esbuild');
+	fs.chmodSync('node_modules/.bin/esbuild', 0o777);
+}
 
 // chmod a+x node_modules/vite/bin/vite.js
 fs.chmodSync('node_modules/vite/bin/vite.js', 0o755);

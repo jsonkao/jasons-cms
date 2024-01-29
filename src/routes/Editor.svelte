@@ -11,7 +11,7 @@
 	/**
 	 * The graphic in focus (and whose code is in the CodeEditor)
 	 */
-	openComponent.set((blocks.find((d) => d.type === 'graphic') as GraphicBlock)?.name);
+	openComponent.set(`/src/lib/generated/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`);
 
 	let showCodeEditor = false;
 
@@ -41,7 +41,7 @@
 				showCodeEditor = !showCodeEditor;
 				break;
 			case 'focusGraphic':
-				openComponent.set(event.data.name);
+				openComponent.set(`/src/lib/generated/${event.data.name}.svelte`);
 				break;
 			case 'editorMounted':
 				progress.set(steps.EDITOR_READY);
@@ -54,6 +54,10 @@
 	 * TODO: Incorporate $openGlobalFile
 	 */
 	function handleSave(event: CustomEvent) {
+		if (!$openComponent) {
+			console.error('Attempted to save but openComponent is null', event);
+			return;
+		}
 		writeFile($openComponent, event.detail);
 	}
 </script>
@@ -114,7 +118,7 @@
 	}
 
 	.layout-center .code-container {
-		max-width: 720px;
+		max-width: max(80%, 720px);
 	}
 
 	/* Styles for layout-bottom */

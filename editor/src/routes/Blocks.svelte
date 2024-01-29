@@ -68,7 +68,8 @@
 	if (browser) {
 		const ydoc = new Y.Doc();
 
-		provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
+		// provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
+		provider = new WebsocketProvider('wss://demos.yjs.dev/ws', 'prosemirror-demo', ydoc);
 		provider.awareness.setLocalStateField('user', { color, name });
 
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
