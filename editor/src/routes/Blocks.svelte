@@ -1,10 +1,3 @@
-<script context="module">
-	const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
-	const name = names[Math.floor(Math.random() * names.length)];
-	const colors = ['#A32251', 'rgb(7, 7, 126)', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
-	const color = colors[Math.floor(Math.random() * colors.length)];
-</script>
-
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
@@ -24,6 +17,11 @@
 	type BlockWithState =
 		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
 		| GraphicBlock;
+
+	const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
+	const name = names[Math.floor(Math.random() * names.length)];
+	const colors = ['#A32251', 'rgb(7, 7, 126)', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
+	const color = colors[Math.floor(Math.random() * colors.length)];
 
 	/**
 	 * When Backspace is pressed on an empty prosemirror state,
@@ -73,6 +71,12 @@
 		provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
 		provider.awareness.setLocalStateField('user', { color, name });
 
+		provider.awareness.on('change', (u) => {
+			console.log('Awareness cursors', [...provider.awareness.getStates().values()].map((s) => s.cursor));
+		});
+
+		const cursorPlugin = yCursorPlugin(provider.awareness, { cursorBuilder });
+
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
 			// TODO: Check whether d.uid is already in the documentMap
 			// TODO: populate with initial data
@@ -80,7 +84,7 @@
 				const state = createEditor(undefined, [
 					blockDeletionPlugin,
 					ySyncPlugin(ydoc.getXmlFragment(d.uid)),
-					yCursorPlugin(provider.awareness, { cursorBuilder }),
+					cursorPlugin,
 					yUndoPlugin(),
 					keymap({
 						'Mod-z': undo,
