@@ -36,7 +36,6 @@ const ignored_directories = [
 
 const ignored_files = new Set([
 	'node_modules/svelte/compiler.cjs',
-	'node_modules/y-webrtc/dist/demo.js',
 	'node_modules/y-protocols/dist/test.js'
 ]);
 

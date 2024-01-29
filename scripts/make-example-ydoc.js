@@ -2,6 +2,8 @@ import * as Y from 'yjs';
 import { readFileSync, writeFileSync } from 'fs';
 import exampleData from '../src/lib/server/database/example-data.json' assert { type: 'json' };
 
+// TODO: remove when Liveblocks integration is complete
+
 const ydoc = new Y.Doc();
 
 exampleData.forEach((block) => {
