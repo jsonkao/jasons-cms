@@ -71,20 +71,12 @@
 		provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
 		provider.awareness.setLocalStateField('user', { color, name });
 
-		provider.awareness.on('change', (u) => {
-			console.log('Awareness cursors', [...provider.awareness.getStates().values()].map((s) => s.cursor));
-		});
-
-		const cursorPlugin = yCursorPlugin(provider.awareness, { cursorBuilder });
-
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
-			// TODO: Check whether d.uid is already in the documentMap
-			// TODO: populate with initial data
 			if (d.type === 'text') {
 				const state = createEditor(undefined, [
 					blockDeletionPlugin,
-					ySyncPlugin(ydoc.getXmlFragment(d.uid)),
-					cursorPlugin,
+					ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
+					yCursorPlugin(provider.awareness, { cursorBuilder }),
 					yUndoPlugin(),
 					keymap({
 						'Mod-z': undo,
@@ -122,7 +114,6 @@
 			<ProsemirrorEditor
 				bind:this={b.editor}
 				editorState={b.state}
-				on:change={(e) => (blocksWithState[i].state = e.detail.editorState)}
 				on:blur={() => (lastTextFocused = i)}
 				debounceChangeEventsInterval={0}
 			/>
