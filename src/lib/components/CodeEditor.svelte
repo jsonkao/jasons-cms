@@ -31,6 +31,7 @@
 		ydoc = new Y.Doc();
 		Y.applyUpdate(ydoc, ydocState);
 
+		// TODO: switch to liveblocks
 		provider = new WebrtcProvider('codemirror6-demo-room', ydoc);
 		ytext = ydoc.getText('a');
 

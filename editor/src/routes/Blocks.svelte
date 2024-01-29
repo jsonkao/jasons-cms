@@ -10,7 +10,6 @@
 	import Component from './Component.svelte';
 
 	import * as Y from 'yjs';
-	import { WebrtcProvider } from 'y-webrtc';
 	import { ySyncPlugin, yCursorPlugin, yUndoPlugin, undo, redo } from 'y-prosemirror';
 	import { keymap } from 'prosemirror-keymap';
 
@@ -69,7 +68,6 @@
 	}
 
 	let blocksWithState: BlockWithState[] = [];
-	let provider: WebrtcProvider;
 	let destroy = () => {};
 
 	if (browser) {
@@ -81,7 +79,7 @@
 
 		const ydoc = new Y.Doc();
 
-		const yProvider = new LiveblocksProvider(room, ydoc); // provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
+		const yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color, name });
 
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
@@ -114,7 +112,6 @@
 
 		return () => {
 			observer && observer.disconnect();
-			provider && provider.destroy();
 			destroy();
 		};
 	});
