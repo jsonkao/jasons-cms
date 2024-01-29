@@ -106,7 +106,7 @@ export async function startWebContainer(blocks: Block[]) {
 			// A file for constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
 			generateFile(
 				'globals.js',
-				`export const userName = ${userName}; export const userColor = ${userColor};`
+				`export const userName = "${userName}"; export const userColor = "${userColor}";`
 			)
 		]);
 
