@@ -64,7 +64,8 @@ export async function initialize() {
 	} else {
 		promises.push(
 			loadFiles().then((files) => {
-				if (import.meta.hot) import.meta.hot.data.templateFiles = templateFiles = files;
+				templateFiles = files;
+				if (import.meta.hot) import.meta.hot.data.templateFiles = templateFiles;
 			})
 		);
 	}
@@ -78,6 +79,7 @@ export async function startWebContainer(blocks: Block[]) {
 
 	// Mount and unzip files
 	// TODO LATER: diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
+	console.log('TEMPLATE FILES', templateFiles);
 
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(templateFiles);
