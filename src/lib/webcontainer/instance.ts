@@ -16,16 +16,26 @@ if (browser) {
 }
 
 if (import.meta.hot) {
-	// In dev, with HMR, reuse the same WebContainer
-	import.meta.hot.accept(async () => {
-		killCurrentProcess();
-		await startWebContainer(lastUsedBlocks, new Promise((fulfill) => fulfill(lastUsedFiles)));
+	// In dev HMR, kill current process and do starting steps again
+	import.meta.hot.accept(() => {
+		startWebContainer(lastUsedBlocks, new Promise((fulfill) => fulfill(lastUsedFiles)));
+	});
+
+	import.meta.hot.on('vite:beforeUpdate', () => {
+		killCurrentProcess(); // not working
 	});
 }
 
-async function initialize() {
+export async function initialize() {
 	progress.set(steps.BOOTING);
-	webcontainerInstance = await WebContainer.boot();
+
+	// Reuse the same webcontainer in dev HMR
+	if (import.meta.hot && import.meta.hot.data.webcontainerInstance) {
+		webcontainerInstance = import.meta.hot.data.webcontainerInstance;
+	} else {
+		webcontainerInstance = await WebContainer.boot();
+		if (import.meta.hot) import.meta.hot.data.webcontainerInstance = webcontainerInstance;
+	}
 }
 
 export async function startWebContainer(blocks: Block[], filesPromise: BundleFiles) {
@@ -36,37 +46,19 @@ export async function startWebContainer(blocks: Block[], filesPromise: BundleFil
 	lastUsedFiles = files;
 	lastUsedBlocks = blocks;
 
-	// Mount files
+	// Mount and unzip files if needed
+
+	const rootFiles = await webcontainerInstance.fs.readdir('/');
 
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(files);
 
-	async function spawn(command: string, args: string[], errorMessage: string, logOutput = false) {
-		if (currentProcess) throw new Error('A process is already running');
-		const process = await webcontainerInstance.spawn(command, args);
-		currentProcess = process;
-
-		if (logOutput) process.output.pipeTo(log_stream());
-
-		return process.exit.then((code) => {
-			if (currentProcess === process) currentProcess = undefined;
-			if (code !== 0) {
-				throw new Error(errorMessage);
-			}
-		});
-	}
-
-	// Unzip files
-
 	progress.set(steps.UNZIPPING);
-	await spawn('node', ['unzip.cjs'], 'Failed to unzip files');
+	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
 
 	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
 
-	await Promise.all([
-		spawn('chmod', ['a+x', 'node_modules/vite/bin/vite.js'], 'Failed to chmod'),
-		generateFiles()
-	]);
+	await generateFiles();
 
 	async function generateFiles() {
 		await Promise.all([
@@ -110,7 +102,7 @@ export async function stopWebContainer() {
 		if (webcontainerInstance) await webcontainerInstance.teardown();
 		else console.warn('webcontainerInstance is not there', webcontainerInstance);
 	} catch (e) {
-		console.error('teardown failed', e);
+		console.error('Teardown failed', e);
 	}
 }
 
@@ -131,7 +123,34 @@ export async function writeFile(filename: string, contents: string) {
 
 function killCurrentProcess() {
 	if (currentProcess) {
+		console.log('Trying to kill', currentProcess);
 		currentProcess.kill();
 		currentProcess = undefined;
 	}
+	console.log('Did the kill work?');
+}
+
+async function spawn(command: string, args: string[], errorMessage: string, logOutput = false) {
+	if (!webcontainerInstance) {
+		console.warn(
+			`Tried to spawn a process but webcontainerInstance isn't there. Not spawning: ${command} ${args}`
+		);
+		return;
+	}
+
+	if (currentProcess)
+		throw new Error(`A process is already running. Had tried to spawn ${command} ${args}`);
+
+	const process = await webcontainerInstance.spawn(command, args);
+	currentProcess = process;
+	console.log(`Just spawned ${command} ${args} with currentProcess ${currentProcess}`);
+
+	if (logOutput) process.output.pipeTo(log_stream());
+
+	return process.exit.then((code) => {
+		if (currentProcess === process) currentProcess = undefined;
+		if (code !== 0) {
+			console.error(`Error in spawn for command ${command} ${args}: ${errorMessage}`);
+		}
+	});
 }

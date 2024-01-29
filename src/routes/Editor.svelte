@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { base, codeEditorPosition, openComponent, progress } from '$lib/stores';
-	import { writeFile } from '$lib/webcontainer';
+	import { writeFile } from '$lib/webcontainer/instance.ts';
 
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';
@@ -36,13 +36,9 @@
 	 * Handles all messages from the iframe
 	 */
 	function onMessage(event: MessageEvent) {
-		console.log('Message from child: ', event.data);
 		switch (event.data.type) {
 			case 'toggleEditor':
 				showCodeEditor = !showCodeEditor;
-				break;
-			case 'saveFile':
-				handleSave();
 				break;
 			case 'focusGraphic':
 				openComponent.set(event.data.name);

@@ -61,9 +61,6 @@
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
 			window.parent.postMessage({ type: 'toggleEditor' }, '*');
-		} else if (e.metaKey && e.key === 's') {
-			e.preventDefault();
-			window.parent.postMessage({ type: 'saveFile' }, '*');
 		}
 	}
 
