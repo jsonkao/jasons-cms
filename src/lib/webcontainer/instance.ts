@@ -1,15 +1,14 @@
 import { WebContainer, type WebContainerProcess } from '@webcontainer/api';
 import { browser } from '$app/environment';
 import { base, progress } from '$lib/stores.ts';
-import { steps } from '$lib/constants.ts';
+import { steps, userName, userColor } from '$lib/constants.ts';
 import { loadFiles } from './files.ts';
 
 let webcontainerInstance: WebContainer;
-let templateFiles: Awaited<BundleFiles>;
+let templateFiles: Awaited<ReturnType<typeof loadFiles>>;
 
 let currentProcess: WebContainerProcess | undefined;
 
-console.log('module3');
 if (import.meta.hot) {
 	import.meta.hot.on('vite:beforeUpdate', ({ updates }) => {
 		if (updates.some((u) => u.path === '/src/routes/+page.svelte' && u.type === 'js-update')) {
@@ -74,9 +73,6 @@ export async function initialize() {
 }
 
 export async function startWebContainer(blocks: Block[]) {
-	console.log('startWebContainer', blocks.length);
-	console.log('test3');
-
 	// Wait for the WebContainer to be initialized and for files to be fetched
 	await ready;
 
@@ -96,36 +92,29 @@ export async function startWebContainer(blocks: Block[]) {
 	async function generateFiles() {
 		await Promise.all([
 			// Graphics Svelte files
-			...graphicBlocks.map(({ name, code }) => writeFile(`${name}.svelte`, code)),
+			...graphicBlocks.map(({ name, code }) => generateFile(`${name}.svelte`, code)),
 			// A lib/index.js file to export all the graphic components
-			writeFile(
+			generateFile(
 				'index.js',
 				graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
 					`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
 			),
 			// A data.json file with blocks data
-			writeFile('data.json', JSON.stringify(blocks))
+			generateFile('data.json', JSON.stringify(blocks)),
+			// A file for constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
+			generateFile(
+				'globals.js',
+				`export const userName = ${userName}; export const userColor = ${userColor};`
+			)
 		]);
 
-		function writeFile(filename: string, content: string) {
+		function generateFile(filename: string, content: string) {
 			return webcontainerInstance.fs.writeFile(`src/lib/generated/${filename}`, content);
 		}
 	}
 
 	progress.set(steps.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
-}
-
-export async function stopWebContainer() {
-	base.set(null);
-	progress.set(null);
-	try {
-		console.log('Tearing down webcontainer...', webcontainerInstance);
-		if (webcontainerInstance) await webcontainerInstance.teardown();
-		else console.warn('webcontainerInstance is not there', webcontainerInstance);
-	} catch (e) {
-		console.error('Teardown failed', e);
-	}
 }
 
 function log_stream() {

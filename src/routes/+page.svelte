@@ -5,13 +5,15 @@
 	import type { PageData } from './$types';
 	import Editor from './Editor.svelte';
 
+	/**
+	 * Retrieve page's blocks data
+	 */
 	export let data: PageData;
 	const { blocks } = data;
 
 	/**
-	 * Starting and stopping webcontainer
+	 * In browser, start webcontainer
 	 */
-	console.log('+page.svelte');
 	if (browser) startWebContainer(blocks);
 
 	/**

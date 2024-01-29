@@ -3,6 +3,7 @@
 	import { browser } from '$app/environment';
 	import { createObserver } from './utils.js';
 	import rawBlocks from '$lib/generated/data.json';
+	import { userName, userColor } from '$lib/generated/globals.js';
 
 	import type { EditorState } from 'prosemirror-state';
 	import { createEditor, cursorBuilder, makePlugin, toPlainText } from './prosemirror';
@@ -24,11 +25,6 @@
 	type BlockWithState =
 		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
 		| GraphicBlock;
-
-	const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
-	const name = names[Math.floor(Math.random() * names.length)];
-	const colors = ['#A32251', 'rgb(7, 7, 126)', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
-	const color = colors[Math.floor(Math.random() * colors.length)];
 
 	/**
 	 * When Backspace is pressed on an empty prosemirror state,
@@ -81,7 +77,7 @@
 		const ydoc = new Y.Doc();
 
 		const yProvider = new LiveblocksProvider(room, ydoc);
-		yProvider.awareness.setLocalStateField('user', { color, name });
+		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
 			if (d.type === 'text') {

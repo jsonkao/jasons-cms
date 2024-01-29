@@ -10,13 +10,6 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
-
-	type BundleFiles = ReturnType<typeof loadFiles>;
-
-	interface WebcontainerModule {
-		startWebContainer(blocks: Block[], files: BundleFiles): Promise<void>;
-		stopWebContainer(): Promise<void>;
-	}
 }
 
 export {};
