@@ -46,7 +46,6 @@
 			const lastBlock = blocksWithState[lastTextFocused];
 			if (lastBlock.type === 'text') {
 				const editor = lastBlock.editor;
-				console.log('Trying to focus text with', editor);
 				editor?.focus();
 			}
 		}
@@ -68,8 +67,7 @@
 	if (browser) {
 		const ydoc = new Y.Doc();
 
-		// provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
-		provider = new WebsocketProvider('wss://demos.yjs.dev/ws', 'prosemirror-demo', ydoc);
+		provider = new WebrtcProvider('prosemirror-us-cms-demo-room', ydoc);
 		provider.awareness.setLocalStateField('user', { color, name });
 
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
