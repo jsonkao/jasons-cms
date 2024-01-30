@@ -52,7 +52,7 @@ export async function initialize() {
 				});
 
 				webcontainerInstance.on('error', ({ message }) => {
-					console.log("There was an error", message)
+					console.log('There was an error', message);
 				});
 			})
 		);
