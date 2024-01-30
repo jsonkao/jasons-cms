@@ -92,7 +92,7 @@ export async function startWebContainer(blocks: Block[]) {
 
 	async function generateFiles() {
 		await Promise.all([
-			// Graphics Svelte files
+			// Initial write of graphics Svelte files so the dev server starts with a good preview
 			...graphicBlocks.map(({ name, code }) => generateFile(`${name}.svelte`, code)),
 			// A lib/index.js file to export all the graphic components
 			generateFile(

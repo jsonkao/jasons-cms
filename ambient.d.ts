@@ -1,6 +1,5 @@
 interface TextBlock {
 	type: 'text';
-	text: string;
 	uid: string;
 }
 

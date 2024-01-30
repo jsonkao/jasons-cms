@@ -10,6 +10,9 @@ export const progress: Writable<(typeof steps)[keyof typeof steps] | null> = wri
 
 export const error: Writable<Error | null> = writable(null);
 
+/**
+ * The graphic in focus (and whose code is in the CodeEditor)
+ */
 export const openComponent: Writable<string | null> = writable(null);
 
 export const openGlobalFile: Writable<string | null> = writable(null);

@@ -44,7 +44,6 @@
 		yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 
-		console.log('openComponent', $openComponent);
 		setExtension($openComponent);
 
 		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want

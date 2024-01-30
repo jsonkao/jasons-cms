@@ -1,23 +1,22 @@
 [
-	{ "type": "text", "text": "", "uid": "1" },
 	{
-		"type": "graphic",
-		"name": "a",
-		"code": "<script>\n\timport { onMount } from 'svelte';\n\n\tlet count = 0;\n\n\tonMount(() => {\n\t\tconst interval = setInterval(() => (count += 1), 1000);\n\t\treturn () => clearInterval(interval);\n\t});\n</script>\n\n<div>\n\t<p>Count: {count}</p>\n</div>\n\n<style>\n\tdiv {\n\t\tdisplay: flex;\n\t\tjustify-content: center;\n\t\talign-items: center;\n\t\theight: 300px;\n\t\tbackground: rgba(255, 0, 0, 0.1);\n\t\tborder: 1px solid red;\n\t}\n</style>\n"
-	},
-	{
-		"uid": "2",
 		"type": "text",
-		"text": "<p>Hundreds of thousands of people poured into the streets of Hong Kong on Sunday, June 16, and marched almost two miles (three kilometers), protesting a proposed extradition bill and calling for the city’s leader to step down.</p><p>It was the largest of three major protests against the bill that were held over eight days. More demonstrations are <a href=\"https://www.nytimes.com/aponline/2019/06/24/world/asia/ap-as-hong-kong-protests.html\">scheduled for Wednesday</a>, ahead of the Group of 20 summit meeting in Osaka, Japan. The composite images below help show the enormous scale of the June 16 demonstrations.</p>"
+		"uid": "1"
 	},
 	{
 		"type": "graphic",
-		"name": "b",
-		"code": "<script>\n\timport { onMount } from 'svelte';\n\n\tlet fontSize = 16;\n\n\tonMount(() => {\n\t\tconst interval = setInterval(() => (fontSize = Math.random() * 100), 1000);\n\t\treturn () => clearInterval(interval);\n\t});\n</script>\n\n<div>\n\t<p style:font-size=\"{fontSize}px\">Hello world!</p>\n</div>\n\n<style>\n\tdiv {\n\t\tdisplay: flex;\n\t\tjustify-content: center;\n\t\talign-items: center;\n\t\theight: 120vh;\n\t\tbackground: #f3f3f3;\n\t\tborder: none;\n\t}\n\n\tp {\n\t\tfont-family: Arial;\n\t\ttransition-duration: 0.2s;\n\t}\n</style>\n"
+		"name": "a"
 	},
 	{
-		"uid": "3",
 		"type": "text",
-		"text": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus.</p>"
+		"uid": "2"
+	},
+	{
+		"type": "graphic",
+		"name": "b"
+	},
+	{
+		"type": "text",
+		"uid": "3"
 	}
 ]

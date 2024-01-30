@@ -7,8 +7,10 @@ This repo uses npm.
 ## Developing
 
 ```
-npm run zip && npm run dev
+npm run dev
 ```
+
+Requires a .env file with a `LIVEBLOCKS_SECRET_KEY` and a `LIVEBLOCKS_PUBLIC_KEY`.
 
 ## Demos
 

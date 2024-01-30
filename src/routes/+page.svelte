@@ -14,7 +14,12 @@
 	/**
 	 * In browser, start webcontainer
 	 */
-	if (browser) startWebContainer(blocks);
+	if (browser) {
+		startWebContainer(blocks);
+		openComponent.set(
+			`/src/lib/generated/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`
+		);
+	}
 
 	/**
 	 * Handles saving the file. Eventually, will probably communicate with a database.
@@ -29,4 +34,4 @@
 	}
 </script>
 
-<Editor {blocks} on:save={handleSave} />
+<Editor on:save={handleSave} />

@@ -5,15 +5,6 @@
 	import Loading from '$lib/components/Loading.svelte';
 	import { steps } from '$lib/constants';
 
-	export let blocks: Block[];
-
-	/**
-	 * The graphic in focus (and whose code is in the CodeEditor)
-	 */
-	openComponent.set(
-		`/src/lib/generated/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`
-	);
-
 	let showCodeEditor = false;
 
 	/**

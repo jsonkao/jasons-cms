@@ -36,6 +36,7 @@
 	"type": "module",
 	"dependencies": {
 		"@liveblocks/client": "^1.9.7",
+		"@liveblocks/node": "^1.9.7",
 		"@liveblocks/yjs": "^1.9.7",
 		"@replit/codemirror-lang-svelte": "^6.0.0",
 		"@webcontainer/api": "^1.1.8",
