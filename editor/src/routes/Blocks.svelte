@@ -105,7 +105,7 @@
 	let contentEl: HTMLElement;
 	onMount(() => {
 		window.parent?.postMessage({ type: 'editorMounted' }, '*');
-		const observer = createObserver(contentEl.querySelectorAll('.graphic'));
+		const observer = createObserver(contentEl.querySelectorAll('[data-name]'));
 
 		return () => {
 			observer && observer.disconnect();
