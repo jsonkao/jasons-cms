@@ -52,7 +52,7 @@ export async function initialize() {
 				});
 
 				webcontainerInstance.on('error', ({ message }) => {
-					// TODO: handle errors
+					console.log("There was an error", message)
 				});
 			})
 		);
@@ -79,7 +79,6 @@ export async function startWebContainer(blocks: Block[]) {
 
 	// Mount and unzip files
 	// TODO LATER: diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
-	console.log('TEMPLATE FILES', templateFiles);
 
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(templateFiles);

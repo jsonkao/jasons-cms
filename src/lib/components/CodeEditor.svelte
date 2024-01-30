@@ -9,12 +9,18 @@
 	import * as Y from 'yjs';
 	// @ts-ignore
 	import { yCollab } from 'y-codemirror.next';
-	import { WebrtcProvider } from 'y-webrtc';
 
 	import { codeEditorPosition, openComponent } from '$lib/stores';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import { userName, userColor } from '$lib/constants';
-	import { getYdocState } from '$lib/yjs';
+
+	import { createClient } from '@liveblocks/client';
+	import LiveblocksProvider from '@liveblocks/yjs';
+	import { browser } from '$app/environment';
+
+	const client = createClient({
+		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
+	});
 
 	/**
 	 * Create Y.Text
@@ -23,34 +29,36 @@
 	let ydoc: Y.Doc;
 	let ytext: Y.Text;
 	let yExtension: Extension;
-	let provider: WebrtcProvider;
+	let yProvider: LiveblocksProvider<any, any, any, any>;
 
-	onMount(async () => {
-		const ydocState = await getYdocState();
+	let destroy = () => {};
 
-		ydoc = new Y.Doc();
-		Y.applyUpdate(ydoc, ydocState);
-
-		// TODO: switch to liveblocks
-		provider = new WebrtcProvider('codemirror6-demo-room', ydoc);
-		ytext = ydoc.getText('a');
-
-		provider.awareness.setLocalStateField('user', {
-			name: userName,
-			color: userColor,
-			colorLight: '#000'
+	if (browser) {
+		const { room, leave } = client.enterRoom('my-room', {
+			initialPresence: {}
 		});
 
-		yExtension = yCollab(ytext, provider.awareness);
-	});
-	onDestroy(() => provider?.destroy());
+		destroy = leave;
 
-	$: if (ydoc && yExtension && $openComponent) updateYdoc($openComponent);
+		ydoc = new Y.Doc();
+		yProvider = new LiveblocksProvider(room, ydoc);
+		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 
-	function updateYdoc(openComponent: string) {
+		console.log('openComponent', $openComponent);
+		setExtension($openComponent);
+
+		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
+		// persistance for? (i.e. non-components like +page.server.js or Blocks.svelte)
+	}
+
+	onDestroy(() => destroy());
+
+	$: if (ydoc && yExtension && $openComponent) setExtension($openComponent);
+
+	function setExtension(openComponent: string) {
 		// Do I need to manually destroy the old yCollab?
 		ytext = ydoc.getText(openComponent);
-		yExtension = yCollab(ytext, provider.awareness);
+		yExtension = yCollab(ytext, yProvider.awareness);
 	}
 
 	/**
