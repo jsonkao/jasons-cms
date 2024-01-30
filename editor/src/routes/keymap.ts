@@ -2,7 +2,7 @@
  * Copied from prosemirror-svelte
  */
 
-import { toggleMark, baseKeymap } from 'prosemirror-commands';
+import { toggleMark, baseKeymap, setBlockType } from 'prosemirror-commands';
 import { keymap } from 'prosemirror-keymap';
 
 const addKey = (keyMap, name, combo, command) => {
@@ -18,6 +18,9 @@ const createKeyMapConfiguration = (schema) => {
 
 	addKey(config, 'toggleMarkEm', 'Mod-i', toggleMark(schema.marks.em));
 	addKey(config, 'toggleMarkEm', 'Mod-I', toggleMark(schema.marks.em));
+
+	addKey(config, "setBlockTypeParagraph", "Mod-Alt-0", setBlockType(schema.nodes.paragraph));
+	addKey(config, "setBlockTypeHeadline", "Mod-Alt-1", setBlockType(schema.nodes.headline));
 
 	return config;
 };
