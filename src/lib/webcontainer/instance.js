@@ -1,14 +1,22 @@
-import { WebContainer, type WebContainerProcess } from '@webcontainer/api';
+import { WebContainer } from '@webcontainer/api';
 import { browser } from '$app/environment';
+import { steps } from '$lib/constants.ts';
 import { base, progress } from '$lib/stores.ts';
-import { steps, userName, userColor } from '$lib/constants.ts';
-import { loadFiles } from './files.ts';
+import { amendTemplateFiles, fetchTemplateFiles } from './files.js';
 
-let webcontainerInstance: WebContainer;
-let templateFiles: Awaited<ReturnType<typeof loadFiles>>;
+/** @type {WebContainer} The WebContainer instance. */
+let webcontainerInstance;
 
-let currentProcess: WebContainerProcess | undefined;
+/** @type {Awaited<ReturnType<typeof fetchTemplateFiles>>} The template files. */
+let templateFiles;
 
+/** @type {import('@webcontainer/api').WebContainerProcess | undefined} The current process running in the WebContainer. */
+let currentProcess;
+
+/**
+ * On HMR updates, kill the current process so we can safely start a new one.
+ * Right now, this doesn't work because it disconnects the webcontainer from the project, whatever that means.
+ */
 if (import.meta.hot) {
 	import.meta.hot.on('vite:beforeUpdate', ({ updates }) => {
 		if (updates.some((u) => u.path === '/src/routes/+page.svelte' && u.type === 'js-update')) {
@@ -22,9 +30,6 @@ if (import.meta.hot) {
 		console.log('dispose');
 		killCurrentProcess();
 	});
-	// Second, the new module is executed
-	// Third, this accept handler (from the old module) is called
-	// import.meta.hot.accept(() => { console.log('accept'); startWebContainer(lastUsedBlocks); });
 }
 
 /**
@@ -32,13 +37,16 @@ if (import.meta.hot) {
  */
 let ready = browser ? initialize() : new Promise(() => {});
 
+/**
+ * Initialize the WebContainer and fetch the template files.
+ */
 export async function initialize() {
 	progress.set(steps.BOOTING);
 
 	const promises = [];
 
 	// Reuse the same webcontainer in dev HMR
-	if (import.meta.hot && import.meta.hot.data.webcontainerInstance) {
+	if (import.meta.hot?.data.webcontainerInstance) {
 		webcontainerInstance = import.meta.hot.data.webcontainerInstance;
 	} else {
 		promises.push(
@@ -50,20 +58,19 @@ export async function initialize() {
 					progress.set(steps.SERVER_READY);
 					base.set(url);
 				});
-
 				webcontainerInstance.on('error', ({ message }) => {
-					console.log('There was an error', message);
+					console.error('WebContainer instance error:', message);
 				});
 			})
 		);
 	}
 
 	// Reuse the same template files in dev HMR
-	if (import.meta.hot && import.meta.hot.data.templateFiles) {
+	if (import.meta.hot?.data.templateFiles) {
 		templateFiles = import.meta.hot.data.templateFiles;
 	} else {
 		promises.push(
-			loadFiles().then((files) => {
+			fetchTemplateFiles().then((files) => {
 				templateFiles = files;
 				if (import.meta.hot) import.meta.hot.data.templateFiles = templateFiles;
 			})
@@ -73,46 +80,22 @@ export async function initialize() {
 	await Promise.all(promises);
 }
 
-export async function startWebContainer(blocks: Block[]) {
+/**
+ * Call this function to mount the WebContainer and start the dev server.
+ * @param {Block[]} blocks
+ */
+export async function startWebContainer(blocks) {
 	// Wait for the WebContainer to be initialized and for files to be fetched
 	await ready;
 
 	// Mount and unzip files
 	// TODO LATER: diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
-
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(templateFiles);
 
 	progress.set(steps.UNZIPPING);
 	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
-
-	const graphicBlocks = blocks.filter((block) => block.type === 'graphic') as GraphicBlock[];
-
-	await generateFiles();
-
-	async function generateFiles() {
-		await Promise.all([
-			// Initial write of graphics Svelte files so the dev server starts with a good preview
-			...graphicBlocks.map(({ name, code }) => generateFile(`${name}.svelte`, code)),
-			// A lib/index.js file to export all the graphic components
-			generateFile(
-				'index.js',
-				graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
-					`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
-			),
-			// A data.json file with blocks data
-			generateFile('data.json', JSON.stringify(blocks)),
-			// A file for constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
-			generateFile(
-				'globals.js',
-				`export const userName = "${userName}"; export const userColor = "${userColor}";`
-			)
-		]);
-
-		function generateFile(filename: string, content: string) {
-			return webcontainerInstance.fs.writeFile(`src/lib/generated/${filename}`, content);
-		}
-	}
+	await amendTemplateFiles(webcontainerInstance, blocks);
 
 	progress.set(steps.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
@@ -126,10 +109,18 @@ function log_stream() {
 	});
 }
 
-export async function writeFile(path: string, contents: string) {
+/**
+ * A helper to write a file to the WebContainer's file system.
+ * @param {string} path - The path of the file
+ * @param {string} contents - The content of the file
+ */
+export async function writeFile(path, contents) {
 	await webcontainerInstance.fs.writeFile(path, contents);
 }
 
+/**
+ * A helper to kill the current process running in the WebContainer.
+ */
 function killCurrentProcess() {
 	if (currentProcess) {
 		console.log('Killing', currentProcess);
@@ -138,14 +129,14 @@ function killCurrentProcess() {
 	}
 }
 
-async function spawn(command: string, args: string[], errorMessage: string, logOutput = false) {
-	if (!webcontainerInstance) {
-		console.warn(
-			`Tried to spawn a process but webcontainerInstance isn't there. Not spawning: ${command} ${args}`
-		);
-		return;
-	}
-
+/**
+ * A helper to spawn a process in the WebContainer.
+ * @param {string} command - The command to run
+ * @param {string[]} args - The arguments to pass to the command
+ * @param {string} errorMessage - The error message to log if the process fails
+ * @param {boolean} [logOutput] - Whether to log the output of the process
+ */
+async function spawn(command, args, errorMessage, logOutput = false) {
 	if (currentProcess)
 		throw new Error(`A process is already running. Had tried to spawn ${command} ${args}`);
 
@@ -157,7 +148,7 @@ async function spawn(command: string, args: string[], errorMessage: string, logO
 	return process.exit.then((code) => {
 		if (currentProcess === process) currentProcess = undefined;
 		if (code !== 0) {
-			console.error(`Error in spawn for command ${command} ${args}: ${errorMessage}`);
+			console.error(`Non-zero exit code in ${command} ${args}: ${errorMessage}`);
 		}
 	});
 }

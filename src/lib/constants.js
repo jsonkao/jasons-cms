@@ -17,7 +17,9 @@ export const steps = {
  */
 
 const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
+/** The name for both CodeMirror and ProseMirror's collaborative cursors */
 export const userName = names[Math.floor(Math.random() * names.length)];
 
 const colors = ['#A32251', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
+/** The color for both CodeMirror and ProseMirror's collaborative cursors */
 export const userColor = colors[Math.floor(Math.random() * colors.length)];

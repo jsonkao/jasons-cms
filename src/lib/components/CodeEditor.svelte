@@ -55,9 +55,6 @@
 	$: if (ydoc && yExtension && $openComponent) setExtension($openComponent);
 
 	function setExtension(openComponent: string) {
-		// const ymap: Y.Map<Y.Text> = ydoc.getMap('components');
-		// if (!ymap.has(openComponent)) ymap.set(openComponent, new Y.Text());
-		// ytext = ymap.get(openComponent)!;
 		ytext = ydoc.getText(openComponent);
 		yExtension = yCollab(ytext, yProvider.awareness);
 	}
