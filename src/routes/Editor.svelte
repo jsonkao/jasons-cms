@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
 	import { base, progress } from '$lib/stores/status.ts';
-
+	import { GENERATED_PATH, steps } from '$lib/constants.js';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';
-	import { steps } from '$lib/constants';
 
 	let showCodeEditor = false;
 
@@ -35,7 +34,7 @@
 				showCodeEditor = !showCodeEditor;
 				break;
 			case 'focusGraphic':
-				openComponent.set(`/src/lib/generated/${event.data.name}.svelte`);
+				openComponent.set(`${GENERATED_PATH}/${event.data.name}.svelte`);
 				break;
 			case 'editorMounted':
 				progress.set(steps.EDITOR_READY);

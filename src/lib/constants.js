@@ -13,6 +13,11 @@ export const steps = {
 };
 
 /**
+ * The base path for dynamically created files in the webcontainer fs
+ */
+export const GENERATED_PATH = '/src/lib/generated';
+
+/**
  * User attributes
  */
 

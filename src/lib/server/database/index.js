@@ -1,5 +1,6 @@
-import { Liveblocks } from '@liveblocks/node';
 import { LIVEBLOCKS_SECRET_KEY } from '$env/static/private';
+import { GENERATED_PATH } from '$lib/constants.js';
+import { Liveblocks } from '@liveblocks/node';
 
 const liveblocks = new Liveblocks({ secret: LIVEBLOCKS_SECRET_KEY });
 const yjsDoc = await liveblocks.getYjsDocument('my-room');
@@ -16,7 +17,7 @@ export const getBlocks = () =>
 			if (block.type === 'graphic') {
 				return {
 					...block,
-					code: /** @type {string} */ (yjsDoc[`/src/lib/generated/${block.name}.svelte`])
+					code: /** @type {string} */ (yjsDoc[`${GENERATED_PATH}/${block.name}.svelte`])
 				};
 			}
 			return block;

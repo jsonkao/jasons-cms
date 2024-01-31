@@ -1,20 +1,19 @@
 <script lang="ts">
-	import { createEventDispatcher, onDestroy } from 'svelte';
-
 	import type { Extension } from '@codemirror/state';
 	import { svelte } from '@replit/codemirror-lang-svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
-	import { createClient } from '@liveblocks/client';
-	import LiveblocksProvider from '@liveblocks/yjs';
 
 	// @ts-ignore
 	import { yCollab } from 'y-codemirror.next';
 	import * as Y from 'yjs';
+	import { createClient } from '@liveblocks/client';
+	import LiveblocksProvider from '@liveblocks/yjs';
 
 	import { browser } from '$app/environment';
-	import { userColor, userName } from '$lib/constants.js';
+	import { GENERATED_PATH, userColor, userName } from '$lib/constants.js';
 	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
 
 	const client = createClient({
@@ -43,7 +42,7 @@
 		yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 
-		setExtension($openComponent);
+		$openComponent && setExtension($openComponent);
 
 		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
 		// persistance for? (i.e. non-components like +page.server.js or Blocks.svelte)
@@ -80,7 +79,7 @@
 		}
 		if (e.metaKey && ['a', 'b'].includes(e.key)) {
 			e.preventDefault();
-			openComponent.set(`/src/lib/generated/${e.key}.svelte`);
+			openComponent.set(`${GENERATED_PATH}/${e.key}.svelte`);
 		}
 		if (e.metaKey && e.key === 'x') {
 			e.preventDefault();

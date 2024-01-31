@@ -55,32 +55,6 @@ export const createEditor = (doc, plugins) =>
 	});
 
 /**
- * A function that creates a minimal rich text editor with string HTML.
- * Based on the createRichTextEditor function from prosemirror-svelte.
- * @param {string} html
- * @param {Plugin[]} plugins
- * @returns {EditorState}
- */
-export const createEditorFromHTML = (html, plugins) => {
-	const doc = createDocumentFromHtml(richTextSchema, html);
-	return createEditor(doc, plugins);
-};
-
-/**
- * Parses an html string to create a document from it.
- * Taken from prosemirror-svelte.
- * @param schema {Schema}
- * @param html {string}
- * @returns {Document}
- */
-const createDocumentFromHtml = (schema, html) => {
-	const parser = DOMParser.fromSchema(schema);
-	const node = document.createElement('div');
-	node.innerHTML = html;
-	return parser.parse(node);
-};
-
-/**
  * Generator for a cursor element. Based off y-prosemirror cursor-plugin.js, but really
  * is copying structure from y-codemirror.next/src/y-remote-selections.js
  * @param {{ name: string, color: string }} user

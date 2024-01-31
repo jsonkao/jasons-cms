@@ -1,22 +1,28 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import rawBlocks from '$lib/generated/data.json';
+	import { userColor, userName } from '$lib/generated/globals.js';
+
 	import { browser } from '$app/environment';
 	import { createObserver } from '$lib/utils.js';
-	import rawBlocks from '$lib/generated/data.json';
-	import { userName, userColor } from '$lib/generated/globals.js';
-
-	import type { EditorState } from 'prosemirror-state';
-	import { createEditor, cursorBuilder, makePlugin, toPlainText } from '$lib/prosemirror/index.js';
-	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
+	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
+	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
-	import * as Y from 'yjs';
-	import { ySyncPlugin, yCursorPlugin, yUndoPlugin, undo, redo } from 'y-prosemirror';
-	import { keymap } from 'prosemirror-keymap';
-	import type { Awareness } from 'y-protocols/awareness';
-
+	import { createEditor, cursorBuilder, makePlugin, toPlainText } from '$lib/prosemirror/index.js';
 	import { createClient } from '@liveblocks/client';
 	import LiveblocksProvider from '@liveblocks/yjs';
+	import { keymap } from 'prosemirror-keymap';
+	import { type EditorState } from 'prosemirror-state';
+	import {
+		redo,
+		undo,
+		yCursorPlugin,
+		ySyncPlugin,
+		ySyncPluginKey,
+		yUndoPlugin
+	} from 'y-prosemirror';
+	import type { Awareness } from 'y-protocols/awareness';
+	import * as Y from 'yjs';
 
 	const client = createClient({
 		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
@@ -54,16 +60,6 @@
 		}
 	}
 
-	/**
-	 * Listen for Cmd+E to toggle the editor or Cmd+S to save the file
-	 */
-	function onKeydown(e: KeyboardEvent) {
-		if (e.metaKey && e.key === 'e') {
-			e.preventDefault();
-			window.parent.postMessage({ type: 'toggleEditor' }, '*');
-		}
-	}
-
 	let blocksWithState: BlockWithState[] = [];
 	let destroy = () => {};
 
@@ -79,13 +75,23 @@
 		const yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 
+		const undoManager = new Y.UndoManager(
+			rawBlocks
+				.filter((b) => b.type === 'text')
+				.map((b) => ydoc.getXmlFragment('graphic-' + b.uid)),
+			{
+				trackedOrigins: new Set([ySyncPluginKey]),
+				captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
+			}
+		);
+
 		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
 			if (d.type === 'text') {
 				const state = createEditor(undefined, [
 					blockDeletionPlugin,
 					ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
 					yCursorPlugin(yProvider.awareness as Awareness, { cursorBuilder }),
-					yUndoPlugin(),
+					yUndoPlugin({ undoManager }),
 					keymap({
 						'Mod-z': undo,
 						'Mod-y': redo,
@@ -114,7 +120,7 @@
 	});
 </script>
 
-<svelte:window on:message={onMessage} on:keydown={onKeydown} />
+<svelte:window on:message={onMessage} />
 
 <div class="content" bind:this={contentEl}>
 	{#each blocksWithState as b, i}
@@ -123,7 +129,6 @@
 				bind:this={b.editor}
 				editorState={b.state}
 				on:blur={() => (lastTextFocused = i)}
-				debounceChangeEventsInterval={0}
 			/>
 		{:else if b.type === 'graphic'}
 			<Component block={b} />

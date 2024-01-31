@@ -1,4 +1,4 @@
-import { userName, userColor } from '$lib/constants.js';
+import { GENERATED_PATH, userColor, userName } from '$lib/constants.js';
 import zipped from './files.zip?url';
 import unzip from './unzip.cjs?url';
 
@@ -30,12 +30,12 @@ export async function fetchTemplateFiles() {
  */
 export async function amendTemplateFiles(webcontainerInstance, blocks) {
 	/**
-	 * A helper function to write a file to the $lib/generated folder inside the WebContainer's file system
+	 * A helper function to generate a file
 	 * @param {string} filename - The name of the file
 	 * @param {string} content - The content of the file
 	 */
 	function writeFile(filename, content) {
-		webcontainerInstance.fs.writeFile(`src/lib/generated/${filename}`, content);
+		webcontainerInstance.fs.writeFile(`${GENERATED_PATH}/${filename}`, content);
 	}
 
 	const graphicBlocks = /** @type {GraphicBlock[]} */ (

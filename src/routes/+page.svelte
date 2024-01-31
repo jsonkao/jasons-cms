@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { GENERATED_PATH } from '$lib/constants.js';
 	import { openComponent } from '$lib/stores/code-editor.js';
 	import { startWebContainer, writeFile } from '$lib/webcontainer/instance.js';
 	import type { PageData } from './$types';
@@ -17,7 +18,7 @@
 	if (browser) {
 		startWebContainer(blocks);
 		openComponent.set(
-			`/src/lib/generated/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`
+			`${GENERATED_PATH}/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`
 		);
 	}
 
