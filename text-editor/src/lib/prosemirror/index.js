@@ -3,63 +3,28 @@
  */
 
 import { keymap } from 'prosemirror-keymap';
-import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
-import { redo, undo, yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
-import { UndoManager } from 'yjs';
+import { EditorState, Plugin } from 'prosemirror-state';
+import { redo, undo } from 'y-prosemirror';
 import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
 
 /**
- * Convert raw blocks to blocks that have an editor state
- * @param {{ydoc: import('yjs').Doc, provider: import('@liveblocks/yjs').default, rawBlocks: Block[] }} parameters
- * @returns {BlockWithState[]}
- */
-export function createBlocksWithState({ ydoc, provider, rawBlocks }) {
-	const undoManager = new UndoManager(
-		rawBlocks
-			.filter((b) => b.type === 'text')
-			.map((b) => ydoc.getXmlFragment(/** @type {TextBlock} */ (b).uid)),
-		{
-			trackedOrigins: new Set([ySyncPluginKey]),
-			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
-		}
-	);
-
-	return rawBlocks.map((d) => {
-		if (d.type === 'text') {
-			const state = createEditor(undefined, [
-				ySyncPlugin(ydoc.getXmlFragment(d.uid)),
-				yCursorPlugin(provider.awareness, { cursorBuilder }),
-				yUndoPlugin({ undoManager }),
-				keymap({
-					'Mod-z': undo,
-					'Mod-y': redo,
-					'Mod-Shift-z': redo
-				})
-			]);
-			return {
-				...d,
-				state,
-				editor: undefined
-			};
-		}
-		return d;
-	});
-}
-
-/**
- * A function that creates a minimal rich text editor with a starter doc.
- * Based on the createRichTextEditor function from prosemirror-svelte.
- * @param {import('prosemirror-model').Node | undefined} doc
+ * A helper function to create a minimal rich text editor.
  * @param {Plugin[]} plugins
  * @returns {EditorState}
  */
-export const createEditor = (doc, plugins) =>
+export const createEditor = (plugins) =>
 	EditorState.create({
 		schema: richTextSchema,
-		doc,
-		selection: doc ? TextSelection.atStart(doc) : undefined,
-		plugins: [...plugins, richTextKeyMap(richTextSchema)]
+		plugins: [
+			...plugins,
+			keymap({
+				'Mod-z': undo,
+				'Mod-y': redo,
+				'Mod-Shift-z': redo
+			}),
+			richTextKeyMap(richTextSchema)
+		]
 	});
 
 /**
@@ -68,7 +33,7 @@ export const createEditor = (doc, plugins) =>
  * @param {{ name: string, color: string }} user
  * @returns {HTMLElement}
  */
-function cursorBuilder(user) {
+export function cursorBuilder(user) {
 	const cursor = document.createElement('span');
 	cursor.classList.add('cm-ySelectionCaret');
 	cursor.setAttribute('style', `border-color: ${user.color}; background-color: ${user.color}`);

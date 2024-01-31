@@ -15,6 +15,7 @@
 	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
+	import { LIVEBLOCKS_ROOM } from '../../../../shared/constants.js';
 
 	const client = createClient({
 		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
@@ -32,7 +33,7 @@
 	let destroy = () => {};
 
 	if (browser) {
-		const { room, leave } = client.enterRoom('my-room', {
+		const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, {
 			initialPresence: {}
 		});
 

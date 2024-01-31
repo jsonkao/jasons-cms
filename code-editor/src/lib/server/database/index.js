@@ -1,9 +1,10 @@
 import { LIVEBLOCKS_SECRET_KEY } from '$env/static/private';
 import { GENERATED_PATH } from '$lib/constants.js';
 import { Liveblocks } from '@liveblocks/node';
+import { LIVEBLOCKS_ROOM } from '../../../../../shared/constants.js';
 
 const liveblocks = new Liveblocks({ secret: LIVEBLOCKS_SECRET_KEY });
-const yjsDoc = await liveblocks.getYjsDocument('my-room');
+const yjsDoc = await liveblocks.getYjsDocument(LIVEBLOCKS_ROOM);
 
 /**
  * Gets blocks data from the Yjs document. It takes the list of blocks from the Yjs document and
