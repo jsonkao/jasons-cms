@@ -17,6 +17,7 @@
 		z-index: 3;
 		align-self: flex-end;
 		justify-self: flex-end;
+		position: absolute;
 	}
 
 	button {

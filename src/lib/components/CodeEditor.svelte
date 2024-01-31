@@ -141,6 +141,7 @@
 		overflow-y: scroll;
 		align-self: center;
 		transition: opacity 0.1s;
+		border-radius: 6px;
 		opacity: 0;
 		pointer-events: none;
 	}
@@ -158,7 +159,11 @@
 		height: 100%;
 	}
 
-	.code-editor:not(.position-bottom) {
+	.code-editor.position-bottom .code-mirror-container {
+		border-radius: 0;
+	}
+
+	.code-editor.position-left {
 		max-width: calc(100% - 30px);
 	}
 </style>

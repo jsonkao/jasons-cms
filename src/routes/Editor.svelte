@@ -80,7 +80,6 @@
 
 	.code-container {
 		min-width: 0;
-		width: 100%;
 		height: 100%;
 		justify-self: center;
 		align-self: center;
@@ -110,6 +109,7 @@
 
 	.layout-bottom .code-container {
 		min-height: 0;
+		width: 100%;
 	}
 
 	.layout-bottom .iframe-container {
@@ -125,6 +125,10 @@
 
 	.layout-left {
 		grid-template-columns: 1fr min-content;
+	}
+
+	.layout-left .code-container {
+		width: 100%;
 	}
 
 	.layout-left .iframe-container {
