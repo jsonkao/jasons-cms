@@ -1,0 +1,8 @@
+{
+  "name": "monorepo",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "format": "pnpm -r format"
+  }
+}

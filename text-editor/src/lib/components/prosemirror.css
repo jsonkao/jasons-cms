@@ -1,54 +1,57 @@
-.ui-editor:not(.editor_empty):first-child, .ui-editor.ProseMirror-focused:first-child{
-  margin-top: 60px;
+.ui-editor:not(.editor_empty):first-child,
+.ui-editor.ProseMirror-focused:first-child {
+	margin-top: 60px;
 }
 
-.ui-editor:not(.editor_empty):last-child, .ui-editor.ProseMirror-focused:last-child{
-  padding-bottom: 60px;
+.ui-editor:not(.editor_empty):last-child,
+.ui-editor.ProseMirror-focused:last-child {
+	padding-bottom: 60px;
 }
 
-.ui-editor{
-  outline: none;
-  margin: 0 auto;
+.ui-editor {
+	outline: none;
+	margin: 0 auto;
 }
 
-.ui-editor p, .ui-editor h1{
-  margin: 1.5rem auto;
-  width: calc(100% - 30px);
+.ui-editor p,
+.ui-editor h1 {
+	margin: 1.5rem auto;
+	width: calc(100% - 30px);
 }
 
-.ui-editor p{
-  max-width: 520px;
+.ui-editor p {
+	max-width: 520px;
 }
 
-.ui-editor h1{
-  font-size: 3.2rem;
-  max-width: 710px;
-  text-align: center;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+.ui-editor h1 {
+	font-size: 3.2rem;
+	max-width: 710px;
+	text-align: center;
+	line-height: 1.1;
+	letter-spacing: -0.04em;
 }
 
 .ui-editor,
-.ui-editor p{
-  -webkit-font-smoothing: antialiased;
-  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-  font-size: 1.1rem;
-  line-height: 1.5;
-  color: #121212;
+.ui-editor p {
+	-webkit-font-smoothing: antialiased;
+	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+	font-size: 1.1rem;
+	line-height: 1.5;
+	color: #121212;
 }
 
 /* Use this instead of Prosemirror's built in placeholder to account for multiline content */
 .ui-editor:not(.editor_empty) p:has(br:only-child):last-child:before,
-.ui-editor.ProseMirror-focused p:has(br:only-child):last-child:before{
-  position: absolute;
-  content: 'Write something...';
-  pointer-events: none;
-  color: #aaa;
-  z-index: -1;
+.ui-editor.ProseMirror-focused p:has(br:only-child):last-child:before {
+	position: absolute;
+	content: 'Write something...';
+	pointer-events: none;
+	color: #aaa;
+	z-index: -1;
 }
 
 /* Empty ui-editors should take up zero space */
-.ui-editor.editor_empty:not(.ProseMirror-focused) p{
-  height: 0;
-  margin: 0;
+.ui-editor.editor_empty:not(.ProseMirror-focused) p {
+	height: 0;
+	margin: 0;
 }

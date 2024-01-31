@@ -25,11 +25,7 @@ await new Promise((r) => setTimeout(r, 1000));
 function seedArray() {
 	console.log(`Seeding (deleting ${yarray.length} elements)...`);
 	yarray.delete(0, yarray.length); // Clear the array
-	yarray.insert(0, [
-		makeTextBlock('text1'),
-		makeGraphicBlock('graphic1'),
-		makeTextBlock('text2')
-	]);
+	yarray.insert(0, [makeTextBlock('text1'), makeGraphicBlock('graphic1'), makeTextBlock('text2')]);
 }
 seedArray();
 
