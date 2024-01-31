@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { createObserver } from './utils.js';
+	import { createObserver } from '$lib/utils.js';
 	import rawBlocks from '$lib/generated/data.json';
 	import { userName, userColor } from '$lib/generated/globals.js';
 
 	import type { EditorState } from 'prosemirror-state';
-	import { createEditor, cursorBuilder, makePlugin, toPlainText } from './prosemirror';
+	import { createEditor, cursorBuilder, makePlugin, toPlainText } from '$lib/prosemirror/index.js';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 	import Component from './Component.svelte';
 

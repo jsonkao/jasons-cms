@@ -1,5 +1,5 @@
 <script>
-	import Blocks from './Blocks.svelte';
+	import Blocks from '$lib/Blocks.svelte';
 	import './styles.css';
 </script>
 
