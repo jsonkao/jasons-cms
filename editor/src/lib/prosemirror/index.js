@@ -43,10 +43,10 @@ export const toPlainText = (editorState) => {
 
 /**
  * Convert raw blocks to blocks that have an editor state
- * @param {{ydoc: import('yjs').Doc, awareness, rawBlocks: Block[] }}
+ * @param {{ydoc: import('yjs').Doc, provider: import('@liveblocks/yjs').default, rawBlocks: Block[] }}
  * @returns {BlockWithState[]}
  */
-export function createBlocksWithState({ ydoc, awareness, rawBlocks }) {
+export function createBlocksWithState({ ydoc, provider, rawBlocks }) {
 	const undoManager = new UndoManager(
 		rawBlocks.filter((b) => b.type === 'text').map((b) => ydoc.getXmlFragment('graphic-' + b.uid)),
 		{
@@ -59,7 +59,7 @@ export function createBlocksWithState({ ydoc, awareness, rawBlocks }) {
 		if (d.type === 'text') {
 			const state = createEditor(undefined, [
 				ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
-				yCursorPlugin(awareness, { cursorBuilder }),
+				yCursorPlugin(provider.awareness, { cursorBuilder }),
 				yUndoPlugin({ undoManager }),
 				keymap({
 					'Mod-z': undo,

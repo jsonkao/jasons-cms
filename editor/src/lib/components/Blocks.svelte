@@ -44,18 +44,16 @@
 		const { room, leave } = client.enterRoom('my-room', {
 			initialPresence: {}
 		});
-
 		destroy = leave;
 
 		const ydoc = new Y.Doc();
-
 		const yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 
 		blocksWithState = createBlocksWithState({
 			rawBlocks: rawBlocks as Block[],
 			ydoc,
-			awareness: yProvider.awareness
+			provider: yProvider
 		});
 	}
 
