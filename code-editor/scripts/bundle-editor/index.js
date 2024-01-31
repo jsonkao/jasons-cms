@@ -10,11 +10,7 @@ import glob from 'tiny-glob/sync.js';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 
-if (!!process.env.VERCEL) {
-	execSync('git clean -d -f editor');
-}
-
-const cwd = 'editor';
+const cwd = '../text-editor';
 
 console.time('install');
 if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
