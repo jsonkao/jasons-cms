@@ -8,20 +8,10 @@
 	import Component from './Component.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
-	import { createEditor, cursorBuilder, makePlugin, toPlainText } from '$lib/prosemirror/index.js';
+	import { createBlocksWithState } from '$lib/prosemirror/index.js';
 	import { createClient } from '@liveblocks/client';
 	import LiveblocksProvider from '@liveblocks/yjs';
-	import { keymap } from 'prosemirror-keymap';
 	import { type EditorState } from 'prosemirror-state';
-	import {
-		redo,
-		undo,
-		yCursorPlugin,
-		ySyncPlugin,
-		ySyncPluginKey,
-		yUndoPlugin
-	} from 'y-prosemirror';
-	import type { Awareness } from 'y-protocols/awareness';
 	import * as Y from 'yjs';
 
 	const client = createClient({
@@ -31,19 +21,6 @@
 	type BlockWithState =
 		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
 		| GraphicBlock;
-
-	/**
-	 * When Backspace is pressed on an empty prosemirror state,
-	 * delete the entire block, unmounting the ProsemirrorEditor component.
-	 */
-	const blockDeletionPlugin = makePlugin(function (view, event) {
-		if (event.key === 'Backspace' && toPlainText(view.state) === '') {
-			blocksWithState = blocksWithState.filter(
-				(b) => !(b.type === 'text' && b.state && toPlainText(b.state) === '')
-			);
-		}
-		return false;
-	});
 
 	let lastTextFocused = 0;
 
@@ -75,36 +52,10 @@
 		const yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 
-		const undoManager = new Y.UndoManager(
-			rawBlocks
-				.filter((b) => b.type === 'text')
-				.map((b) => ydoc.getXmlFragment('graphic-' + b.uid)),
-			{
-				trackedOrigins: new Set([ySyncPluginKey]),
-				captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
-			}
-		);
-
-		blocksWithState = (rawBlocks as Block[]).map((d, i) => {
-			if (d.type === 'text') {
-				const state = createEditor(undefined, [
-					blockDeletionPlugin,
-					ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
-					yCursorPlugin(yProvider.awareness as Awareness, { cursorBuilder }),
-					yUndoPlugin({ undoManager }),
-					keymap({
-						'Mod-z': undo,
-						'Mod-y': redo,
-						'Mod-Shift-z': redo
-					})
-				]);
-				return {
-					...d,
-					state,
-					editor: undefined
-				};
-			}
-			return d;
+		blocksWithState = createBlocksWithState({
+			rawBlocks: rawBlocks as Block[],
+			ydoc,
+			awareness: yProvider.awareness
 		});
 	}
 

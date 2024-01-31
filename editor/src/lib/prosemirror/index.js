@@ -3,9 +3,11 @@
  */
 
 import { EditorState, TextSelection, Plugin } from 'prosemirror-state';
-import { Schema, DOMParser } from 'prosemirror-model';
+import { keymap } from 'prosemirror-keymap';
+import { redo, undo, yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
 import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
+import { UndoManager } from 'yjs';
 
 /**
  * When Backspace is pressed on an empty prosemirror state,
@@ -38,6 +40,42 @@ export const toPlainText = (editorState) => {
 		return paragraphs.join('\n');
 	}
 };
+
+/**
+ * Convert raw blocks to blocks that have an editor state
+ * @param {{ydoc: import('yjs').Doc, awareness, rawBlocks: Block[] }}
+ * @returns {BlockWithState[]}
+ */
+export function createBlocksWithState({ ydoc, awareness, rawBlocks }) {
+	const undoManager = new UndoManager(
+		rawBlocks.filter((b) => b.type === 'text').map((b) => ydoc.getXmlFragment('graphic-' + b.uid)),
+		{
+			trackedOrigins: new Set([ySyncPluginKey]),
+			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
+		}
+	);
+
+	return rawBlocks.map((d) => {
+		if (d.type === 'text') {
+			const state = createEditor(undefined, [
+				ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
+				yCursorPlugin(awareness, { cursorBuilder }),
+				yUndoPlugin({ undoManager }),
+				keymap({
+					'Mod-z': undo,
+					'Mod-y': redo,
+					'Mod-Shift-z': redo
+				})
+			]);
+			return {
+				...d,
+				state,
+				editor: undefined
+			};
+		}
+		return d;
+	});
+}
 
 /**
  * A function that creates a minimal rich text editor with a starter doc.
