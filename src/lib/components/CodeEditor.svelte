@@ -1,22 +1,21 @@
 <script lang="ts">
-	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 
-	import CodeMirror from 'svelte-codemirror-editor';
-	import { svelte } from '@replit/codemirror-lang-svelte';
 	import type { Extension } from '@codemirror/state';
+	import { svelte } from '@replit/codemirror-lang-svelte';
+	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
-
-	import * as Y from 'yjs';
-	// @ts-ignore
-	import { yCollab } from 'y-codemirror.next';
-
-	import { codeEditorPosition, openComponent } from '$lib/stores';
-	import PlacementButtons from './PlacementButtons.svelte';
-	import { userName, userColor } from '$lib/constants';
-
 	import { createClient } from '@liveblocks/client';
 	import LiveblocksProvider from '@liveblocks/yjs';
+
+	// @ts-ignore
+	import { yCollab } from 'y-codemirror.next';
+	import * as Y from 'yjs';
+
 	import { browser } from '$app/environment';
+	import { userColor, userName } from '$lib/constants.js';
+	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
+	import PlacementButtons from './PlacementButtons.svelte';
 
 	const client = createClient({
 		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'

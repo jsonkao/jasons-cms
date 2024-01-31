@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { base, codeEditorPosition, openComponent, progress } from '$lib/stores';
+	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
+	import { base, progress } from '$lib/stores/status.ts';
 
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';

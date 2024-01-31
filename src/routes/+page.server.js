@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { getBlocks } from '$lib/server/database';
-import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ fetch }) => {
+/** @type {import('./$types').PageLoad} */
+export async function load() {
 	try {
 		return {
 			blocks: await getBlocks()
@@ -10,4 +10,4 @@ export const load: PageLoad = async ({ fetch }) => {
 	} catch (e) {
 		error(505, { message: `Unable to fetch blocks: ${e}` });
 	}
-};
+}

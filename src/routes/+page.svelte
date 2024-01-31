@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { openComponent } from '$lib/stores';
+	import { openComponent } from '$lib/stores/code-editor.js';
 	import { startWebContainer, writeFile } from '$lib/webcontainer/instance.ts';
 	import type { PageData } from './$types';
 	import Editor from './Editor.svelte';

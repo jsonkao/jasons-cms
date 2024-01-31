@@ -1,5 +1,5 @@
 <script>
-	import { codeEditorPosition } from '$lib/stores';
+	import { codeEditorPosition } from '$lib/stores/code-editor.js';
 </script>
 
 <div class="placement-buttons">

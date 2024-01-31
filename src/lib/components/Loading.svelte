@@ -1,7 +1,7 @@
 <script>
 	import { fade, slide } from 'svelte/transition';
-	import { progress } from '$lib/stores';
-	import { steps } from '$lib/constants';
+	import { progress } from '$lib/stores/status.ts';
+	import { steps } from '$lib/constants.js';
 
 	const numberOfSteps = Object.keys(steps).length - 1;
 </script>
