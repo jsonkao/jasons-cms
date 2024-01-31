@@ -10,38 +10,6 @@ import { richTextSchema } from './schema.ts';
 import { UndoManager } from 'yjs';
 
 /**
- * When Backspace is pressed on an empty prosemirror state,
- * delete the entire block, unmounting the ProsemirrorEditor component.
- * @param {import('prosemirror-view').EditorProps['handleKeyDown']} handleKeyDown
- */
-export const makePlugin = (handleKeyDown) =>
-	new Plugin({
-		props: {
-			handleKeyDown
-		}
-	});
-
-/**
- * Converts the editor state to plain text. Taken from prosemirror-svelte
- * @param {EditorState} editorState
- * @returns {string}
- */
-export const toPlainText = (editorState) => {
-	if (editorState.doc.childCount === 0) {
-		return '';
-	} else if (editorState.doc.childCount === 1) {
-		return editorState.doc.textContent;
-	} else {
-		/** @type {string[]} */
-		let paragraphs = [];
-		for (let i = 0; i < editorState.doc.childCount; i++) {
-			paragraphs.push(editorState.doc.child(i).textContent);
-		}
-		return paragraphs.join('\n');
-	}
-};
-
-/**
  * Convert raw blocks to blocks that have an editor state
  * @param {{ydoc: import('yjs').Doc, provider: import('@liveblocks/yjs').default, rawBlocks: Block[] }}
  * @returns {BlockWithState[]}
@@ -98,7 +66,7 @@ export const createEditor = (doc, plugins) =>
  * @param {{ name: string, color: string }} user
  * @returns {HTMLElement}
  */
-export const cursorBuilder = (user) => {
+function cursorBuilder(user) {
 	const cursor = document.createElement('span');
 	cursor.classList.add('cm-ySelectionCaret');
 	cursor.setAttribute('style', `border-color: ${user.color}; background-color: ${user.color}`);
@@ -126,4 +94,4 @@ export const cursorBuilder = (user) => {
 	cursor.insertBefore(divSelectionInfo, null);
 	cursor.insertBefore(document.createTextNode('\u2060'), null);
 	return cursor;
-};
+}

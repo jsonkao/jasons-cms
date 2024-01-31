@@ -14,7 +14,7 @@
 	$: if ($base && iframe) iframe.src = $base;
 
 	/**
-	 * Pressing Cmd+# toggles the editor
+	 * Pressing Cmd+E toggles the editor
 	 */
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.metaKey && e.key === 'e') {
