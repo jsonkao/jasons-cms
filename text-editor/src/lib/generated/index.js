@@ -1,5 +1,4 @@
-import a from './a.svelte';
-import b from './b.svelte';
 import graphic1 from './graphic1.svelte';
+import graphic2 from './graphic2.svelte';
 
-export default { a, b, graphic1 };
+export default { graphic1, graphic2 };
