@@ -1,4 +1,4 @@
-import { userName, userColor } from '$lib/constants.ts';
+import { userName, userColor } from '$lib/constants.js';
 import zipped from './files.zip?url';
 import unzip from './unzip.cjs?url';
 
