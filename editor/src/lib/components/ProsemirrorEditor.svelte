@@ -3,7 +3,7 @@
 	 * This component was copied from https://github.com/christianheine/prosemirror-svelte and lightly modified to:
 	 * - Clean up type annotations and styles
 	 * - Propogate blur events to parent (this might've not been needed)
-	 * 
+	 *
 	 * So... maybe there wans't a strong reason to copy this component. I'll keep it for now, because there is a slight change
 	 * this caused a duplicate import of yjs.
 	 *

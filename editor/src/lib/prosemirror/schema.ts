@@ -10,7 +10,6 @@ const strongDOM: DOMOutputSpec = ['strong', 0];
  * TODO: Add links, maybe images
  */
 
-
 export const richTextSchema = new Schema({
 	nodes: {
 		doc: {
