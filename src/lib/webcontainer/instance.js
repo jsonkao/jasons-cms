@@ -1,6 +1,6 @@
 import { WebContainer } from '@webcontainer/api';
 import { browser } from '$app/environment';
-import { steps } from '$lib/constants.ts';
+import { steps } from '$lib/constants.js';
 import { base, progress } from '$lib/stores/status.ts';
 import { amendTemplateFiles, fetchTemplateFiles } from './files.js';
 
