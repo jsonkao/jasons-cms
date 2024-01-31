@@ -1,6 +1,7 @@
 import { GENERATED_PATH, userColor, userName } from '$lib/constants.js';
 import zipped from './files.zip?url';
 import unzip from './unzip.cjs?url';
+import { LIVEBLOCKS_ROOM } from '../../../../shared/constants.js';
 
 /**
  * Fetch the template files for the WebContainer.
@@ -26,9 +27,9 @@ export async function fetchTemplateFiles() {
  * Modify template files and add new files (e.g. graphic components) the WebContainer.
  * This function should run after the WebContainer has been mounted.
  * @param {import('@webcontainer/api').WebContainer} webcontainerInstance - The WebContainer instance
- * @param {Block[]} blocks - The blocks data
+ * @param {InitialGraphic[]} initialGraphics - Data on initial graphics
  */
-export async function amendTemplateFiles(webcontainerInstance, blocks) {
+export async function amendTemplateFiles(webcontainerInstance, initialGraphics) {
 	/**
 	 * A helper function to generate a file
 	 * @param {string} filename - The name of the file
@@ -38,25 +39,19 @@ export async function amendTemplateFiles(webcontainerInstance, blocks) {
 		webcontainerInstance.fs.writeFile(`${GENERATED_PATH}/${filename}`, content);
 	}
 
-	const graphicBlocks = /** @type {GraphicBlock[]} */ (
-		blocks.filter((block) => block.type === 'graphic')
-	);
-
 	await Promise.all([
 		// Initial write of graphics Svelte files so the dev server starts with a good preview/SSR
-		...graphicBlocks.map(({ name, code }) => writeFile(`${name}.svelte`, code)),
+		...initialGraphics.map(({ name, code }) => writeFile(`${name}.svelte`, code)),
 		// A lib/index.js file to export all the graphic components
 		writeFile(
 			'index.js',
-			graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
-				`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
+			initialGraphics.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
+				`\nexport default { ${initialGraphics.map(({ name }) => name).join(', ')} };`
 		),
-		// A data.json file with blocks data
-		writeFile('data.json', JSON.stringify(blocks)),
 		// A file for constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
 		writeFile(
 			'globals.js',
-			`export const userName = "${userName}"; export const userColor = "${userColor}";`
+			`export const userName = "${userName}"; export const userColor = "${userColor}"; export const LIVEBLOCKS_ROOM = "${LIVEBLOCKS_ROOM}";`
 		)
 	]);
 }

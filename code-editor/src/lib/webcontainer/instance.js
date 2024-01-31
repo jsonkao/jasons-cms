@@ -82,9 +82,9 @@ export async function initialize() {
 
 /**
  * Call this function to mount the WebContainer and start the dev server.
- * @param {Block[]} blocks
+ * @param {InitialGraphic[]} initialGraphics
  */
-export async function startWebContainer(blocks) {
+export async function startWebContainer(initialGraphics) {
 	// Wait for the WebContainer to be initialized and for files to be fetched
 	await ready;
 
@@ -95,7 +95,7 @@ export async function startWebContainer(blocks) {
 
 	progress.set(steps.UNZIPPING);
 	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
-	await amendTemplateFiles(webcontainerInstance, blocks);
+	await amendTemplateFiles(webcontainerInstance, initialGraphics);
 
 	progress.set(steps.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);

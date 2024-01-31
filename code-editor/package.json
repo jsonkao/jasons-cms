@@ -11,7 +11,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"zip": "node scripts/bundle-editor",
-		"seed-ydoc": "node --env-file=.env scripts/seed-ydoc.js",
+		"seed": "node --env-file=.env scripts/seed-ydoc.js",
 		"postinstall": "npm run zip"
 	},
 	"devDependencies": {
@@ -20,6 +20,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "8.56.0",
 		"@types/node": "^20.11.7",
+		"@types/ws": "^8.5.10",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"adm-zip": "^0.5.10",
@@ -42,6 +43,7 @@
 		"@liveblocks/yjs": "^1.9.7",
 		"@replit/codemirror-lang-svelte": "^6.0.0",
 		"@webcontainer/api": "^1.1.8",
+		"svelt-yjs": "^1.1.0",
 		"svelte-codemirror-editor": "^1.2.0",
 		"thememirror": "^2.0.1",
 		"y-codemirror.next": "^0.3.2",

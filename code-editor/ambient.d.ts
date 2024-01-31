@@ -10,3 +10,8 @@ interface GraphicBlock {
 }
 
 type Block = TextBlock | GraphicBlock;
+
+interface InitialGraphic {
+	name: string;
+	code: string;
+}

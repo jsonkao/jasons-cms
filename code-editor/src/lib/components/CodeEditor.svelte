@@ -3,6 +3,7 @@
 	import { svelte } from '@replit/codemirror-lang-svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
+	import { readableArray } from 'svelt-yjs';
 
 	// @ts-ignore
 	import { yCollab } from 'y-codemirror.next';
@@ -11,7 +12,7 @@
 	import LiveblocksProvider from '@liveblocks/yjs';
 
 	import { browser } from '$app/environment';
-	import { GENERATED_PATH, userColor, userName } from '$lib/constants.js';
+	import { userColor, userName } from '$lib/constants.js';
 	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
@@ -27,6 +28,8 @@
 
 	let ydoc: Y.Doc;
 	let ytext: Y.Text;
+	let yarrayStore: ReturnType<typeof readableArray>;
+	let yarray: Y.Array<Y.Map<Y.XmlFragment | Y.Text | string>>;
 	let yExtension: Extension;
 	let yProvider: LiveblocksProvider<any, any, any, any>;
 
@@ -42,6 +45,8 @@
 		ydoc = new Y.Doc();
 		yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
+		yarray = ydoc.getArray('blocks-test');
+		yarrayStore = readableArray(yarray);
 
 		$openComponent && setExtension($openComponent);
 
@@ -51,11 +56,19 @@
 
 	onDestroy(() => destroy());
 
-	$: if (ydoc && yExtension && $openComponent) setExtension($openComponent);
+	$: if ($yarrayStore && $openComponent) setExtension($openComponent);
 
-	function setExtension(openComponent: string) {
-		ytext = ydoc.getText(openComponent);
-		yExtension = yCollab(ytext, yProvider.awareness);
+	function setExtension(name: string) {
+		let foundYtext: Y.Text = null;
+		for (const ymap of $yarrayStore) {
+			console.log(ymap);
+			if (ymap.get('name') === name) foundYtext = ymap.get('code') as Y.Text;
+		}
+		console.log('foundYtext', foundYtext);
+		if (foundYtext) {
+			ytext = foundYtext;
+			yExtension = yCollab(ytext, yProvider.awareness);
+		}
 	}
 
 	/**
@@ -80,11 +93,11 @@
 		}
 		if (e.metaKey && ['a', 'b'].includes(e.key)) {
 			e.preventDefault();
-			openComponent.set(`${GENERATED_PATH}/${e.key}.svelte`);
+			openComponent.set({ a: 'graphic1', b: 'graphic2' }[e.key]!);
 		}
 		if (e.metaKey && e.key === 'x') {
 			e.preventDefault();
-			openComponent.set('/src/routes/Blocks.svelte');
+			// openComponent.set('/src/routes/Blocks.svelte');
 		}
 	}
 </script>

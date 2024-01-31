@@ -1,7 +1,6 @@
-import { userColor, userName } from '$lib/generated/globals.js';
+import { userColor, userName, LIVEBLOCKS_ROOM } from '$lib/generated/globals.js';
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
-import { LIVEBLOCKS_ROOM } from '../../../shared/constants.js';
 
 /**
  * A helper function for creating a Liveblocks room and provider for Yjs.

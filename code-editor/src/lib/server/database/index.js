@@ -1,26 +1,46 @@
-import { LIVEBLOCKS_SECRET_KEY } from '$env/static/private';
-import { GENERATED_PATH } from '$lib/constants.js';
-import { Liveblocks } from '@liveblocks/node';
+import { createClient } from '@liveblocks/client';
+import LiveblocksProvider from '@liveblocks/yjs';
+import WebSocket from 'ws';
+import * as Y from 'yjs';
 import { LIVEBLOCKS_ROOM } from '../../../../../shared/constants.js';
 
-const liveblocks = new Liveblocks({ secret: LIVEBLOCKS_SECRET_KEY });
-const yjsDoc = await liveblocks.getYjsDocument(LIVEBLOCKS_ROOM);
+const client = createClient({
+	publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A',
+	polyfills: {
+		WebSocket
+	}
+});
 
 /**
- * Gets blocks data from the Yjs document. It takes the list of blocks from the Yjs document and
- * maps through them. If the block is a graphic block, it sets the code property to the code from
- * the Yjs document. Otherwise, it returns the block as is.
- * @returns {Block[]} - The blocks data
+ * @returns {InitialGraphic[]} - The blocks data
  */
-export const getBlocks = () =>
-	/** @type {Array<TextBlock | { type: 'graphic'; name: string }>} */ (yjsDoc['blocks']).map(
-		(block) => {
-			if (block.type === 'graphic') {
-				return {
-					...block,
-					code: /** @type {string} */ (yjsDoc[`${GENERATED_PATH}/${block.name}.svelte`])
-				};
-			}
-			return block;
-		}
-	);
+export async function getInitialGraphics() {
+	const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, {
+		initialPresence: {}
+	});
+
+	const ydoc = new Y.Doc();
+	new LiveblocksProvider(room, ydoc);
+	const yarray = ydoc.getArray('blocks-test');
+
+	const populatePromise = new Promise((resolve) => {
+		yarray.observe((event) => {
+			const blockMaps = /** @type {Array<Y.Map<string | Y.Text>>} */ (
+				event.changes.delta[0].insert
+			);
+
+			resolve(
+				blockMaps
+					.filter((ymap) => ymap.get('type') === 'graphic')
+					.map((ymap) => ({
+						name: ymap.get('name'),
+						code: ymap.get('code')?.toString()
+					}))
+			);
+		});
+	});
+
+	const output = await populatePromise;
+	leave();
+	return output;
+}

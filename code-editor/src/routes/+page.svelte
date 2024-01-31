@@ -10,16 +10,14 @@
 	 * Retrieve page's blocks data
 	 */
 	export let data: PageData;
-	const { blocks } = data;
+	const { initialGraphics } = data;
 
 	/**
 	 * In browser, start webcontainer
 	 */
 	if (browser) {
-		startWebContainer(blocks);
-		openComponent.set(
-			`${GENERATED_PATH}/${(blocks.find((d) => d.type === 'graphic') as GraphicBlock).name}.svelte`
-		);
+		startWebContainer(initialGraphics);
+		openComponent.set(initialGraphics[0].name);
 	}
 
 	/**
@@ -27,11 +25,12 @@
 	 * TODO: Incorporate $openGlobalFile
 	 */
 	function handleSave(event: CustomEvent) {
-		if (!$openComponent) {
+		const name = $openComponent;
+		if (!name) {
 			console.error('Attempted to save but openComponent is null', event);
 			return;
 		}
-		writeFile($openComponent, event.detail);
+		writeFile(`${GENERATED_PATH}/${name}.svelte`, event.detail);
 	}
 </script>
 
