@@ -11,16 +11,11 @@
 	import { createBlocksWithState } from '$lib/prosemirror/index.js';
 	import { createClient } from '@liveblocks/client';
 	import LiveblocksProvider from '@liveblocks/yjs';
-	import { type EditorState } from 'prosemirror-state';
 	import * as Y from 'yjs';
 
 	const client = createClient({
 		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
 	});
-
-	type BlockWithState =
-		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
-		| GraphicBlock;
 
 	let lastTextFocused = 0;
 

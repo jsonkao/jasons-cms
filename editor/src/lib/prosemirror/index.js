@@ -2,21 +2,23 @@
  * This file contains helper functions for creating ProseMirror state and schema
  */
 
-import { EditorState, TextSelection, Plugin } from 'prosemirror-state';
 import { keymap } from 'prosemirror-keymap';
+import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
 import { redo, undo, yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
+import { UndoManager } from 'yjs';
 import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
-import { UndoManager } from 'yjs';
 
 /**
  * Convert raw blocks to blocks that have an editor state
- * @param {{ydoc: import('yjs').Doc, provider: import('@liveblocks/yjs').default, rawBlocks: Block[] }}
+ * @param {{ydoc: import('yjs').Doc, provider: import('@liveblocks/yjs').default, rawBlocks: Block[] }} parameters
  * @returns {BlockWithState[]}
  */
 export function createBlocksWithState({ ydoc, provider, rawBlocks }) {
 	const undoManager = new UndoManager(
-		rawBlocks.filter((b) => b.type === 'text').map((b) => ydoc.getXmlFragment('graphic-' + b.uid)),
+		rawBlocks
+			.filter((b) => b.type === 'text')
+			.map((b) => ydoc.getXmlFragment(/** @type {TextBlock} */ (b).uid)),
 		{
 			trackedOrigins: new Set([ySyncPluginKey]),
 			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
@@ -26,7 +28,7 @@ export function createBlocksWithState({ ydoc, provider, rawBlocks }) {
 	return rawBlocks.map((d) => {
 		if (d.type === 'text') {
 			const state = createEditor(undefined, [
-				ySyncPlugin(ydoc.getXmlFragment('graphic-' + d.uid)),
+				ySyncPlugin(ydoc.getXmlFragment(d.uid)),
 				yCursorPlugin(provider.awareness, { cursorBuilder }),
 				yUndoPlugin({ undoManager }),
 				keymap({
