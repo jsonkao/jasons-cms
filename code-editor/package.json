@@ -11,7 +11,8 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"zip": "node scripts/bundle-editor",
-		"seed": "node --env-file=.env scripts/seed-ydoc.js"
+		"seed": "node --env-file=.env scripts/seed-ydoc.js",
+		"postinstall": "npm run zip"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
