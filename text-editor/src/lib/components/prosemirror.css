@@ -1,3 +1,5 @@
+/* Styles for internal prosemirror DOM elements */
+
 .ui-editor:not(.editor_empty):first-child,
 .ui-editor.ProseMirror-focused:first-child {
 	margin-top: 60px;
@@ -41,8 +43,7 @@
 }
 
 /* Use this instead of Prosemirror's built in placeholder to account for multiline content */
-.ui-editor:not(.editor_empty) p:has(br:only-child):last-child:before,
-.ui-editor.ProseMirror-focused p:has(br:only-child):last-child:before {
+.ui-editor.ProseMirror-focused p:has(br:only-child):before {
 	position: absolute;
 	content: 'Write something...';
 	pointer-events: none;
@@ -51,7 +52,7 @@
 }
 
 /* Empty ui-editors should take up zero space */
-.ui-editor.editor_empty:not(.ProseMirror-focused) p {
+.ui-editor.editor_empty:not(.ProseMirror-focused) p:not(:has(.cm-ySelectionCaret)) {
 	height: 0;
 	margin: 0;
 }
