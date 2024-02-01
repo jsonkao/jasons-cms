@@ -22,8 +22,9 @@ The first live demo of U's CMS was released on YouTube on January 22, 2024 ([wat
 
 ## People who have said this is cool
 
-* MGG
+* M(G)G
 * UU
 * AF
 * IH
 * AT
+* C(B)O(J)
