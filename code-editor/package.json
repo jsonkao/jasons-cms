@@ -53,7 +53,7 @@
 		"yjs": "^13.6.11"
 	},
 	"engines": {
-		"node": ">=20.6.0"
+		"node": "20.x"
 	},
 	"overrides": {
 		"rollup": "npm:@rollup/wasm-node"

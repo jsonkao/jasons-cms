@@ -10,7 +10,7 @@ This repo uses npm.
 npm run dev
 ```
 
-Requires a .env file in `code-editor` with a `LIVEBLOCKS_SECRET_KEY` and a `LIVEBLOCKS_PUBLIC_KEY`.
+Requires a `code-editor/.env` with a `LIVEBLOCKS_SECRET_KEY` and a `LIVEBLOCKS_PUBLIC_KEY`.
 
 ## Structure
 
