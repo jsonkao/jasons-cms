@@ -13,7 +13,9 @@ import { execSync } from 'child_process';
 const cwd = '../text-editor';
 
 console.time('install');
-// if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
+if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
+// kill symlink
+execSync('ls node_modules/shared', { cwd, stdio: 'inherit'});
 console.timeEnd('install');
 
 const zip = new AdmZip();

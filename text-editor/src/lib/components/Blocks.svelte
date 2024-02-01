@@ -9,7 +9,6 @@
 	import { createEditor, cursorBuilder } from '$lib/prosemirror/index.js';
 	import type { EditorState } from 'prosemirror-state';
 	import { readableArray, type YReadableArray } from 'shared';
-	import type { Readable } from 'svelte/store';
 	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
 	import * as Y from 'yjs';
 	import './prosemirror.css';
