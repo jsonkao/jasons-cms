@@ -29,7 +29,6 @@ const ignored_directories = [
 	'node_modules/.bin',
 	'node_modules/rollup/dist/shared',
 	'lib0/coverage'
-	// 'node_modules/y-leveldb'
 ];
 
 const ignored_files = new Set([
