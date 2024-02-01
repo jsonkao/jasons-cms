@@ -74,10 +74,10 @@ if (ignored_files.size > 0) {
 
 console.time('writing zip');
 const out = zip.toBuffer();
-// console log the file size of out in kilobytes
 fs.writeFileSync(`src/lib/webcontainer/files.zip`, out);
 console.timeEnd('writing zip');
 
+// console log the file size of out in megabytes
 console.log();
 console.log(
 	`Zip file is ${Math.round((fs.statSync('src/lib/webcontainer/files.zip').size / 1024 / 1024) * 100) / 100}MB`
