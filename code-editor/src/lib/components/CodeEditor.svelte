@@ -13,7 +13,7 @@
 
 	import { browser } from '$app/environment';
 	import { userColor, userName, LIVEBLOCKS_ROOM } from '$lib/constants.js';
-	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
+	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
 
@@ -25,10 +25,8 @@
 	 * Create Y.Text
 	 */
 
-	let ydoc: Y.Doc;
 	let ytext: Y.Text;
 	let yarrayStore: ReturnType<typeof readableArray>;
-	let yarray: Y.Array<Y.Map<Y.XmlFragment | Y.Text | string>>;
 	let yExtension: Extension;
 	let yProvider: LiveblocksProvider<any, any, any, any>;
 
@@ -38,33 +36,31 @@
 		const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, {
 			initialPresence: {}
 		});
-
 		destroy = leave;
 
-		ydoc = new Y.Doc();
+		const ydoc = new Y.Doc();
 		yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
-		yarray = ydoc.getArray('blocks-test');
-		yarrayStore = readableArray(yarray);
+		yarrayStore = readableArray(ydoc.getArray('blocks-test'));
 
-		$openComponent && setExtension($openComponent);
+		$openComponentName && setExtension($openComponentName);
 
 		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
-		// persistance for? (i.e. non-components like +page.server.js or Blocks.svelte)
+		// persistence for? (e.g. Blocks.svelte, but not +page.server.js)
+		// TODO: Create a ydoc top-level map for non-block files we do want persistance for (e.g. +page.server.js)
 	}
 
 	onDestroy(() => destroy());
 
-	$: if ($yarrayStore && $openComponent) setExtension($openComponent);
+	$: if ($yarrayStore && $openComponentName) setExtension($openComponentName);
 
 	function setExtension(name: string) {
-		let foundYtext: Y.Text = null;
+		// First, find the Y.Text for the requested component name
+		let foundYtext: Y.Text | undefined;
 		for (const ymap of $yarrayStore) {
-			console.log(ymap);
 			if (ymap.get('name') === name) foundYtext = ymap.get('code') as Y.Text;
 		}
-		console.log('foundYtext', foundYtext);
-		if (foundYtext) {
+		if (foundYtext !== undefined) {
 			ytext = foundYtext;
 			yExtension = yCollab(ytext, yProvider.awareness);
 		}
@@ -92,11 +88,11 @@
 		}
 		if (e.metaKey && ['a', 'b'].includes(e.key)) {
 			e.preventDefault();
-			openComponent.set({ a: 'graphic1', b: 'graphic2' }[e.key]!);
+			openComponentName.set({ a: 'graphic1', b: 'graphic2' }[e.key]!);
 		}
 		if (e.metaKey && e.key === 'x') {
 			e.preventDefault();
-			// openComponent.set('/src/routes/Blocks.svelte');
+			// openComponentName.set('/src/routes/Blocks.svelte');
 		}
 	}
 </script>

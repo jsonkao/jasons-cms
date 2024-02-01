@@ -3,12 +3,12 @@
 	 * This component is currently unused. Need to figure out how to integrate global files
 	 * with YDoc.
 	 */
-	import { openComponent, openGlobalFile } from '$lib/stores/code-editor.js';
+	import { openComponentName, openGlobalFile } from '$lib/stores/code-editor.js';
 
-	$: openFile = $openGlobalFile || $openComponent;
+	$: openFile = $openGlobalFile || $openComponentName;
 
 	$: files = [
-		{ label: 'Client', filename: $openComponent },
+		{ label: 'Client', filename: $openComponentName },
 		{ label: 'Data', filename: '/src/routes/+page.server.js' },
 		{ label: 'Styles', filename: '/src/routes/styles.css' }
 	];

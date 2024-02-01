@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
  * @type {import('svelte/store').Writable<string | null>}
  * The graphic in focus (and whose code is in the CodeEditor)
  */
-export const openComponent = writable(null);
+export const openComponentName = writable(null);
 
 /**
  * @type {import('svelte/store').Writable<string | null>}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
+	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
 	import { base, progress } from '$lib/stores/status.ts';
 	import { steps } from '$lib/constants.js';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
@@ -34,7 +34,7 @@
 				showCodeEditor = !showCodeEditor;
 				break;
 			case 'focusGraphic':
-				openComponent.set(event.data.name);
+				openComponentName.set(event.data.name);
 				break;
 			case 'editorMounted':
 				progress.set(steps.EDITOR_READY);

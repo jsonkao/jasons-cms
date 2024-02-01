@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { GENERATED_PATH } from '$lib/constants.js';
-	import { openComponent } from '$lib/stores/code-editor.js';
+	import { openComponentName } from '$lib/stores/code-editor.js';
 	import { startWebContainer, writeFile } from '$lib/webcontainer/instance.js';
 	import type { PageData } from './$types';
 	import Editor from './Editor.svelte';
@@ -17,7 +17,7 @@
 	 */
 	if (browser) {
 		startWebContainer(initialGraphics);
-		openComponent.set(initialGraphics[0].name);
+		openComponentName.set(initialGraphics[0].name);
 	}
 
 	/**
@@ -25,9 +25,9 @@
 	 * TODO: Incorporate $openGlobalFile
 	 */
 	function handleSave(event: CustomEvent) {
-		const name = $openComponent;
+		const name = $openComponentName;
 		if (!name) {
-			console.error('Attempted to save but openComponent is null', event);
+			console.error('Attempted to save but openComponentName is null', event);
 			return;
 		}
 		writeFile(`${GENERATED_PATH}/${name}.svelte`, event.detail);
