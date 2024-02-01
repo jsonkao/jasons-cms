@@ -65,20 +65,23 @@
 	const pmEditors: Record<string, any> = {};
 
 	const getName = (blockMap: BlockMap) => blockMap.get('name') as string;
-	const getUid = (blockMap: BlockMap) => blockMap.get('uid') as string;
+	const getInternalId = (blockMap: BlockMap) => {
+		if (blockMap._item === null) throw new Error('I thought Y.Map._item would never be null');
+		return Object.values(blockMap._item.id).join('-');
+	};
 </script>
 
 <svelte:window on:message={onMessage} />
 
 <div class="content" bind:this={contentEl}>
 	{#if createEditorForBlock && $yarrayStore}
-		{#each $yarrayStore || [] as blockMap}
+		{#each $yarrayStore || [] as blockMap (getInternalId(blockMap))}
 			{#if blockMap.get('type') === 'graphic'}
 				<Component name={getName(blockMap)} />
 			{:else if blockMap.get('type') === 'text'}
 				<ProsemirrorEditor
-					bind:this={pmEditors[getUid(blockMap)]}
-					on:blur={() => (lastTextFocused = getUid(blockMap))}
+					bind:this={pmEditors[getInternalId(blockMap)]}
+					on:blur={() => (lastTextFocused = getInternalId(blockMap))}
 					editorState={createEditorForBlock(blockMap)}
 				/>
 			{/if}
