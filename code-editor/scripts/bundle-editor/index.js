@@ -14,7 +14,7 @@ const cwd = '../text-editor';
 
 console.time('install');
 // if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
-execSync('rm -rf node_modules package-lock.json && npm ci', { cwd });
+execSync('rm -rf node_modules package-lock.json && npm i', { cwd });
 console.timeEnd('install');
 
 const zip = new AdmZip();
