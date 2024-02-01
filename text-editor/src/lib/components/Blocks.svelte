@@ -8,7 +8,7 @@
 
 	import { createEditor, cursorBuilder } from '$lib/prosemirror/index.js';
 	import type { EditorState } from 'prosemirror-state';
-	import { readableArray } from 'svelt-yjs';
+	import { readableArray, type YReadableArray } from 'shared';
 	import type { Readable } from 'svelte/store';
 	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
 	import * as Y from 'yjs';
@@ -29,7 +29,7 @@
 
 	let destroy = () => {};
 	let createEditorForBlock: (blockMap: BlockMap) => EditorState;
-	let yarrayStore: Readable<Array<BlockMap>>;
+	let yarrayStore: YReadableArray<BlockMap>;
 
 	if (browser) {
 		const ydoc = new Y.Doc();

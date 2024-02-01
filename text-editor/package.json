@@ -1,8 +1,9 @@
 {
-	"name": "editor",
+	"name": "text-editor",
 	"version": "0.0.1",
+	"private": true,
 	"scripts": {
-		"dev": "./node_modules/vite/bin/vite.js dev",
+		"dev": "vite dev",
 		"build": "./node_modules/vite/bin/vite.js build",
 		"preview": "./node_modules/vite/bin/vite.js preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -26,7 +27,7 @@
 		"prosemirror-model": "^1.19.4",
 		"prosemirror-state": "^1.4.3",
 		"prosemirror-view": "^1.32.7",
-		"svelt-yjs": "^1.1.0",
+		"shared": "*",
 		"y-prosemirror": "^1.2.2",
 		"yjs": "^13.6.11"
 	},

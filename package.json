@@ -1,8 +1,13 @@
 {
-  "name": "monorepo",
+  "name": "us-cms",
   "type": "module",
   "private": true,
   "scripts": {
     "format": "pnpm -r format"
-  }
+  },
+  "workspaces": [
+    "code-editor",
+    "text-editor",
+    "shared"
+  ]
 }

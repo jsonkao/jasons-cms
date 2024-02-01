@@ -3,7 +3,7 @@
 	import { svelte } from '@replit/codemirror-lang-svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
-	import { readableArray } from 'svelt-yjs';
+	import { readableArray, type YReadableArray } from 'shared';
 
 	// @ts-ignore
 	import { yCollab } from 'y-codemirror.next';
@@ -26,7 +26,7 @@
 	 */
 
 	let ytext: Y.Text;
-	let yarrayStore: ReturnType<typeof readableArray>;
+	let yarrayStore: YReadableArray<Y.Map<Y.Text | string>>;
 	let yExtension: Extension;
 	let yProvider: LiveblocksProvider<any, any, any, any>;
 

@@ -13,7 +13,7 @@ import { execSync } from 'child_process';
 const cwd = '../text-editor';
 
 console.time('install');
-if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
+// if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
 console.timeEnd('install');
 
 const zip = new AdmZip();

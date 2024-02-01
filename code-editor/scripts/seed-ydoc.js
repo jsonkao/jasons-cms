@@ -54,7 +54,7 @@ async function populateRoomWithData() {
 			console.log(`Deleting ${yarray.length} elements...\n`);
 			yarray.delete(0, yarray.length); // Clear the array
 		}
-		console.log('Seeding...\n')
+		console.log('Seeding...\n');
 		yarray.insert(0, [
 			makeTextBlock('text1'),
 			makeGraphicBlock(
