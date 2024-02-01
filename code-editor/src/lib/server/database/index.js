@@ -1,8 +1,8 @@
+import { LIVEBLOCKS_ROOM } from '$lib/constants.js';
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
-import { LIVEBLOCKS_ROOM } from '../../../../../shared/constants.js';
 
 const client = createClient({
 	publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A',
@@ -12,7 +12,7 @@ const client = createClient({
 });
 
 /**
- * @returns {InitialGraphic[]} - The blocks data
+ * @returns {Promise<InitialGraphic[]>} - The blocks data
  */
 export async function getInitialGraphics() {
 	const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, {

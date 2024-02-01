@@ -12,11 +12,10 @@
 	import LiveblocksProvider from '@liveblocks/yjs';
 
 	import { browser } from '$app/environment';
-	import { userColor, userName } from '$lib/constants.js';
+	import { userColor, userName, LIVEBLOCKS_ROOM } from '$lib/constants.js';
 	import { codeEditorPosition, openComponent } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
-	import { LIVEBLOCKS_ROOM } from '../../../../shared/constants.js';
 
 	const client = createClient({
 		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'

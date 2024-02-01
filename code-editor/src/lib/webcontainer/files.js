@@ -1,7 +1,6 @@
-import { GENERATED_PATH, userColor, userName } from '$lib/constants.js';
+import { GENERATED_PATH, LIVEBLOCKS_ROOM, userColor, userName } from '$lib/constants.js';
 import zipped from './files.zip?url';
 import unzip from './unzip.cjs?url';
-import { LIVEBLOCKS_ROOM } from '../../../../shared/constants.js';
 
 /**
  * Fetch the template files for the WebContainer.

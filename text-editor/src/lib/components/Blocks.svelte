@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { createLiveblocksProvider } from '$lib/liveblocks.js';
 	import { browser } from '$app/environment';
+	import { createLiveblocksProvider } from '$lib/liveblocks.js';
 	import { createObserver } from '$lib/utils.js';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
 	import { createEditor, cursorBuilder } from '$lib/prosemirror/index.js';
-	import { readableArray } from 'svelt-yjs';
-	import * as Y from 'yjs';
-	import type { Readable } from 'svelte/store';
 	import type { EditorState } from 'prosemirror-state';
+	import { readableArray } from 'svelt-yjs';
+	import type { Readable } from 'svelte/store';
 	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
+	import * as Y from 'yjs';
 	import './prosemirror.css';
 
 	type BlockMap = Y.Map<Y.XmlFragment | string>;
