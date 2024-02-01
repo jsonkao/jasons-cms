@@ -12,8 +12,8 @@
 	top: 0;
 	border-radius: 50%;
 	position: absolute;
-	width: 0.4em;
-	height: 0.4em;
+	width: 8px;
+	height: 8px;
 	background-color: inherit;
 	transition: opacity 0.3s;
 	transform: translate(-50%, -50%);
@@ -27,7 +27,7 @@
 .cm-ySelectionInfo {
 	position: absolute;
 	top: 0;
-	font-size: 0.7em;
+	font-size: 12px;
 	line-height: 1.4;
 	user-select: none;
 	color: white;
@@ -38,8 +38,8 @@
 	opacity: 0;
 	white-space: nowrap;
 	padding: 0 5px;
-	-webkit-font-smoothing: antialiased;
-	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+	letter-spacing: normal;
+	font-weight: normal;
 	transform: translate(-1px, -100%);
 }
 

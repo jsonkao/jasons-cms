@@ -55,7 +55,7 @@
 	</div>
 
 	<div class="iframe-container">
-		<iframe bind:this={iframe} title="Content" />
+		<iframe bind:this={iframe} title="" />
 		<Loading />
 	</div>
 </div>
