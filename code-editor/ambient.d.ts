@@ -1,6 +1,6 @@
 interface TextBlock {
 	type: 'text';
-	uid: string;
+	text: string;
 }
 
 interface GraphicBlock {
