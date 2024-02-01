@@ -83,7 +83,7 @@ console.log(
 	`Zip file is ${Math.round((fs.statSync('src/lib/webcontainer/files.zip').size / 1024 / 1024) * 100) / 100}MB`
 );
 
-// bundle adm-zip so we can use it in the webcontainer
+// bundle unzip script so we can use it in the webcontainer
 esbuild.buildSync({
 	entryPoints: [fileURLToPath(new URL('./unzip.js', import.meta.url))],
 	bundle: true,
