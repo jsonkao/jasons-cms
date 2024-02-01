@@ -21,7 +21,7 @@ export const GENERATED_PATH = '/src/lib/generated';
  * User attributes
  */
 
-const names = ['Urvashi', 'Martín', 'John-Michelle', 'Jason', 'Peanut'];
+const names = ['Jason', 'Hurubie', 'Chudi Jr.', 'Ben', 'Heidi', 'Liz'];
 /** The name for both CodeMirror and ProseMirror's collaborative cursors */
 export const userName = names[Math.floor(Math.random() * names.length)];
 
