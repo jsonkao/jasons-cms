@@ -13,6 +13,7 @@
 
 	import { browser } from '$app/environment';
 	import { LIVEBLOCKS_ROOM, userColor, userName } from '$lib/constants.js';
+	import { listenToNumberOfCoders } from '$lib/yjs.js';
 	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
 	import { hydrateWebContainerFileSystem, saveComponent } from '$lib/webcontainer/instance.js';
 	import { onDestroy } from 'svelte';
@@ -44,11 +45,11 @@
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 		yarrayStore = readableArray(ydoc.getArray('blocks-test'));
 
-		$openComponentName && setExtension($openComponentName);
-
 		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
 		// persistence for? (e.g. Blocks.svelte, but not +page.server.js)
 		// TODO: Create a ydoc top-level map for non-block files we do want persistance for (e.g. +page.server.js)
+
+		listenToNumberOfCoders(yProvider.awareness);
 	}
 
 	onDestroy(() => destroy());
@@ -96,6 +97,13 @@
 			// openComponentName.set('/src/routes/Blocks.svelte');
 		}
 	}
+
+	$: yProvider &&
+		yProvider.awareness.setLocalStateField('user', {
+			color: userColor,
+			name: userName,
+			coding: showCodeEditor
+		});
 </script>
 
 <div

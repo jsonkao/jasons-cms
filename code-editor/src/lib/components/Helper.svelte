@@ -1,5 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { otherCoders } from '$lib/stores/code-editor.js';
 
 	const dispatch = createEventDispatcher();
 </script>
@@ -8,14 +9,22 @@
 	<div class="helper-item">
 		<button on:click={() => dispatch('toggle')}>
 			<i class="code-icon" />
+
+			{#if $otherCoders.length > 0}
+				<span class="other-coders">
+					{#each $otherCoders as { color }}
+						<span class="coder" style="background-color: {color}" />
+					{/each}
+				</span>
+			{/if}
 		</button>
-		<span>code editor (cmd+e)</span>
+		<p>code editor (cmd+e)</p>
 	</div>
 	<div class="helper-item">
 		<button>
 			<i>?</i>
 		</button>
-		<span>help</span>
+		<p>help</p>
 	</div>
 </div>
 
@@ -39,7 +48,7 @@
 
 	.helper-item:first-child button {
 		pointer-events: all;
-		opacity: 0.4;
+		opacity: 1;
 	}
 
 	button {
@@ -58,21 +67,22 @@
 		opacity: 1;
 	}
 
-	span,
+	p,
 	i {
+		display: inline;
 		font-size: 1rem;
 		line-height: 1;
 		-webkit-font-smoothing: antialiased;
 		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-		color: rgba(0, 0, 0, 3);
+		color: black;
 	}
 
 	button,
-	span {
+	p {
 		transition-duration: 0.3s;
 	}
 
-	span {
+	p {
 		width: 0;
 		white-space: pre;
 		opacity: 0;
@@ -91,5 +101,22 @@
 
 	.code-icon {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M24 12L18.3431 17.6569L16.9289 16.2426L21.1716 12L16.9289 7.75736L18.3431 6.34315L24 12ZM2.82843 12L7.07107 16.2426L5.65685 17.6569L0 12L5.65685 6.34315L7.07107 7.75736L2.82843 12ZM9.78845 21H7.66009L14.2116 3H16.3399L9.78845 21Z'%3E%3C/path%3E%3C/svg%3E");
+	}
+
+	.other-coders {
+		position: absolute;
+		bottom: 3px;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		gap: 3px;
+		z-index: 3;
+	}
+
+	.coder {
+		--size: 6px;
+		border-radius: 50%;
+		width: var(--size);
+		height: var(--size);
 	}
 </style>
