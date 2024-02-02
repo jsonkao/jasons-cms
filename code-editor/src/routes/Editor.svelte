@@ -28,7 +28,7 @@
 	 * Handles all messages from the iframe
 	 */
 	function onMessage(event: MessageEvent) {
-		console.log('child', event);
+		// console.log('child', event);
 		switch (event.data.type) {
 			case 'toggleEditor':
 				showCodeEditor = !showCodeEditor;
@@ -47,11 +47,7 @@
 
 <div class="container layout-{$codeEditorPosition}" class:showing-editor={showCodeEditor}>
 	<div class="code-container">
-		<CodeEditor
-			on:changePosition={(p) => codeEditorPosition.set(p.detail)}
-			on:save
-			{showCodeEditor}
-		/>
+		<CodeEditor {showCodeEditor} />
 	</div>
 
 	<div class="iframe-container">

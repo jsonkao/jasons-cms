@@ -18,22 +18,19 @@ let currentProcess;
 /**
  * On HMR updates, kill the current process so we can safely start a new one.
  * Right now, this doesn't work because it disconnects the webcontainer from the project, whatever that means.
+ * Not sure if any of this works tbh.
  */
 if (import.meta.hot) {
-	import.meta.hot.on('vite:beforeUpdate', ({ updates }) => {
-		if (updates.some((u) => u.path === '/src/routes/+page.svelte' && u.type === 'js-update')) {
-			console.log('vite:beforeUpdate', updates);
-			killCurrentProcess();
-		}
-	});
-
 	// On HMR, first clean up the current process
 	import.meta.hot.dispose(() => {
 		console.log('dispose');
 		killCurrentProcess();
 	});
-}
 
+	import.meta.hot.accept(() => {
+		console.log('accept');
+	})
+}
 /**
  * In the browser, this promise resolves when the WebContainer is ready to be used and template files have been fetched.
  */
@@ -66,8 +63,12 @@ export async function initialize() {
 		);
 	}
 
-	await Promise.all(promises);
-	await mount();
+	if (promises.length > 0) {
+		await Promise.all(promises);
+		await mount();
+	}
+
+	startWebContainer(); // Do not await this
 }
 
 /**
@@ -81,6 +82,7 @@ async function boot() {
 	webcontainerInstance.on('server-ready', (port, url) => {
 		progress.set(steps.SERVER_READY);
 		base.set(url);
+		console.log('Server ready at', url, port);
 	});
 	webcontainerInstance.on('error', ({ message }) => {
 		console.error('WebContainer instance error:', message);
@@ -95,7 +97,6 @@ async function mount() {
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(templateFiles);
 
-	progress.set(steps.UNZIPPING);
 	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
 
 	// Clear the /src/lib/generated directory
@@ -108,8 +109,6 @@ async function mount() {
  * Call this function to mount the WebContainer and start the dev server.
  */
 export async function startWebContainer() {
-	await ready; // Wait for booting and mounting
-
 	progress.set(steps.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
 }
@@ -136,8 +135,7 @@ export async function hydrateWebContainerFileSystem(yarray) {
 		allGraphics.push({ name, code, alreadyExists: currentGraphics.includes(`${name}.svelte`) });
 	});
 
-	console.log(currentGraphics, allGraphics);
-
+	// If there's no open component, set the first one
 	if (get(openComponentName) === null && allGraphics.length > 0) {
 		openComponentName.set(allGraphics[0].name);
 	}
@@ -153,6 +151,19 @@ export async function hydrateWebContainerFileSystem(yarray) {
 				`\nexport default { ${allGraphics.map(({ name }) => name).join(', ')} };`
 		)
 	]);
+}
+
+/**
+ * Handles saving the file
+ * TODO: Incorporate $openGlobalFile
+ * @param {string | null} componentName - The name of the component to save
+ * @param {string} content - The content of the component to save
+ */
+export async function saveComponent(componentName, content) {
+	if (componentName === null) {
+		throw new Error('Attempted to save but openComponentName is null');
+	}
+	await writeFile(`${GENERATED_PATH}/${componentName}.svelte`, content);
 }
 
 /**

@@ -1,21 +1,21 @@
 <script lang="ts">
 	import type { Extension } from '@codemirror/state';
 	import { svelte } from '@replit/codemirror-lang-svelte';
+	import { readableArray, type YReadableArray } from 'shared';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
-	import { readableArray, type YReadableArray } from 'shared';
 
 	// @ts-ignore
 	import { yCollab } from 'y-codemirror.next';
-	import * as Y from 'yjs';
 	import { createClient } from '@liveblocks/client';
 	import LiveblocksProvider from '@liveblocks/yjs';
+	import * as Y from 'yjs';
 
 	import { browser } from '$app/environment';
-	import { userColor, userName, LIVEBLOCKS_ROOM } from '$lib/constants.js';
-	import { hydrateWebContainerFileSystem } from '$lib/webcontainer/instance.js';
+	import { LIVEBLOCKS_ROOM, userColor, userName } from '$lib/constants.js';
 	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
-	import { createEventDispatcher, onDestroy } from 'svelte';
+	import { hydrateWebContainerFileSystem, saveComponent } from '$lib/webcontainer/instance.js';
+	import { onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
 
 	const client = createClient({
@@ -77,8 +77,6 @@
 
 	let containerElement: HTMLElement;
 
-	const dispatch = createEventDispatcher();
-
 	// If the editor gets shown, focus the contenteditable element
 	// TODO: This is null for some reason
 	$: if (showCodeEditor && containerElement)
@@ -87,7 +85,7 @@
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.metaKey && e.key === 's') {
 			e.preventDefault();
-			dispatch('save', ytext.toString());
+			saveComponent($openComponentName, ytext.toString());
 		}
 		if (e.metaKey && ['a', 'b'].includes(e.key)) {
 			e.preventDefault();
