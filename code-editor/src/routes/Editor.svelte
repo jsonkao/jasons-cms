@@ -4,6 +4,7 @@
 	import { steps } from '$lib/constants.js';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';
+	import Helper from '$lib/components/Helper.svelte';
 
 	let showCodeEditor = false;
 
@@ -19,10 +20,15 @@
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
-			showCodeEditor = !showCodeEditor;
-			iframe.contentWindow?.postMessage({ type: 'focusText' }, '*');
+			toggleEditor();
 		}
 	}
+
+	function toggleEditor() {
+		showCodeEditor = !showCodeEditor;
+	}
+
+	$: if (!showCodeEditor) iframe?.contentWindow?.postMessage({ type: 'focusText' }, '*');
 
 	/**
 	 * Handles all messages from the iframe
@@ -31,7 +37,7 @@
 		// console.log('child', event);
 		switch (event.data.type) {
 			case 'toggleEditor':
-				showCodeEditor = !showCodeEditor;
+				toggleEditor();
 				break;
 			case 'focusGraphic':
 				openComponentName.set(event.data.name);
@@ -54,6 +60,8 @@
 		<iframe bind:this={iframe} title="" />
 		<Loading />
 	</div>
+
+	<Helper on:toggle={toggleEditor} />
 </div>
 
 <style>
