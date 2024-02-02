@@ -44,11 +44,11 @@
 
 /* Use this instead of Prosemirror's built in placeholder to account for multiline content */
 .ui-editor.ProseMirror-focused p:has(br:only-child):before {
-	position: absolute;
-	content: 'Write something...';
+	/* position: absolute;
+	content: 'Press ‘/’ for commands…';
 	pointer-events: none;
 	color: #aaa;
-	z-index: -1;
+	z-index: -1; */
 }
 
 /* Empty ui-editors should take up zero space */

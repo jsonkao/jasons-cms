@@ -1,5 +1,6 @@
 <script>
 	import Blocks from '$lib/components/Blocks.svelte';
+	import Popup from '$lib/components/Popup.svelte';
 	import './styles.css';
 
 	/**
@@ -17,3 +18,4 @@
 <svelte:window on:keydown={onKeydown} />
 
 <Blocks />
+<Popup />

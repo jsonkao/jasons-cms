@@ -42,6 +42,7 @@
 			trackedOrigins: new Set([ySyncPluginKey]),
 			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
 		});
+		// undoManager.on('stack-item-added', ({ stackItem }) => console.log('undo stack item added', stackItem));
 
 		createEditorForBlock = (blockMap: BlockMap) =>
 			createEditor([
