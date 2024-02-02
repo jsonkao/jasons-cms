@@ -1,11 +1,11 @@
 <script>
 	/**
 	 * This component was copied from https://github.com/christianheine/prosemirror-svelte and lightly modified to:
+	 * - Use an editor state creator function instead of a static editor state
 	 * - Clean up type annotations and styles
 	 * - Propogate blur events to parent (this might've not been needed)
 	 *
-	 * So... maybe there wans't a strong reason to copy this component. I'll keep it for now, because there is a slight change
-	 * this caused a duplicate import of yjs.
+	 * And finally, there is a slight change prosemirror-svelte was causing a duplicate import of yjs.
 	 *
 	 * Copyright 2019 Christian Heine
 	 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -21,8 +21,11 @@
 	/** @type {string} */
 	export let className = 'ui-editor';
 
+	/** @type {() => import('prosemirror-state').EditorState}*/
+	export let editorStateCreator;
+
 	/** @type {import('prosemirror-state').EditorState} */
-	export let editorState;
+	let editorState = editorStateCreator();
 
 	/** @type {string} */
 	export let placeholder = '';
@@ -92,6 +95,7 @@
 	};
 
 	onMount(() => {
+		console.log('mounting');
 		view = new EditorView(
 			{ mount: editor },
 			{
@@ -123,6 +127,7 @@
 	});
 
 	onDestroy(() => {
+		console.log('unmounting');
 		view && view.destroy();
 	});
 </script>

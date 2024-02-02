@@ -9,6 +9,8 @@ import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
 import { popupStore } from '$lib/stores.js';
 
+/** @typedef {import('prosemirror-view').EditorView} EditorView */
+
 /**
  * A helper function to create a minimal rich text editor.
  * @param {Plugin[]} plugins
@@ -25,7 +27,7 @@ export const createEditor = (plugins) =>
 				'Mod-Shift-z': redo
 			}),
 			richTextKeyMap(richTextSchema),
-			customCommands()
+			FloatingMenuPlugin()
 		]
 	});
 
@@ -66,48 +68,82 @@ export function cursorBuilder(user) {
 }
 
 /**
- * Creates a plugin that listens to custom commands being typed — in the style of Notion (e.g. /graphic)
+ * Took the default generator for the selection attributes and made it more transparent
+ *
+ * @param {any} user user data
+ * @return {import('prosemirror-view').DecorationAttrs}
  */
-function customCommands() {
+export const selectionBuilder = (user) => {
+  return {
+    style: `background-color: ${user.color}44`,
+    class: 'ProseMirror-yjs-selection'
+  }
+}
+
+/**
+ * Creates a floating menu plugin
+ */
+function FloatingMenuPlugin() {
 	return new Plugin({
-		view(editorView) {
-			return new CustomCommandView(editorView);
-		}
+		view: (editorView) => new FloatingMenuView(editorView)
 	});
 }
 
 /**
- * A view for the custom command plugin.
+ * A view for the floating menu plugin.
  * References:
  *   - https://github.com/ueberdosis/tiptap/blob/main/packages/extension-floating-menu/src/floating-menu-plugin.ts
  *   - https://github.com/ProseMirror/prosemirror-dropcursor/blob/master/src/dropcursor.ts
  */
-class CustomCommandView {
+class FloatingMenuView {
+	/** @type {EditorView} The editor view */
+	editorView;
+
+	/** @type {boolean} Whether to prevent hiding on next blur */
+	preventHide = false;
+
 	/**
-	 * @param {import('prosemirror-view').EditorView} editorView
+	 * @param {EditorView} editorView
 	 */
 	constructor(editorView) {
 		this.editorView = editorView;
 		// On focus, also call update
-		editorView.dom.addEventListener('focus', () => setTimeout(() => this.update(this.editorView)));
+		editorView.dom.addEventListener('focus', this.focusHandler);
+		// On blur, hide the floating menu (in some cases)
 		editorView.dom.addEventListener('blur', this.blurHandler);
+		// On mousedown, prevent blur from hiding the floating menu
+		editorView.dom.addEventListener('mousedown', this.mousedownHandler, { capture: true });
 	}
+
+	focusHandler = () => {
+		// Tiptap code says this `setTimeout` makes sure `selection` is already updated
+		setTimeout(() => this.update(this.editorView));
+	};
 
 	/**
 	 * @param {FocusEvent} event
 	 */
-	blurHandler(event) {
+	blurHandler = (event) => {
+		if (this.preventHide) {
+			// Prevent a blur event caused by clicking the floating menu from hiding the floating menu
+			this.preventHide = false;
+			return;
+		}
+
 		const targetNode = /** @type {Node} */ (event.target);
 		const relatedTarget = /** @type {Node} */ (event.relatedTarget);
 
-		if (relatedTarget?.id === 'popup-button') return;
 		if (targetNode?.parentNode?.contains(relatedTarget)) return;
 
 		popupStore.set({ visible: false });
-	}
+	};
+
+	mousedownHandler = () => {
+		this.preventHide = true;
+	};
 
 	/**
-	 * @param {import('prosemirror-view').EditorView} editorView
+	 * @param {EditorView} editorView
 	 * @param {EditorState} [prevState]
 	 */
 	update(editorView, prevState) {

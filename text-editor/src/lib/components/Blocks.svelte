@@ -4,10 +4,10 @@
 	import { createObserver } from '$lib/utils.js';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
-	import Popup from './Popup.svelte';
+	import FloatingMenu from './FloatingMenu.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
-	import { createEditor, cursorBuilder } from '$lib/prosemirror/index.js';
+	import { createEditor, cursorBuilder, selectionBuilder } from '$lib/prosemirror/index.js';
 	import type { EditorState } from 'prosemirror-state';
 	import { readableArray, type YReadableArray } from 'shared';
 	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
@@ -29,11 +29,14 @@
 
 	let destroy = () => {};
 	let createEditorForBlock: (blockMap: BlockMap) => EditorState;
+	let ydoc: Y.Doc;
 	let yarrayStore: YReadableArray<BlockMap>;
+	let transactionOrigin: number;
 
 	if (browser) {
 		// TODO: Move this logic into a separate JavaScript file?
-		const ydoc = new Y.Doc();
+		ydoc = new Y.Doc();
+		transactionOrigin = ydoc.clientID;
 		const { awareness, leave } = createLiveblocksProvider(ydoc);
 		destroy = leave;
 
@@ -41,17 +44,23 @@
 		yarrayStore = readableArray(yarray);
 
 		const undoManager = new Y.UndoManager(yarray, {
-			trackedOrigins: new Set([ySyncPluginKey]),
-			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
+			trackedOrigins: new Set([ySyncPluginKey, transactionOrigin]),
+			captureTransaction: (tr) => {
+				return tr.meta.get('addToHistory') !== false;
+			}
 		});
-		// undoManager.on('stack-item-added', ({ stackItem }) => console.log('undo stack item added', stackItem));
+		undoManager.on('stack-item-added', ({ stackItem }) =>
+			console.log('undo stack item added', stackItem)
+		);
 
-		createEditorForBlock = (blockMap: BlockMap) =>
-			createEditor([
+		createEditorForBlock = (blockMap: BlockMap) => {
+			console.log('creating editor for block', blockMap);
+			return createEditor([
 				ySyncPlugin(blockMap.get('text') as Y.XmlFragment),
-				yCursorPlugin(awareness, { cursorBuilder }),
+				yCursorPlugin(awareness, { cursorBuilder, selectionBuilder }),
 				yUndoPlugin({ undoManager })
 			]);
+		};
 	}
 
 	let contentEl: HTMLElement;
@@ -78,18 +87,20 @@
 	 * @param {CustomEvent} e
 	 */
 	function insertNewGraphic(e) {
-		console.log('inserting', e)
+		console.log('inserting', e);
 		const ymap = new Y.Map();
 
 		const yxmlFragment = new Y.XmlFragment();
 		const yxmlElement = new Y.XmlElement('paragraph');
-		yxmlElement.insert(0, [new Y.XmlText('TESTING TESTING')]);
+		yxmlElement.insert(0, [new Y.XmlText('TESTING INSERT')]);
 		yxmlFragment.insert(0, [yxmlElement]);
 
 		ymap.set('type', 'text');
 		ymap.set('text', yxmlFragment);
 
-		yarrayStore.y.push([ymap]);
+		ydoc.transact(() => {
+			yarrayStore.y.push([ymap]);
+		}, transactionOrigin);
 	}
 </script>
 
@@ -104,11 +115,11 @@
 				<ProsemirrorEditor
 					bind:this={pmEditors[getInternalId(blockMap)]}
 					on:blur={() => (lastTextFocused = getInternalId(blockMap))}
-					editorState={createEditorForBlock(blockMap)}
+					editorStateCreator={() => createEditorForBlock(blockMap)}
 				/>
 			{/if}
 		{/each}
 	{/if}
 </div>
 
-<Popup on:new-graphic={insertNewGraphic} />
+<FloatingMenu on:new-graphic={insertNewGraphic} />

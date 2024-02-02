@@ -3,11 +3,19 @@
 	import { popupStore } from '$lib/stores';
 
 	const dispatch = createEventDispatcher();
+
+	function handleClick() {
+		dispatch('new-graphic', 'data');
+		popupStore.set({ visible: false });
+	}
 </script>
 
 {#if $popupStore.visible && $popupStore.left && $popupStore.top}
 	<div class="popup" style="top: {$popupStore.top}px; left: {$popupStore.left}px">
-		<p>Write or <button id="popup-button" on:click={() => dispatch('new-graphic', 'data')}>code</button>...</p>
+		<p>
+			Write or
+			<button on:click={handleClick}>code</button>...
+		</p>
 	</div>
 {/if}
 
