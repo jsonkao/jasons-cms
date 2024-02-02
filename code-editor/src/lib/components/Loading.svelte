@@ -32,7 +32,7 @@
 		width: 100%;
 		height: 100%;
 		position: relative;
-		backdrop-filter: blur(10px);
+		/* backdrop-filter: blur(10px); */
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
