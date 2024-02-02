@@ -13,6 +13,7 @@
 
 	import { browser } from '$app/environment';
 	import { userColor, userName, LIVEBLOCKS_ROOM } from '$lib/constants.js';
+	import { hydrateWebContainerFileSystem } from '$lib/webcontainer/instance.js';
 	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
@@ -26,7 +27,7 @@
 	 */
 
 	let ytext: Y.Text;
-	let yarrayStore: YReadableArray<Y.Map<Y.Text | string>>;
+	let yarrayStore: YReadableArray<BlockMap>;
 	let yExtension: Extension;
 	let yProvider: LiveblocksProvider<any, any, any, any>;
 
@@ -53,6 +54,8 @@
 	onDestroy(() => destroy());
 
 	$: if ($yarrayStore && $openComponentName) setExtension($openComponentName);
+
+	$: hydrateWebContainerFileSystem($yarrayStore);
 
 	function setExtension(name: string) {
 		// First, find the Y.Text for the requested component name

@@ -15,3 +15,6 @@ interface InitialGraphic {
 	name: string;
 	code: string;
 }
+
+// TODO: share this
+type BlockMap = import('yjs').Map<import('yjs').XmlFragment | import('yjs').Text | string>;

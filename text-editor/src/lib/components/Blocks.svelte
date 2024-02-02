@@ -14,8 +14,6 @@
 	import * as Y from 'yjs';
 	import './prosemirror.css';
 
-	type BlockMap = Y.Map<Y.XmlFragment | string>;
-
 	let lastTextFocused: string;
 
 	/**
@@ -43,6 +41,7 @@
 		const yarray: Y.Array<BlockMap> = ydoc.getArray('blocks-test');
 		yarrayStore = readableArray(yarray);
 
+		// BUG: Undo/Redo is buggy with insertion
 		const undoManager = new Y.UndoManager(yarray, {
 			trackedOrigins: new Set([ySyncPluginKey, transactionOrigin]),
 			captureTransaction: (tr) => {

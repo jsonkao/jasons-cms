@@ -23,35 +23,6 @@ export async function fetchTemplateFiles() {
 }
 
 /**
- * Modify template files and add new files (e.g. graphic components) the WebContainer.
- * This function should run after the WebContainer has been mounted.
- * @param {import('@webcontainer/api').WebContainer} webcontainerInstance - The WebContainer instance
- * @param {InitialGraphic[]} initialGraphics - Data on initial graphics
- */
-export async function amendTemplateFiles(webcontainerInstance, initialGraphics) {
-	/**
-	 * A helper function to generate a file
-	 * @param {string} filename - The name of the file
-	 * @param {string} content - The content of the file
-	 */
-	function writeFile(filename, content) {
-		webcontainerInstance.fs.writeFile(`${GENERATED_PATH}/${filename}`, content);
-	}
-
-	await Promise.all([
-		// Initial write of graphics Svelte files so the dev server starts with a good preview/SSR
-		...initialGraphics.map(({ name, code }) => writeFile(`${name}.svelte`, code)),
-		// A lib/index.js file to export all the graphic components
-		writeFile(
-			'index.js',
-			initialGraphics.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
-				`\nexport default { ${initialGraphics.map(({ name }) => name).join(', ')} };`
-		),
-		writeGlobals(webcontainerInstance)
-	]);
-}
-
-/**
  * Write a globals file with constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
  * @param {import('@webcontainer/api').WebContainer} webcontainerInstance - The WebContainer instance
  */

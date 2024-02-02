@@ -1,8 +1,10 @@
 import { browser } from '$app/environment';
-import { steps } from '$lib/constants.js';
+import { get } from 'svelte/store';
+import { GENERATED_PATH, steps } from '$lib/constants.js';
 import { base, progress } from '$lib/stores/status.ts';
+import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
-import { amendTemplateFiles, fetchTemplateFiles } from './files.js';
+import { fetchTemplateFiles, writeGlobals } from './files.js';
 
 /** @type {WebContainer} The WebContainer instance. */
 let webcontainerInstance;
@@ -49,20 +51,7 @@ export async function initialize() {
 	if (import.meta.hot?.data.webcontainerInstance) {
 		webcontainerInstance = import.meta.hot.data.webcontainerInstance;
 	} else {
-		promises.push(
-			WebContainer.boot().then((instance) => {
-				webcontainerInstance = instance;
-				if (import.meta.hot) import.meta.hot.data.webcontainerInstance = instance;
-
-				webcontainerInstance.on('server-ready', (port, url) => {
-					progress.set(steps.SERVER_READY);
-					base.set(url);
-				});
-				webcontainerInstance.on('error', ({ message }) => {
-					console.error('WebContainer instance error:', message);
-				});
-			})
-		);
+		promises.push(instantiateWebContainer());
 	}
 
 	// Reuse the same template files in dev HMR
@@ -81,26 +70,91 @@ export async function initialize() {
 }
 
 /**
- * Call this function to mount the WebContainer and start the dev server.
- * @param {InitialGraphic[]} initialGraphics
+ * A function that boots and mounts template files to the WebContainer.
  */
-export async function startWebContainer(initialGraphics) {
-	// Wait for the WebContainer to be initialized and for files to be fetched
-	await ready;
+async function instantiateWebContainer() {
+	// Boot
+
+	const instance = await WebContainer.boot();
+	webcontainerInstance = instance;
+	if (import.meta.hot) import.meta.hot.data.webcontainerInstance = instance;
+
+	webcontainerInstance.on('server-ready', (port, url) => {
+		progress.set(steps.SERVER_READY);
+		base.set(url);
+	});
+	webcontainerInstance.on('error', ({ message }) => {
+		console.error('WebContainer instance error:', message);
+	});
 
 	// Mount and unzip files
-	// TODO LATER: diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
+	// TODO (maybe): on HMR, diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
+
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(templateFiles);
 
 	progress.set(steps.UNZIPPING);
 	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
-	await amendTemplateFiles(webcontainerInstance, initialGraphics);
+
+	// Clear the /src/lib/generated directory
+	await webcontainerInstance.fs.rm(GENERATED_PATH, { recursive: true });
+	await webcontainerInstance.fs.mkdir(GENERATED_PATH);
+	await writeGlobals(webcontainerInstance);
+}
+
+/**
+ * Call this function to mount the WebContainer and start the dev server.
+ */
+export async function startWebContainer() {
+	// Wait for the WebContainer to be initialized and for files to be fetched
+	await ready;
 
 	progress.set(steps.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
 }
 
+/**
+ * Populate the WebContainer's file system with the given code files.
+ * @param {import('yjs').Array<BlockMap>} yarray - The Yjs array of code files
+ */
+export async function hydrateWebContainerFileSystem(yarray) {
+	await ready;
+
+	const currentGraphics = await webcontainerInstance.fs.readdir(GENERATED_PATH);
+
+	/** @type {Array<{ name: string, code: string, alreadyExists: boolean }} */
+	const allGraphics = [];
+	yarray.forEach((blockMap) => {
+		if (blockMap.get('type') !== 'graphic') return;
+
+		const name = /** @type {string} */ (blockMap.get('name'));
+		const code = /** @type {import('yjs').Text} */ (blockMap.get('code')).toString();
+
+		allGraphics.push({ name, code, alreadyExists: currentGraphics.includes(`${name}.svelte`) });
+	});
+
+	console.log(currentGraphics, allGraphics);
+
+	if (get(openComponentName) === null && allGraphics.length > 0) {
+		openComponentName.set(allGraphics[0].name);
+	}
+
+	await Promise.all([
+		...allGraphics
+			.filter((b) => !b.alreadyExists)
+			.map(({ name, code }) => writeFile(`${GENERATED_PATH}/${name}.svelte`, code)),
+		// A lib/index.js file to export all the graphic components
+		writeFile(
+			`${GENERATED_PATH}/index.js`,
+			allGraphics.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
+				`\nexport default { ${allGraphics.map(({ name }) => name).join(', ')} };`
+		)
+	]);
+}
+
+/**
+ * A helper to create a WritableStream that logs the data it receives.
+ */
 function log_stream() {
 	return new WritableStream({
 		write(data) {
