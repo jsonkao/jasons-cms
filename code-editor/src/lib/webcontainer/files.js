@@ -60,7 +60,7 @@ export function writeGlobals(webcontainerInstance) {
 	return webcontainerInstance.fs.writeFile(
 		`${GENERATED_PATH}/globals.js`,
 		Object.keys(variables)
-			.map((key) => `export const ${key} = "${variables[key]}";`)
+			.map((key) => `export const ${key} = "${variables[/** @type {keyof variables} */ (key)]}";`)
 			.join('\n')
 	);
 }

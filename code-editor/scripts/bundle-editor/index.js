@@ -3,12 +3,12 @@
  * and also git clean path
  */
 
-import fs from 'fs';
-import esbuild from 'esbuild';
 import AdmZip from 'adm-zip';
+import { execSync } from 'child_process';
+import esbuild from 'esbuild';
+import fs from 'fs';
 import glob from 'tiny-glob/sync.js';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
 
 const cwd = '../text-editor';
 

@@ -1,7 +1,7 @@
-import { WebContainer } from '@webcontainer/api';
 import { browser } from '$app/environment';
 import { steps } from '$lib/constants.js';
 import { base, progress } from '$lib/stores/status.ts';
+import { WebContainer } from '@webcontainer/api';
 import { amendTemplateFiles, fetchTemplateFiles } from './files.js';
 
 /** @type {WebContainer} The WebContainer instance. */
