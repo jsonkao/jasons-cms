@@ -51,7 +51,7 @@ export async function initialize() {
 	if (import.meta.hot?.data.webcontainerInstance) {
 		webcontainerInstance = import.meta.hot.data.webcontainerInstance;
 	} else {
-		promises.push(instantiateWebContainer());
+		promises.push(boot());
 	}
 
 	// Reuse the same template files in dev HMR
@@ -67,14 +67,13 @@ export async function initialize() {
 	}
 
 	await Promise.all(promises);
+	await mount();
 }
 
 /**
- * A function that boots and mounts template files to the WebContainer.
+ * Boot a new webcontainer instance. Persist the instance in HMR.
  */
-async function instantiateWebContainer() {
-	// Boot
-
+async function boot() {
 	const instance = await WebContainer.boot();
 	webcontainerInstance = instance;
 	if (import.meta.hot) import.meta.hot.data.webcontainerInstance = instance;
@@ -86,10 +85,13 @@ async function instantiateWebContainer() {
 	webcontainerInstance.on('error', ({ message }) => {
 		console.error('WebContainer instance error:', message);
 	});
+}
 
-	// Mount and unzip files
-	// TODO (maybe): on HMR, diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
-
+/**
+ * Mount the WebContainer and unzip the template files.
+ * TODO (maybe): on HMR, diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
+ */
+async function mount() {
 	progress.set(steps.MOUNTING);
 	await webcontainerInstance.mount(templateFiles);
 
@@ -106,15 +108,16 @@ async function instantiateWebContainer() {
  * Call this function to mount the WebContainer and start the dev server.
  */
 export async function startWebContainer() {
-	// Wait for the WebContainer to be initialized and for files to be fetched
-	await ready;
+	await ready; // Wait for booting and mounting
 
 	progress.set(steps.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
 }
 
 /**
- * Populate the WebContainer's file system with the given code files.
+ * Given a Yjs array of blocks, make sure that the Svelte components exist in the WebContainer's file system.
+ * Also generate an `index.js` file that exports all the graphic components.
+ * in the WebContainer's file system with the given code files.
  * @param {import('yjs').Array<BlockMap>} yarray - The Yjs array of code files
  */
 export async function hydrateWebContainerFileSystem(yarray) {
