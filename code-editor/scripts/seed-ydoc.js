@@ -5,7 +5,9 @@ import WebSocket from 'ws';
 import * as Y from 'yjs';
 import { LIVEBLOCKS_ROOM } from '../src/lib/constants.js';
 
-await createRoom();
+const TESTING = process.argv.includes('--test');
+
+if (!TESTING) await createRoom();
 await populateRoomWithData();
 
 /**
@@ -47,7 +49,7 @@ async function populateRoomWithData() {
 	new LiveblocksProvider(room, ydoc);
 	const yarray = ydoc.getArray('blocks-test');
 
-	await seedArray();
+	if (!TESTING) await seedArray();
 	await testArray();
 	leave();
 
@@ -117,7 +119,7 @@ async function populateRoomWithData() {
 	}
 
 	async function testArray() {
-		await new Promise((r) => setTimeout(r, 1000));
+		await new Promise((r) => setTimeout(r, 2000));
 		console.log('Testing...');
 		console.log('  - length:', yarray.length);
 		console.log('  - content:', JSON.stringify(yarray.toJSON()));

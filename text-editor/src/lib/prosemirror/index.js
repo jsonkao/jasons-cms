@@ -99,9 +99,9 @@ class CustomCommandView {
 	blurHandler(event) {
 		const targetNode = /** @type {Node} */ (event.target);
 		const relatedTarget = /** @type {Node} */ (event.relatedTarget);
-		if (relatedTarget && targetNode?.parentNode?.contains(relatedTarget)) {
-			return;
-		}
+
+		if (relatedTarget?.id === 'popup-button') return;
+		if (targetNode?.parentNode?.contains(relatedTarget)) return;
 
 		popupStore.set({ visible: false });
 	}
@@ -123,6 +123,7 @@ class CustomCommandView {
 			return;
 		}
 
+		// TODO: add a resize event listener
 		const rect = /** @type {HTMLElement} */ (textElement).getBoundingClientRect();
 		popupStore.set({
 			visible: true,

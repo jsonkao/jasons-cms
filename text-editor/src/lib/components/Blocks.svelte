@@ -4,6 +4,7 @@
 	import { createObserver } from '$lib/utils.js';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
+	import Popup from './Popup.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
 	import { createEditor, cursorBuilder } from '$lib/prosemirror/index.js';
@@ -31,6 +32,7 @@
 	let yarrayStore: YReadableArray<BlockMap>;
 
 	if (browser) {
+		// TODO: Move this logic into a separate JavaScript file?
 		const ydoc = new Y.Doc();
 		const { awareness, leave } = createLiveblocksProvider(ydoc);
 		destroy = leave;
@@ -70,6 +72,25 @@
 		if (blockMap._item === null) throw new Error('I thought Y.Map._item would never be null');
 		return Object.values(blockMap._item.id).join('-');
 	};
+
+	/**
+	 * A WIP!!
+	 * @param {CustomEvent} e
+	 */
+	function insertNewGraphic(e) {
+		console.log('inserting', e)
+		const ymap = new Y.Map();
+
+		const yxmlFragment = new Y.XmlFragment();
+		const yxmlElement = new Y.XmlElement('paragraph');
+		yxmlElement.insert(0, [new Y.XmlText('TESTING TESTING')]);
+		yxmlFragment.insert(0, [yxmlElement]);
+
+		ymap.set('type', 'text');
+		ymap.set('text', yxmlFragment);
+
+		yarrayStore.y.push([ymap]);
+	}
 </script>
 
 <svelte:window on:message={onMessage} />
@@ -89,3 +110,5 @@
 		{/each}
 	{/if}
 </div>
+
+<Popup on:new-graphic={insertNewGraphic} />

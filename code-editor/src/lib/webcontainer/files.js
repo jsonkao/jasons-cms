@@ -47,10 +47,20 @@ export async function amendTemplateFiles(webcontainerInstance, initialGraphics) 
 			initialGraphics.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
 				`\nexport default { ${initialGraphics.map(({ name }) => name).join(', ')} };`
 		),
-		// A file for constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
-		writeFile(
-			'globals.js',
-			`export const userName = "${userName}"; export const userColor = "${userColor}"; export const LIVEBLOCKS_ROOM = "${LIVEBLOCKS_ROOM}";`
-		)
+		writeGlobals(webcontainerInstance)
 	]);
+}
+
+/**
+ * Write a globals file with constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
+ * @param {import('@webcontainer/api').WebContainer} webcontainerInstance - The WebContainer instance
+ */
+export function writeGlobals(webcontainerInstance) {
+	const variables = { userName, userColor, LIVEBLOCKS_ROOM };
+	return webcontainerInstance.fs.writeFile(
+		`${GENERATED_PATH}/globals.js`,
+		Object.keys(variables)
+			.map((key) => `export const ${key} = "${variables[key]}";`)
+			.join('\n')
+	);
 }
