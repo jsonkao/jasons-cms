@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { createLiveblocksProvider } from '$lib/liveblocks.js';
+	import { createLiveblocksProvider, IndestructibleUndoManager } from '$lib/yjs.js';
 	import { createObserver } from '$lib/utils.js';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
@@ -42,18 +42,18 @@
 		yarrayStore = readableArray(yarray);
 
 		// BUG: Undo/Redo is buggy with insertion
-		const undoManager = new Y.UndoManager(yarray, {
+		const undoManager = new IndestructibleUndoManager(yarray, {
 			trackedOrigins: new Set([ySyncPluginKey, transactionOrigin]),
-			captureTransaction: (tr) => {
-				return tr.meta.get('addToHistory') !== false;
-			}
+			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
 		});
-		undoManager.on('stack-item-added', ({ stackItem }) =>
-			console.log('undo stack item added', stackItem)
-		);
+
+		destroy = () => {
+			leave();
+			ydoc.destroy();
+			undoManager.actuallyDestroy();
+		};
 
 		createEditorForBlock = (blockMap: BlockMap) => {
-			console.log('creating editor for block', blockMap);
 			return createEditor([
 				ySyncPlugin(blockMap.get('text') as Y.XmlFragment),
 				yCursorPlugin(awareness, { cursorBuilder, selectionBuilder }),
@@ -86,7 +86,6 @@
 	 * @param {CustomEvent} e
 	 */
 	function insertNewGraphic(e) {
-		console.log('inserting', e);
 		const ymap = new Y.Map();
 
 		const yxmlFragment = new Y.XmlFragment();

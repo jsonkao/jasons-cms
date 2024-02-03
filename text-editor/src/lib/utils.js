@@ -1,14 +1,3 @@
-/**
- * Place caret at end of a contenteditable element
- * @param {HTMLElement | null} el
- */
-export async function placeCaretAtEnd(el) {
-	if (el === null) return;
-
-	el.focus();
-	document.getSelection()?.modify('move', 'forward', 'documentboundary');
-}
-
 const DEBUG = false;
 
 /**

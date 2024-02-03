@@ -95,7 +95,6 @@
 	};
 
 	onMount(() => {
-		console.log('mounting');
 		view = new EditorView(
 			{ mount: editor },
 			{
@@ -127,7 +126,6 @@
 	});
 
 	onDestroy(() => {
-		console.log('unmounting');
 		view && view.destroy();
 	});
 </script>
