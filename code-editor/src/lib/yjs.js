@@ -7,7 +7,9 @@ import { otherCoders } from '$lib/stores/code-editor.js';
 export function listenToNumberOfCoders(awareness) {
 	awareness.on('change', ({ added, updated, removed }) => {
 		otherCoders.set(
-			[...awareness.getStates().values()].map((state) => state.user).filter((user) => user.coding)
+			[...awareness.getStates().values()]
+				.map((state) => state.user)
+				.filter((user) => user && user.coding)
 		);
 	});
 }

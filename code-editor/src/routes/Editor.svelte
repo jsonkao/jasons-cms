@@ -12,7 +12,16 @@
 	 * Handling the iframe
 	 */
 	let iframe: HTMLIFrameElement;
-	$: if ($base && iframe) iframe.src = $base;
+	$: if ($base) {
+		console.log($base, iframe);
+		// removing the iframe from the document allows us to
+		// change the src without adding a history entry, which
+		// would make back/forward traversal very annoying
+		const parentNode = /** @type {HTMLElement} */ (iframe.parentNode);
+		parentNode?.removeChild(iframe);
+		iframe.src = $base;
+		parentNode?.appendChild(iframe);
+	}
 
 	/**
 	 * Pressing Cmd+E toggles the editor

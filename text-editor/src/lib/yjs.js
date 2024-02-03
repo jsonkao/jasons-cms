@@ -57,12 +57,20 @@ export class IndestructibleUndoManager extends UndoManager {
 /**
  * Insert a graphic
  * @param {BlockInsertionParams} arguments
+ * @param {string} newGraphicName
  */
-export function prepareInsertion({ editorNodes, cursorIndex }) {
+export function prepareInsertion({ editorNodes, cursorIndex }, newGraphicName) {
 	const textBefore = makeTextBlock(editorNodes.content.slice(0, cursorIndex));
 	const textAfter = makeTextBlock(editorNodes.content.slice(cursorIndex));
 
-	return [textBefore, makeCodingBlock('graphic-test', 'HI'), textAfter];
+	return [
+		textBefore,
+		makeCodingBlock(
+			newGraphicName,
+			'<div />\n<style>div { height: 300px; width: 100%; background: cornflowerblue }</style>'
+		),
+		textAfter
+	];
 }
 
 /**

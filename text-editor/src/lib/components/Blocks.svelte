@@ -82,21 +82,21 @@
 	const getName = (blockMap: BlockMap) => blockMap.get('name') as string;
 	const getInternalId = (blockMap: BlockMap) => {
 		if (blockMap._item === null) throw new Error('I thought Y.Map._item would never be null');
-		return Object.values(blockMap._item.id).join('-');
+		return Object.values(blockMap._item.id).join('_');
 	};
 
 	/**
-	 * Let parent handle the insertion of new graphics so we can still safely develop the text-editor
+	 * Insert new graphic block
 	 */
 	function insertNewGraphic(e: CustomEvent<BlockInsertionParams>) {
-		// if (window === window.parent) return;
-		const newElements = prepareInsertion(e.detail);
-
 		const currentIndex = yFindIndex(
 			yarrayStore.y as Y.Array<BlockMap>,
 			e.detail.activeYXmlFragment.parent as BlockMap
 		);
 		if (currentIndex === -1) throw new Error('Could not find the current index');
+
+		const idAboutToBeDeleted = getInternalId(yarrayStore.y.get(currentIndex));
+		const newElements = prepareInsertion(e.detail, 'graphic' + idAboutToBeDeleted);
 
 		ydoc.transact(() => {
 			yarrayStore.y.delete(currentIndex);

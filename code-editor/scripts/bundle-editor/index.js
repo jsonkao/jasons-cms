@@ -13,8 +13,11 @@ import { fileURLToPath } from 'url';
 const cwd = '../text-editor';
 
 console.time('install');
-// if (!fs.existsSync(cwd + '/node_modules')) execSync('npm ci', { cwd });
-execSync('rm -rf node_modules package-lock.json && npm i', { cwd });
+if (!!process.env.VERCEL) {
+	execSync('rm -rf node_modules package-lock.json && npm i', { cwd });
+} else if (!fs.existsSync(cwd + '/node_modules')) {
+	execSync('npm ci', { cwd });
+}
 console.timeEnd('install');
 
 const zip = new AdmZip();

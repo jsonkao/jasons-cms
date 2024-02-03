@@ -1,11 +1,16 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { otherCoders } from '$lib/stores/code-editor.js';
+	import { progress } from '$lib/stores/status.ts';
+	import { steps } from '$lib/constants.js';
 
 	const dispatch = createEventDispatcher();
 </script>
 
-<div class="helper-container">
+<div
+	class="helper-container"
+	class:show-all={!$progress || $progress.number < steps.EDITOR_READY.number}
+>
 	<div class="helper-item">
 		<button on:click={() => dispatch('toggle')}>
 			<i class="code-icon" />
@@ -46,7 +51,8 @@
 		align-items: center;
 	}
 
-	.helper-item:first-child button {
+	.helper-item:first-child button,
+	.helper-container.show-all button {
 		pointer-events: all;
 		opacity: 1;
 	}
@@ -97,6 +103,7 @@
 		opacity: 0.7;
 		align-items: center;
 		justify-content: center;
+		font-style: normal;
 	}
 
 	.code-icon {

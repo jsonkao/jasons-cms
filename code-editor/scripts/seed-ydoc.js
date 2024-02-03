@@ -77,7 +77,8 @@ async function populateRoomWithData() {
 			),
 			makeTextBlock(
 				'Lorem ipsum dolor sit amtet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus.'
-			)
+			),
+			makeTextBlock('Another text block is here. This is for testing insertion.')
 		]);
 	}
 
