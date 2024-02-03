@@ -1,5 +1,5 @@
 import type { EditorState } from 'prosemirror-state';
-import type { Fragment } from 'prosemirror-model';
+import type { Node } from 'prosemirror-model';
 import type ProsemirrorEditor from '$lib/components/ProsemirrorEditor.svelte';
 import type { UndoManager } from 'yjs';
 
@@ -24,8 +24,8 @@ declare global {
 	type BlockMap = Y.Map<Y.XmlFragment | string>;
 
 	type BlockInsertionParams = {
-		editorNodes: Fragment;
-		cursorIndex: number;
+		docNode: Node;
+		cursorPosition: number;
 		activeYXmlFragment: Y.XmlFragment;
 	};
 }

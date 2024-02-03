@@ -89,18 +89,18 @@
 	 * Insert new graphic block
 	 */
 	function insertNewGraphic(e: CustomEvent<BlockInsertionParams>) {
-		const currentIndex = yFindIndex(
+		const ymapIndex = yFindIndex(
 			yarrayStore.y as Y.Array<BlockMap>,
 			e.detail.activeYXmlFragment.parent as BlockMap
 		);
-		if (currentIndex === -1) throw new Error('Could not find the current index');
+		if (ymapIndex === -1) throw new Error('Could not find the current index');
 
-		const idAboutToBeDeleted = getInternalId(yarrayStore.y.get(currentIndex));
+		const idAboutToBeDeleted = getInternalId(yarrayStore.y.get(ymapIndex));
 		const newElements = prepareInsertion(e.detail, 'graphic' + idAboutToBeDeleted);
 
 		ydoc.transact(() => {
-			yarrayStore.y.delete(currentIndex);
-			yarrayStore.y.push(newElements);
+			yarrayStore.y.delete(ymapIndex);
+			yarrayStore.y.insert(ymapIndex, newElements);
 		}, transactionOrigin);
 	}
 </script>

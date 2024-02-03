@@ -162,6 +162,9 @@ class FloatingMenuView {
 		if (ysyncPlugin === undefined) throw new Error('ySyncPlugin not found');
 		const ysyncPluginState = ysyncPlugin.getState(editorView.state);
 
+		const docNode = editorView.state.doc;
+		const cursorPosition = $anchor.pos;
+
 		// TODO: add a resize event listener
 		// TODO: Use cursor pos method?
 		const rect = /** @type {HTMLElement} */ (textElement).getBoundingClientRect();
@@ -170,8 +173,8 @@ class FloatingMenuView {
 			visible: true,
 			left: rect.left + window.scrollX,
 			top: rect.top + window.scrollY,
-			editorNodes: editorView.state.doc.content,
-			cursorIndex: $anchor.index(0),
+			docNode,
+			cursorPosition,
 			activeYXmlFragment: ysyncPluginState.type
 		});
 	}

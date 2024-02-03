@@ -1,12 +1,13 @@
 import { LIVEBLOCKS_ROOM, userColor, userName } from '$lib/generated/globals.js';
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
+import { prosemirrorToYXmlFragment } from 'y-prosemirror';
 import {
 	UndoManager,
 	Map as YMap,
 	Text as YText,
-	XmlFragment as YXmlFragment,
 	XmlElement as YXmlElement,
+	XmlFragment as YXmlFragment,
 	XmlText as YXmlText
 } from 'yjs';
 
@@ -59,9 +60,9 @@ export class IndestructibleUndoManager extends UndoManager {
  * @param {BlockInsertionParams} arguments
  * @param {string} newGraphicName
  */
-export function prepareInsertion({ editorNodes, cursorIndex }, newGraphicName) {
-	const textBefore = makeTextBlock(editorNodes.content.slice(0, cursorIndex));
-	const textAfter = makeTextBlock(editorNodes.content.slice(cursorIndex));
+export function prepareInsertion({ docNode, cursorPosition }, newGraphicName) {
+	const textBefore = makeTextBlock(docNode.cut(0, cursorPosition));
+	const textAfter = makeTextBlock(docNode.cut(cursorPosition));
 
 	return [
 		textBefore,
@@ -74,21 +75,12 @@ export function prepareInsertion({ editorNodes, cursorIndex }, newGraphicName) {
 }
 
 /**
- * @param {Array<import('prosemirror-model').Node>} nodes
+ * @param {import('prosemirror-model').Node} node
  * @returns {YMap<YXmlFragment>}
  */
-function makeTextBlock(nodes) {
-	if (nodes.length === 0) throw new Error('No nodes provided');
-
+function makeTextBlock(node) {
 	const ymap = new YMap();
-	const yxmlFragment = new YXmlFragment();
-
-	for (const node of nodes) {
-		const yxmlElement = new YXmlElement(node.type.name);
-		yxmlElement.insert(0, [new YXmlText(node.textContent)]);
-		yxmlFragment.insert(0, [yxmlElement]);
-	}
-
+	const yxmlFragment = prosemirrorToYXmlFragment(node);
 	ymap.set('type', 'text');
 	ymap.set('text', yxmlFragment);
 

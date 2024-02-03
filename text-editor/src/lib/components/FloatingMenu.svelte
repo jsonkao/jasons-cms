@@ -6,8 +6,8 @@
 
 	function handleClick() {
 		dispatch('insert', {
-			editorNodes: $popupStore.editorNodes!,
-			cursorIndex: $popupStore.cursorIndex!,
+			docNode: $popupStore.docNode!,
+			cursorPosition: $popupStore.cursorPosition!,
 			activeYXmlFragment: $popupStore.activeYXmlFragment!
 		});
 		popupStore.set({ visible: false });
