@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { createLiveblocksProvider, IndestructibleUndoManager } from '$lib/yjs.js';
+	import {
+		createLiveblocksProvider,
+		IndestructibleUndoManager,
+		prepareInsertion,
+		yFindIndex
+	} from '$lib/yjs.js';
 	import { createObserver } from '$lib/utils.js';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
@@ -41,8 +46,7 @@
 		const yarray: Y.Array<BlockMap> = ydoc.getArray('blocks-test');
 		yarrayStore = readableArray(yarray);
 
-		// BUG: Undo/Redo is buggy with insertion
-		const undoManager = new IndestructibleUndoManager(yarray, {
+		const undoManager = new (IndestructibleUndoManager as typeof Y.UndoManager)(yarray, {
 			trackedOrigins: new Set([ySyncPluginKey, transactionOrigin]),
 			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
 		});
@@ -50,7 +54,7 @@
 		destroy = () => {
 			leave();
 			ydoc.destroy();
-			undoManager.actuallyDestroy();
+			(undoManager as IndestructibleUndoManager).actuallyDestroy();
 		};
 
 		createEditorForBlock = (blockMap: BlockMap) => {
@@ -82,22 +86,21 @@
 	};
 
 	/**
-	 * A WIP!!
-	 * @param {CustomEvent} e
+	 * Let parent handle the insertion of new graphics so we can still safely develop the text-editor
 	 */
-	function insertNewGraphic(e) {
-		const ymap = new Y.Map();
+	function insertNewGraphic(e: CustomEvent<BlockInsertionParams>) {
+		// if (window === window.parent) return;
+		const newElements = prepareInsertion(e.detail);
 
-		const yxmlFragment = new Y.XmlFragment();
-		const yxmlElement = new Y.XmlElement('paragraph');
-		yxmlElement.insert(0, [new Y.XmlText('TESTING INSERT')]);
-		yxmlFragment.insert(0, [yxmlElement]);
-
-		ymap.set('type', 'text');
-		ymap.set('text', yxmlFragment);
+		const currentIndex = yFindIndex(
+			yarrayStore.y as Y.Array<BlockMap>,
+			e.detail.activeYXmlFragment.parent as BlockMap
+		);
+		if (currentIndex === -1) throw new Error('Could not find the current index');
 
 		ydoc.transact(() => {
-			yarrayStore.y.push([ymap]);
+			yarrayStore.y.delete(currentIndex);
+			yarrayStore.y.push(newElements);
 		}, transactionOrigin);
 	}
 </script>
@@ -120,4 +123,4 @@
 	{/if}
 </div>
 
-<FloatingMenu on:new-graphic={insertNewGraphic} />
+<FloatingMenu on:insert={insertNewGraphic} />

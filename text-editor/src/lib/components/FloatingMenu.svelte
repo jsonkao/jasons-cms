@@ -1,11 +1,15 @@
-<script>
+<script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { popupStore } from '$lib/stores';
 
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher<{ insert: BlockInsertionParams }>();
 
 	function handleClick() {
-		dispatch('new-graphic', 'data');
+		dispatch('insert', {
+			editorNodes: $popupStore.editorNodes!,
+			cursorIndex: $popupStore.cursorIndex!,
+			activeYXmlFragment: $popupStore.activeYXmlFragment!
+		});
 		popupStore.set({ visible: false });
 	}
 </script>

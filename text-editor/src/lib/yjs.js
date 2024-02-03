@@ -1,7 +1,14 @@
 import { LIVEBLOCKS_ROOM, userColor, userName } from '$lib/generated/globals.js';
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
-import { UndoManager } from 'yjs';
+import {
+	UndoManager,
+	Map as YMap,
+	Text as YText,
+	XmlFragment as YXmlFragment,
+	XmlElement as YXmlElement,
+	XmlText as YXmlText
+} from 'yjs';
 
 /**
  * A helper function for creating a Liveblocks room and provider for Yjs.
@@ -45,4 +52,64 @@ export class IndestructibleUndoManager extends UndoManager {
 	actuallyDestroy() {
 		super.destroy();
 	}
+}
+
+/**
+ * Insert a graphic
+ * @param {BlockInsertionParams} arguments
+ */
+export function prepareInsertion({ editorNodes, cursorIndex }) {
+	const textBefore = makeTextBlock(editorNodes.content.slice(0, cursorIndex));
+	const textAfter = makeTextBlock(editorNodes.content.slice(cursorIndex));
+
+	return [textBefore, makeCodingBlock('graphic-test', 'HI'), textAfter];
+}
+
+/**
+ * @param {Array<import('prosemirror-model').Node>} nodes
+ * @returns {YMap<YXmlFragment>}
+ */
+function makeTextBlock(nodes) {
+	if (nodes.length === 0) throw new Error('No nodes provided');
+
+	const ymap = new YMap();
+	const yxmlFragment = new YXmlFragment();
+
+	for (const node of nodes) {
+		const yxmlElement = new YXmlElement(node.type.name);
+		yxmlElement.insert(0, [new YXmlText(node.textContent)]);
+		yxmlFragment.insert(0, [yxmlElement]);
+	}
+
+	ymap.set('type', 'text');
+	ymap.set('text', yxmlFragment);
+
+	return ymap;
+}
+
+/**
+ * @param {string} name
+ * @param {string} code
+ * @returns {YMap<string>}
+ */
+function makeCodingBlock(name, code) {
+	const ymap = new YMap();
+	ymap.set('type', 'graphic');
+	ymap.set('name', name);
+	ymap.set('code', new YText(code));
+	return ymap;
+}
+
+/**
+ * An implementation of findIndex but for Yjs arrays
+ * @param {import('yjs').Array<BlockMap>} array
+ * @param {BlockMap} targetElement
+ */
+export function yFindIndex(array, targetElement) {
+	let i = 0;
+	for (const element of array) {
+		if (element === targetElement) return i;
+		i++;
+	}
+	return -1;
 }

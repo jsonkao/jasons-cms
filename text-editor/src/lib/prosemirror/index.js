@@ -4,7 +4,7 @@
 
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Plugin } from 'prosemirror-state';
-import { redo, undo } from 'y-prosemirror';
+import { redo, undo, ySyncPluginKey } from 'y-prosemirror';
 import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
 import { popupStore } from '$lib/stores.js';
@@ -74,11 +74,11 @@ export function cursorBuilder(user) {
  * @return {import('prosemirror-view').DecorationAttrs}
  */
 export const selectionBuilder = (user) => {
-  return {
-    style: `background-color: ${user.color}44`,
-    class: 'ProseMirror-yjs-selection'
-  }
-}
+	return {
+		style: `background-color: ${user.color}44`,
+		class: 'ProseMirror-yjs-selection'
+	};
+};
 
 /**
  * Creates a floating menu plugin
@@ -144,9 +144,8 @@ class FloatingMenuView {
 
 	/**
 	 * @param {EditorView} editorView
-	 * @param {EditorState} [prevState]
 	 */
-	update(editorView, prevState) {
+	update(editorView) {
 		const { selection } = editorView.state;
 		const { $anchor, empty } = selection;
 		const isRootDepth = $anchor.depth === 1;
@@ -159,12 +158,21 @@ class FloatingMenuView {
 			return;
 		}
 
+		const ysyncPlugin = ySyncPluginKey.get(editorView.state);
+		if (ysyncPlugin === undefined) throw new Error('ySyncPlugin not found');
+		const ysyncPluginState = ysyncPlugin.getState(editorView.state);
+
 		// TODO: add a resize event listener
+		// TODO: Use cursor pos method?
 		const rect = /** @type {HTMLElement} */ (textElement).getBoundingClientRect();
+
 		popupStore.set({
 			visible: true,
 			left: rect.left + window.scrollX,
-			top: rect.top + window.scrollY
+			top: rect.top + window.scrollY,
+			editorNodes: editorView.state.doc.content,
+			cursorIndex: $anchor.index(0),
+			activeYXmlFragment: ysyncPluginState.type
 		});
 	}
 }
