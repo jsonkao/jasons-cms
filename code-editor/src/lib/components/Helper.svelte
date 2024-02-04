@@ -74,6 +74,11 @@
 		filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.3));
 		opacity: 0;
 		position: relative;
+		transition-duration: .3s;
+	}
+
+	button:hover {
+		background-color: #f3f3f3;
 	}
 
 	.helper-container:hover .helper-item * {

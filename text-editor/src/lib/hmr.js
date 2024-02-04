@@ -8,13 +8,10 @@
  * @param {HTMLElement} contentElement The element containing content (text and graphics)
  */
 export function startHMRListening(contentElement) {
-	postHeights(contentElement);
-
 	if (import.meta.hot) {
 		import.meta.hot.on(
 			'vite:afterUpdate',
 			/** @param {import('vite').UpdatePayload} payload */ ({ updates }) => {
-				console.log('text-editor HMR update', updates);
 				// Could make it more fine-grained by checking and getting dimensions only for the specific file that changed
 				if (
 					!updates.some(
@@ -35,7 +32,7 @@ export function startHMRListening(contentElement) {
  * Compute client heights of all content blocks on the page and post them to parent
  * @param {HTMLElement} contentElement The element containing content (text and graphics)
  */
-function postHeights(contentElement) {
+export function postHeights(contentElement) {
 	/** @type {Array<BlockHeight>} Get the heights of all graphics */
 	const heights = Array.from(contentElement.children).map(
 		/** @returns {BlockHeight} */ (div) => {

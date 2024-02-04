@@ -10,7 +10,7 @@
 </script>
 
 <div>
-	<p>Count: {count}</p>
+	<p>Nice: {count}</p>
 </div>
 
 <style>

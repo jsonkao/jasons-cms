@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { startHMRListening } from '$lib/hmr.js';
+	import { startHMRListening, postHeights } from '$lib/hmr.js';
 	import {
 		createLiveblocksProvider,
 		IndestructibleUndoManager,
 		prepareInsertion,
 		yFindIndex
 	} from '$lib/yjs.js';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
@@ -67,6 +67,14 @@
 	}
 
 	let contentEl: HTMLElement;
+
+	$: if ($yarrayStore?.length > 0) {
+		postHeights(contentEl);
+
+		// On first prosemirror editor mount, text from ysyncplugin might not have populated yet
+		setTimeout(() => postHeights(contentEl), 500);
+	}
+
 	onMount(() => {
 		startHMRListening(contentEl);
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
