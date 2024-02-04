@@ -8,7 +8,7 @@
 	const dispatch = createEventDispatcher();
 
 	/** Wait for booting before showing helpers because booting blocks the event loop, freezing all UI */
-	$: isVisible = $progress.number > steps.BOOTING.number
+	$: isVisible = $progress.number > steps.BOOTING.number;
 </script>
 
 {#if isVisible}
@@ -59,7 +59,8 @@
 	}
 
 	.helper-item:first-child button,
-	.helper-container.show-all button {
+	.helper-container.show-all button,
+	.helper-container.show-all i {
 		pointer-events: all;
 		opacity: 1;
 	}
@@ -74,7 +75,7 @@
 		filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.3));
 		opacity: 0;
 		position: relative;
-		transition-duration: .3s;
+		transition-duration: 0.3s;
 	}
 
 	button:hover {

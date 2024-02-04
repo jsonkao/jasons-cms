@@ -28,6 +28,11 @@
 		if (event.data.type === 'focusText') {
 			pmEditors[lastTextFocused]?.focus();
 		}
+		if (event.data.type === 'scrollTo') {
+			contentEl
+				.querySelector(`[data-name="${event.data.name}"]`)
+				.scrollIntoView({ behavior: 'smooth' });
+		}
 	}
 
 	let destroy = () => {};

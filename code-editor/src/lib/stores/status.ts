@@ -3,8 +3,6 @@ import { steps } from '$lib/constants.js';
 
 export const base: Writable<string | null> = writable(null);
 
-export const progress: Writable<(typeof steps)[keyof typeof steps]> = writable(
-	steps.INITIALIZING
-);
+export const progress: Writable<(typeof steps)[keyof typeof steps]> = writable(steps.INITIALIZING);
 
 export const error: Writable<Error | null> = writable(null);

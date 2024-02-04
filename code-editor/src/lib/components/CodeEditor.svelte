@@ -89,14 +89,6 @@
 			e.preventDefault();
 			saveComponent($openComponentName, ytext.toString());
 		}
-		if (e.metaKey && ['a', 'b'].includes(e.key)) {
-			e.preventDefault();
-			openComponentName.set({ a: 'graphic1', b: 'graphic2' }[e.key]!);
-		}
-		if (e.metaKey && e.key === 'x') {
-			e.preventDefault();
-			// openComponentName.set('/src/routes/Blocks.svelte');
-		}
 	}
 
 	$: yProvider &&
@@ -132,7 +124,7 @@
 				}}
 			/>
 			<PlacementButtons />
-			<Minimap />
+			<Minimap on:select-graphic />
 		{/if}
 	</div>
 </div>

@@ -55,15 +55,18 @@
 
 <div class="container layout-{$codeEditorPosition}" class:showing-editor={showCodeEditor}>
 	<div class="code-container">
-		<CodeEditor {showCodeEditor} />
+		<CodeEditor
+			{showCodeEditor}
+			on:select-graphic={(e) =>
+				iframe?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*')}
+		/>
 	</div>
 
 	<div class="iframe-container">
 		<iframe bind:this={iframe} title="" />
 		<Loading />
+		<Helper on:toggle={toggleEditor} />
 	</div>
-
-	<Helper on:toggle={toggleEditor} />
 </div>
 
 <style>
@@ -95,6 +98,7 @@
 
 	.iframe-container {
 		display: grid;
+		position: relative;
 	}
 
 	/* Styles for layout-center */

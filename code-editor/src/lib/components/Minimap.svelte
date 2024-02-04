@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { heights } from '$lib/stores/heights.js';
 	import { openComponentName } from '$lib/stores/code-editor.js';
+	import { createEventDispatcher } from 'svelte';
 
 	const TOTAL_HEIGHT = 300;
 
@@ -15,6 +16,12 @@
 			height: heightScale(blockHeight.height)
 		}));
 	}
+
+	const dispatch = createEventDispatcher();
+	function selectGraphic(name: string) {
+		openComponentName.set(name);
+		dispatch('select-graphic', name);
+	}
 </script>
 
 {#if renderingData.length > 0}
@@ -25,9 +32,9 @@
 			{:else if b.type === 'graphic'}
 				<button
 					class="mini-graphic"
-					style:height="{Math.min(TOTAL_HEIGHT / 3, b.height)}px"
+					style:height="{Math.max(8, Math.min(TOTAL_HEIGHT / 3, b.height))}px"
 					class:focused={b.name === $openComponentName}
-          on:click={() => openComponentName.set(b.name)}
+					on:click={() => selectGraphic(b.name)}
 				/>
 			{/if}
 		{/each}
@@ -51,10 +58,10 @@
 
 	button {
 		width: var(--width);
-    padding: 0;
-    border: none;
-    background: none;
-    display: block;
+		padding: 0;
+		border: none;
+		background: none;
+		display: block;
 	}
 
 	.mini-graphic {
@@ -63,12 +70,13 @@
 		box-sizing: border-box;
 		transition: border 0.3s;
 		border-radius: 1px;
-    cursor: pointer;
+		cursor: pointer;
 	}
 
-  .mini-graphic.focused, .mini-graphic:hover {
-    border: 1px solid rgba(255, 255, 255, 0.8);
-  }
+	.mini-graphic.focused,
+	.mini-graphic:hover {
+		border: 1px solid rgba(255, 255, 255, 0.8);
+	}
 
 	.mini-text {
 		border: 4px solid rgba(255, 255, 255, 0.15);
