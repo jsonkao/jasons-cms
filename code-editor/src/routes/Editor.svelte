@@ -94,7 +94,7 @@
 		align-self: center;
 		z-index: 10;
 		pointer-events: none;
-		height: 100%;
+		height: 100vh;
 	}
 
 	.iframe-container {

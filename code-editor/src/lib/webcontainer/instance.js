@@ -84,7 +84,7 @@ async function boot() {
 		// Invalidate previous base URL because the URL might be the same, but we want to re-source the iframe.
 		// I'm not exactly sure what's going on but this makes it work
 		base.set({ url, timeUpdated: Date.now() });
-		console.log('setting base to', { url, timeUpdated: Date.now() })
+		console.log('setting base to', { url, timeUpdated: Date.now() });
 		console.log('k ready at', url, port);
 	});
 	webcontainerInstance.on('error', ({ message }) => {
@@ -117,43 +117,65 @@ export async function startWebContainer() {
 }
 
 /**
- * Given a Yjs array of blocks, make sure that the Svelte components exist in the WebContainer's file system.
- * Also generate an `index.js` file that exports all the graphic components.
- * in the WebContainer's file system with the given code files.
+ * Given a Yjs array of blocks, make sure that the WebContainer's file system is synced (i.e. Svelte components exist
+ * for all components, and Svelte components are deleted for components that have been removed).
+ * Also generate an `index.js` file that imports and exports all the graphic components.
  * @param {Array<BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
  */
-export async function hydrateWebContainerFileSystem(yarray) {
+export async function syncWebContainerFileSystem(yarray) {
 	await ready;
 
 	const currentGraphics = await webcontainerInstance.fs.readdir(GENERATED_PATH);
 
-	/** @type {Array<{ name: string, code: string, alreadyExists: boolean }} */
+	/** @type {Array<{ filename: string, code: string, alreadyExists: boolean }>} */
 	const allGraphics = [];
+	console.log('yarray', yarray);
 	yarray.forEach((blockMap) => {
 		if (blockMap.get('type') !== 'graphic') return;
 
-		const name = /** @type {string} */ (blockMap.get('name'));
+		const filename = /** @type {string} */ (blockMap.get('name')) + '.svelte';
 		const code = /** @type {import('yjs').Text} */ (blockMap.get('code')).toString();
 
-		allGraphics.push({ name, code, alreadyExists: currentGraphics.includes(`${name}.svelte`) });
+		allGraphics.push({ filename, code, alreadyExists: currentGraphics.includes(filename) });
 	});
 
+	// console.log({ currentGraphics, allGraphics });
+	const graphicsToDelete = currentGraphics.filter(
+		(filename) => filename.endsWith('.svelte') && !allGraphics.some((b) => b.filename === filename)
+	);
+
 	// If there's no open component, set the first one
-	if (get(openComponentName) === null && allGraphics.length > 0) {
-		openComponentName.set(allGraphics[0].name);
+	if (allGraphics.length === 0) {
+		openComponentName.set(null);
+	} else if (
+		get(openComponentName) === null ||
+		graphicsToDelete.includes(get(openComponentName) + '.svelte')
+	) {
+		openComponentName.set(allGraphics[0].filename.replace(/\.svelte$/, ''));
 	}
 
 	await Promise.all([
+		// Create components that don't exist yet
 		...allGraphics
 			.filter((b) => !b.alreadyExists)
-			.map(({ name, code }) => writeFile(`${GENERATED_PATH}/${name}.svelte`, code)),
+			.map(({ filename, code }) => writeFile(`${GENERATED_PATH}/${filename}`, code)),
+
 		// A lib/index.js file to export all the graphic components
 		writeFile(
 			`${GENERATED_PATH}/index.js`,
-			allGraphics.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
-				`\nexport default { ${allGraphics.map(({ name }) => name).join(', ')} };`
+			allGraphics
+				.map(({ filename }) => `import ${filename.replace(/\.svelte$/, '')} from './${filename}';`)
+				.join('\n') +
+				`\nexport default { ${allGraphics.map(({ filename }) => filename.replace(/\.svelte$/, '')).join(', ')} };`
 		)
 	]);
+
+	/**
+	 * Ideally, here, we remove component files that are no longer in the Yjs array. However,
+	 * that results in a Vite dev server error (see https://github.com/jsonkao/jasons-cms/issues/14).
+	 * So for now, we're going to avoid doing that, which should be fine because people will probably
+	 * only delete components a few times in one session, so there won't be too much of a memory burden.
+	 */
 }
 
 /**

@@ -104,17 +104,3 @@ function makeCodingBlock(name, code) {
 	ymap.set('code', new YText(code));
 	return ymap;
 }
-
-/**
- * An implementation of findIndex but for Yjs arrays
- * @param {import('yjs').Array<BlockMap>} array
- * @param {BlockMap} targetElement
- */
-export function yFindIndex(array, targetElement) {
-	let i = 0;
-	for (const element of array) {
-		if (element === targetElement) return i;
-		i++;
-	}
-	return -1;
-}

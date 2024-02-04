@@ -4,8 +4,7 @@
 	import {
 		createLiveblocksProvider,
 		IndestructibleUndoManager,
-		prepareInsertion,
-		yFindIndex
+		prepareInsertion
 	} from '$lib/yjs.js';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
@@ -14,7 +13,7 @@
 
 	import { createEditor, cursorBuilder, selectionBuilder } from '$lib/prosemirror/index.js';
 	import type { EditorState } from 'prosemirror-state';
-	import { readableArray, type YReadableArray } from 'shared';
+	import { readableArray, type YReadableArray, yFindIndex } from 'shared';
 	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
 	import * as Y from 'yjs';
 	import './prosemirror.css';
@@ -30,8 +29,8 @@
 		}
 		if (event.data.type === 'scrollTo') {
 			contentEl
-				.querySelector(`[data-name="${event.data.name}"]`)
-				.scrollIntoView({ behavior: 'smooth' });
+				?.querySelector(`[data-name="${event.data.name}"]`)
+				?.scrollIntoView({ behavior: 'smooth' });
 		}
 	}
 

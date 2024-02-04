@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Extension } from '@codemirror/state';
 	import { svelte } from '@replit/codemirror-lang-svelte';
-	import { readableArray, type YReadableArray } from 'shared';
+	import { readableArray, type YReadableArray, yFindGraphicIndex } from 'shared';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
 
@@ -15,7 +15,7 @@
 	import { LIVEBLOCKS_ROOM, userColor, userName } from '$lib/constants.js';
 	import { listenToNumberOfCoders } from '$lib/yjs.js';
 	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
-	import { hydrateWebContainerFileSystem, saveComponent } from '$lib/webcontainer/instance.js';
+	import { syncWebContainerFileSystem, saveComponent } from '$lib/webcontainer/instance.js';
 	import { onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import Minimap from './Minimap.svelte';
@@ -57,7 +57,7 @@
 
 	$: if ($yarrayStore && $openComponentName) setExtension($openComponentName);
 
-	$: hydrateWebContainerFileSystem($yarrayStore);
+	$: syncWebContainerFileSystem($yarrayStore);
 
 	function setExtension(name: string) {
 		// First, find the Y.Text for the requested component name
@@ -69,6 +69,15 @@
 			ytext = foundYtext;
 			yExtension = yCollab(ytext, yProvider.awareness);
 		}
+	}
+
+	function deleteComponent(e: CustomEvent) {
+		// First, find the index for the requested component name
+		const componentIndex = yFindGraphicIndex($yarrayStore, e.detail);
+		if (componentIndex === -1) throw new Error(`Could not find index of component to delete, ${e}`);
+
+		// Then, delete the component from the array
+		yarrayStore.y.delete(componentIndex);
 	}
 
 	/**
@@ -124,7 +133,7 @@
 				}}
 			/>
 			<PlacementButtons />
-			<Minimap on:select-graphic />
+			<Minimap on:select-graphic on:delete-graphic={deleteComponent} />
 		{/if}
 	</div>
 </div>

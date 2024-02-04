@@ -6,7 +6,7 @@
 	const numberOfSteps = Object.keys(steps).length - 1;
 </script>
 
-{#if $progress && $progress.number !== steps.EDITOR_READY.number}
+{#if $progress.number !== steps.EDITOR_READY.number}
 	<div class="loading-container" transition:fade>
 		<div class="progress-container">
 			<div class="progress-bar" style="width: {($progress.number / numberOfSteps) * 100}%" />
