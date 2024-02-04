@@ -2,14 +2,7 @@ import { LIVEBLOCKS_ROOM, userColor, userName } from '$lib/generated/globals.js'
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import { prosemirrorToYXmlFragment } from 'y-prosemirror';
-import {
-	UndoManager,
-	Map as YMap,
-	Text as YText,
-	XmlElement as YXmlElement,
-	XmlFragment as YXmlFragment,
-	XmlText as YXmlText
-} from 'yjs';
+import { UndoManager, Map as YMap, Text as YText, XmlFragment as YXmlFragment } from 'yjs';
 
 /**
  * A helper function for creating a Liveblocks room and provider for Yjs.
@@ -61,8 +54,8 @@ export class IndestructibleUndoManager extends UndoManager {
  * @param {string} newGraphicName
  */
 export function prepareInsertion({ docNode, cursorPosition }, newGraphicName) {
-	const textBefore = makeTextBlock(docNode.cut(0, cursorPosition));
-	const textAfter = makeTextBlock(docNode.cut(cursorPosition));
+	const textBefore = makeTextBlock(docNode.cut(0, cursorPosition - 1));
+	const textAfter = makeTextBlock(docNode.cut(cursorPosition + 1));
 
 	return [
 		textBefore,

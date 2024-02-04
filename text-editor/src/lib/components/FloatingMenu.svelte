@@ -18,7 +18,7 @@
 	<div class="popup" style="top: {$popupStore.top}px; left: {$popupStore.left}px">
 		<p>
 			Write or
-			<button on:click={handleClick}>code</button>...
+			<button on:click={handleClick}>code here</button>...
 		</p>
 	</div>
 {/if}
