@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { startHMRListening } from '$lib/hmr.js';
-	import { createObserver } from '$lib/utils.js';
 	import {
 		createLiveblocksProvider,
 		IndestructibleUndoManager,
@@ -71,10 +70,8 @@
 	onMount(() => {
 		startHMRListening(contentEl);
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
-		const observer = createObserver(contentEl.querySelectorAll('[data-name]'));
 
 		return () => {
-			observer && observer.disconnect();
 			destroy();
 		};
 	});

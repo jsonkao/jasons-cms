@@ -42,9 +42,6 @@
 			case 'toggleEditor':
 				toggleEditor();
 				break;
-			case 'focusGraphic':
-				openComponentName.set(event.data.name);
-				break;
 			case 'editorMounted':
 				progress.set(steps.EDITOR_READY);
 				break;
