@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
-	import { base, progress } from '$lib/stores/status.ts';
-	import { heights } from '$lib/stores/heights.js';
-	import { steps } from '$lib/constants.js';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
-	import Loading from '$lib/components/Loading.svelte';
 	import Helper from '$lib/components/Helper.svelte';
+	import Loading from '$lib/components/Loading.svelte';
+	import { steps } from '$lib/constants.js';
+	import { codeEditorPosition } from '$lib/stores/code-editor.js';
+	import { heights } from '$lib/stores/heights.js';
+	import { base, progress } from '$lib/stores/status.ts';
 
 	let showCodeEditor = false;
 

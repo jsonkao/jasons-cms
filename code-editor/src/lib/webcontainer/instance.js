@@ -23,12 +23,12 @@ let currentProcess;
 if (import.meta.hot) {
 	// On HMR, first clean up the current process
 	import.meta.hot.dispose(() => {
-		console.log('dispose');
+		console.log('[HMR] dispose');
 		killCurrentProcess();
 	});
 
 	import.meta.hot.accept(() => {
-		console.log('accept');
+		console.log('[HMR] accept');
 	});
 }
 /**
@@ -81,6 +81,9 @@ async function boot() {
 
 	webcontainerInstance.on('server-ready', (port, url) => {
 		progress.set(steps.SERVER_READY);
+		// Invalidate previous base URL because the URL might be the same, but we want to re-source the iframe.
+		// I'm not exactly sure what's going on but this makes it work
+		base.set(null);
 		base.set(url);
 		console.log('Server ready at', url, port);
 	});

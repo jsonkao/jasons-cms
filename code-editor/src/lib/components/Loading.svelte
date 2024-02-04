@@ -32,7 +32,8 @@
 		width: 100%;
 		height: 100%;
 		position: relative;
-		/* backdrop-filter: blur(10px); */
+		backdrop-filter: blur(10px);
+		background: rgba(255, 255, 255, 0.7);
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
