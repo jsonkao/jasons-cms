@@ -5,6 +5,7 @@ import { base, progress } from '$lib/stores/status.ts';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
 import { fetchTemplateFiles, writeGlobals } from './files.js';
+import { tick } from 'svelte';
 
 /** @type {WebContainer} The WebContainer instance. */
 let webcontainerInstance;
@@ -83,9 +84,9 @@ async function boot() {
 		progress.set(steps.SERVER_READY);
 		// Invalidate previous base URL because the URL might be the same, but we want to re-source the iframe.
 		// I'm not exactly sure what's going on but this makes it work
-		base.set(null);
-		base.set(url);
-		console.log('Server ready at', url, port);
+		base.set({ url, timeUpdated: Date.now() });
+		console.log('setting base to', { url, timeUpdated: Date.now() })
+		console.log('k ready at', url, port);
 	});
 	webcontainerInstance.on('error', ({ message }) => {
 		console.error('WebContainer instance error:', message);
@@ -194,7 +195,6 @@ export async function writeFile(path, contents) {
  */
 function killCurrentProcess() {
 	if (currentProcess) {
-		console.log('Killing', currentProcess);
 		currentProcess.kill();
 		currentProcess = undefined;
 	}

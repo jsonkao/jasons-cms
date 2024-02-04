@@ -149,7 +149,7 @@
 
 	.code-mirror-container {
 		display: grid;
-		max-height: calc(100vh - 30px);
+		height: 100%;
 		overflow-y: scroll;
 		align-self: center;
 		transition: opacity 0.1s;
@@ -168,15 +168,15 @@
 		pointer-events: all;
 	}
 
-	.code-editor:not(.position-center) .code-mirror-container {
-		height: 100%;
+	.code-editor.position-center .code-mirror-container {
+		max-height: min(80%, calc(100vh - 30px));
 	}
 
 	.code-editor.position-bottom .code-mirror-container {
 		border-radius: 0;
 	}
 
-	.code-editor.position-left {
-		max-width: calc(100% - 30px);
+	.code-editor.position-left .code-mirror-container, .code-editor.position-left :global(.cm-editor) {
+		border-radius: 0;
 	}
 </style>

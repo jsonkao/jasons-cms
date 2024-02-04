@@ -14,9 +14,10 @@
 	 */
 	let iframe: HTMLIFrameElement;
 	$: if ($base && iframe) {
-		// iframe might be undefined because of HMR
-		iframe.src = $base;
+		// Here, I think we need to destroy and recreate the iframe
+		iframe.src = $base.url;
 	}
+	$: console.log($base, iframe);
 
 	/**
 	 * Pressing Cmd+E toggles the editor
@@ -89,7 +90,6 @@
 
 	.code-container {
 		min-width: 0;
-		height: 100%;
 		justify-self: center;
 		align-self: center;
 		z-index: 10;
@@ -108,7 +108,8 @@
 	}
 
 	.layout-center .code-container {
-		max-width: max(80%, 720px);
+		max-width: min(calc(100% - 30px), 720px);
+		width: 100%;
 	}
 
 	/* Styles for layout-bottom */
@@ -118,7 +119,7 @@
 	}
 
 	.layout-bottom .code-container {
-		min-height: 0;
+		height: 50vh;
 		width: 100%;
 	}
 

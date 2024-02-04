@@ -2,11 +2,11 @@
  * Steps for progress
  */
 export const steps = {
-	INITIALIZING: { number: 0, label: 'initializing' },
-	BOOTING: { number: 1, label: 'booting web container' },
-	MOUNTING: { number: 2, label: 'writing virtual files' },
+	INITIALIZING: { number: 0, label: 'welcome' },
+	BOOTING: { number: 1, label: 'starting up' },
+	MOUNTING: { number: 2, label: 'initializing' },
 	INSTALLING: { number: 3, label: 'installing dependencies' },
-	RUNNING: { number: 4, label: 'starting dev server' },
+	RUNNING: { number: 4, label: 'starting server' },
 	SERVER_READY: { number: 5, label: 'mounting editor' },
 	EDITOR_READY: { number: 6, label: 'editor ready' }
 };

@@ -42,7 +42,8 @@
 
 <style>
 	.helper-container {
-		position: absolute;
+		position: fixed;
+		grid-area: 1 / 1;
 		--spacing: 18px;
 		padding-bottom: var(--spacing);
 		padding-left: var(--spacing);

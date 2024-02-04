@@ -9,7 +9,10 @@
 
 	function createRenderingData($heights: Array<BlockHeight>) {
 		const totalHeight = $heights.reduce((acc, blockHeight) => acc + blockHeight.height, 0);
-		const heightScale = (height: number) => (height / totalHeight) * TOTAL_HEIGHT;
+		/** Scale the height of mini-blocks to be between 8px and 70% of the total height */
+		const heightScale = (height: number) => {
+			return Math.max(8, Math.min(TOTAL_HEIGHT * 0.7, (height / totalHeight) * TOTAL_HEIGHT));
+		}
 		return $heights.map((blockHeight) => ({
 			type: blockHeight.type,
 			name: blockHeight.type === 'graphic' ? blockHeight.name : undefined,
@@ -32,7 +35,7 @@
 			{:else if b.type === 'graphic'}
 				<button
 					class="mini-graphic"
-					style:height="{Math.max(8, Math.min(TOTAL_HEIGHT / 3, b.height))}px"
+					style:height="{Math.max(8, Math.min(TOTAL_HEIGHT * 0.7, b.height))}px"
 					class:focused={b.name === $openComponentName}
 					on:click={() => selectGraphic(b.name)}
 				/>
