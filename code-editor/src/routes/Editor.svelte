@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
 	import { base, progress } from '$lib/stores/status.ts';
+	import { heights } from '$lib/stores/heights.js';
 	import { steps } from '$lib/constants.js';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';
@@ -12,15 +13,9 @@
 	 * Handling the iframe
 	 */
 	let iframe: HTMLIFrameElement;
-	$: if ($base) {
-		console.log($base, iframe);
-		// removing the iframe from the document allows us to
-		// change the src without adding a history entry, which
-		// would make back/forward traversal very annoying
-		const parentNode = /** @type {HTMLElement} */ (iframe.parentNode);
-		parentNode?.removeChild(iframe);
+	$: if ($base && iframe) {
+		// iframe might be undefined because of HMR
 		iframe.src = $base;
-		parentNode?.appendChild(iframe);
 	}
 
 	/**
@@ -43,7 +38,6 @@
 	 * Handles all messages from the iframe
 	 */
 	function onMessage(event: MessageEvent) {
-		// console.log('child', event);
 		switch (event.data.type) {
 			case 'toggleEditor':
 				toggleEditor();
@@ -54,6 +48,8 @@
 			case 'editorMounted':
 				progress.set(steps.EDITOR_READY);
 				break;
+			case 'heights':
+				heights.set(event.data.heights);
 		}
 	}
 </script>

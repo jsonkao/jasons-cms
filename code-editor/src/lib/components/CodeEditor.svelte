@@ -18,6 +18,7 @@
 	import { hydrateWebContainerFileSystem, saveComponent } from '$lib/webcontainer/instance.js';
 	import { onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
+	import Minimap from './Minimap.svelte';
 
 	const client = createClient({
 		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
@@ -61,7 +62,9 @@
 	function setExtension(name: string) {
 		// First, find the Y.Text for the requested component name
 		let foundYtext: Y.Text | undefined;
+		console.log(name, $yarrayStore);
 		for (const ymap of $yarrayStore) {
+			console.log(ymap.get('name'));
 			if (ymap.get('name') === name) foundYtext = ymap.get('code') as Y.Text;
 		}
 		if (foundYtext !== undefined) {
@@ -131,6 +134,7 @@
 				}}
 			/>
 			<PlacementButtons />
+			<Minimap />
 		{/if}
 	</div>
 </div>
@@ -162,6 +166,7 @@
 		border-radius: 6px;
 		opacity: 0;
 		pointer-events: none;
+		position: relative;
 	}
 
 	.code-mirror-container > :global(*) {

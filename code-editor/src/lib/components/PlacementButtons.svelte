@@ -10,7 +10,8 @@
 
 <style>
 	.placement-buttons {
-		margin: 10px 9px 10px 0;
+		margin-right: 15px;
+		margin-bottom: 16px;
 		display: flex;
 		flex-direction: column;
 		gap: 5px;

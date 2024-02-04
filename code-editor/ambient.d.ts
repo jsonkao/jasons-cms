@@ -16,5 +16,10 @@ interface InitialGraphic {
 	code: string;
 }
 
-// TODO: share this
+// TODO: these are all duplicated /should be shared
+
 type BlockMap = import('yjs').Map<import('yjs').XmlFragment | import('yjs').Text | string>;
+
+type BlockHeight =
+	| { type: 'text'; height: number }
+	| { type: 'graphic'; name: string; height: number };

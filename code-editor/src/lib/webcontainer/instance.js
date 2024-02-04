@@ -29,7 +29,7 @@ if (import.meta.hot) {
 
 	import.meta.hot.accept(() => {
 		console.log('accept');
-	})
+	});
 }
 /**
  * In the browser, this promise resolves when the WebContainer is ready to be used and template files have been fetched.
@@ -117,7 +117,7 @@ export async function startWebContainer() {
  * Given a Yjs array of blocks, make sure that the Svelte components exist in the WebContainer's file system.
  * Also generate an `index.js` file that exports all the graphic components.
  * in the WebContainer's file system with the given code files.
- * @param {import('yjs').Array<BlockMap>} yarray - The Yjs array of code files
+ * @param {Array<BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
  */
 export async function hydrateWebContainerFileSystem(yarray) {
 	await ready;

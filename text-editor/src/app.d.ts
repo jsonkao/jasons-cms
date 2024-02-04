@@ -20,14 +20,19 @@ declare global {
 		| (TextBlock & { state: EditorState; editor?: ProsemirrorEditor })
 		| GraphicBlock;
 
-	// TODO: put this in shared
-	type BlockMap = Y.Map<Y.XmlFragment | string>;
-
 	type BlockInsertionParams = {
 		docNode: Node;
 		cursorPosition: number;
 		activeYXmlFragment: Y.XmlFragment;
 	};
+
+	// TODO: put all these in shared
+
+	type BlockMap = Y.Map<Y.XmlFragment | string>;
+
+	type BlockHeight =
+		| { type: 'text'; height: number }
+		| { type: 'graphic'; name: string; height: number };
 }
 
 export {};

@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { startHMRListening } from '$lib/hmr.js';
+	import { createObserver } from '$lib/utils.js';
 	import {
 		createLiveblocksProvider,
 		IndestructibleUndoManager,
 		prepareInsertion,
 		yFindIndex
 	} from '$lib/yjs.js';
-	import { createObserver } from '$lib/utils.js';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
@@ -68,7 +69,8 @@
 
 	let contentEl: HTMLElement;
 	onMount(() => {
-		window.parent?.postMessage({ type: 'editorMounted' }, '*');
+		startHMRListening(contentEl);
+		window.parent.postMessage({ type: 'editorMounted' }, '*');
 		const observer = createObserver(contentEl.querySelectorAll('[data-name]'));
 
 		return () => {
