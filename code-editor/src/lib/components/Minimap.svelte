@@ -6,13 +6,11 @@
 	const TOTAL_HEIGHT = 300;
 
 	$: renderingData = createRenderingData($heights);
+	$: console.log(renderingData);
 
 	function createRenderingData($heights: Array<BlockHeight>) {
 		const totalHeight = $heights.reduce((acc, blockHeight) => acc + blockHeight.height, 0);
-		/** Scale the height of mini-blocks to be between 8px and 70% of the total height */
-		const heightScale = (height: number) => {
-			return Math.max(8, Math.min(TOTAL_HEIGHT * 0.7, (height / totalHeight) * TOTAL_HEIGHT));
-		}
+		const heightScale = (height: number) => (height / totalHeight) * TOTAL_HEIGHT;
 		return $heights.map((blockHeight) => ({
 			type: blockHeight.type,
 			name: blockHeight.type === 'graphic' ? blockHeight.name : undefined,

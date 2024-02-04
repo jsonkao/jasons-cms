@@ -172,11 +172,8 @@
 		max-height: min(80%, calc(100vh - 30px));
 	}
 
-	.code-editor.position-bottom .code-mirror-container {
-		border-radius: 0;
-	}
-
-	.code-editor.position-left .code-mirror-container, .code-editor.position-left :global(.cm-editor) {
+	.code-editor:not(.position-center) .code-mirror-container,
+	.code-editor:not(.position-center) :global(.cm-editor) {
 		border-radius: 0;
 	}
 </style>

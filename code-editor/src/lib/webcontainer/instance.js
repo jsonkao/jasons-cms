@@ -5,7 +5,6 @@ import { base, progress } from '$lib/stores/status.ts';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
 import { fetchTemplateFiles, writeGlobals } from './files.js';
-import { tick } from 'svelte';
 
 /** @type {WebContainer} The WebContainer instance. */
 let webcontainerInstance;
