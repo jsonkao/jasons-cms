@@ -61,7 +61,19 @@ export function prepareInsertion({ docNode, cursorPosition }, newGraphicName) {
 		textBefore,
 		makeCodingBlock(
 			newGraphicName,
-			'<div />\n<style>div { height: 300px; width: 100%; background: cornflowerblue }</style>'
+			[
+				'<div>',
+				'\t<!-- Your code here -->',
+				'</div>',
+				'',
+				'<style>',
+				'\tdiv {',
+				'\t\theight: 300px;',
+				'\t\twidth: 100%;',
+				'\t\tbackground: #6495ed66;',
+				'\t}',
+				'</style>'
+			].join('\n')
 		),
 		textAfter
 	];
