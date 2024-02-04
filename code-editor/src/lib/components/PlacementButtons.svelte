@@ -34,6 +34,7 @@
 		opacity: 0.5;
 		transition: opacity 0.3s;
 		border-radius: 1px;
+		overflow: hidden;
 	}
 
 	button:hover {
@@ -56,15 +57,58 @@
 		transform: translate(-50%, -50%);
 	}
 
+	button.position-center:hover::after {
+		animation: fadeOutIn 2.5s infinite;
+	}
+
+	@keyframes fadeOutIn {
+		25%,
+		75% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0;
+		}
+	}
+
 	button.position-left::after {
 		width: 30%;
 		height: 100%;
 		border-right: 1px solid white;
 	}
 
+	button.position-left:hover::after {
+		animation: slideLeftRight 2.5s infinite;
+	}
+
+	@keyframes slideLeftRight {
+		15%,
+		80% {
+			width: 30%;
+		}
+		50% {
+			width: 0;
+			transform: translateX(-1px);
+		}
+	}
+
 	button.position-bottom::after {
 		width: 100%;
 		height: 60%;
 		border-bottom: 1px solid white;
+	}
+
+	button.position-bottom:hover::after {
+		animation: slideDownUp 2.5s infinite;
+	}
+
+	@keyframes slideDownUp {
+		15%,
+		80% {
+			height: 60%;
+		}
+		50% {
+			height: 100%;
+		}
 	}
 </style>
