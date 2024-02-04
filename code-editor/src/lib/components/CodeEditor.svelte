@@ -58,13 +58,12 @@
 	$: if ($yarrayStore && $openComponentName) setExtension($openComponentName);
 
 	$: hydrateWebContainerFileSystem($yarrayStore);
-
+	$: 
+		console.log($yarrayStore)
 	function setExtension(name: string) {
 		// First, find the Y.Text for the requested component name
 		let foundYtext: Y.Text | undefined;
-		console.log(name, $yarrayStore);
 		for (const ymap of $yarrayStore) {
-			console.log(ymap.get('name'));
 			if (ymap.get('name') === name) foundYtext = ymap.get('code') as Y.Text;
 		}
 		if (foundYtext !== undefined) {

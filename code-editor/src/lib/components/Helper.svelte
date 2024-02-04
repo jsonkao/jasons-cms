@@ -3,35 +3,42 @@
 	import { otherCoders } from '$lib/stores/code-editor.js';
 	import { progress } from '$lib/stores/status.ts';
 	import { steps } from '$lib/constants.js';
+	import { fly } from 'svelte/transition';
 
 	const dispatch = createEventDispatcher();
+
+	/** Wait for booting before showing helpers because booting blocks the event loop, freezing all UI */
+	$: isVisible = $progress.number > steps.BOOTING.number
 </script>
 
-<div
-	class="helper-container"
-	class:show-all={!$progress || $progress.number < steps.EDITOR_READY.number}
->
-	<div class="helper-item">
-		<button on:click={() => dispatch('toggle')}>
-			<i class="code-icon" />
+{#if isVisible}
+	<div
+		class="helper-container"
+		class:show-all={$progress.number < steps.EDITOR_READY.number}
+		in:fly={{ x: -40 }}
+	>
+		<div class="helper-item">
+			<button on:click={() => dispatch('toggle')}>
+				<i class="code-icon" />
 
-			{#if $otherCoders.length > 0}
-				<span class="other-coders">
-					{#each $otherCoders as { color }}
-						<span class="coder" style="background-color: {color}" />
-					{/each}
-				</span>
-			{/if}
-		</button>
-		<p>code editor (cmd+e)</p>
+				{#if $otherCoders.length > 0}
+					<span class="other-coders">
+						{#each $otherCoders as { color }}
+							<span class="coder" style="background-color: {color}" />
+						{/each}
+					</span>
+				{/if}
+			</button>
+			<p>code editor (cmd+e)</p>
+		</div>
+		<div class="helper-item">
+			<button>
+				<i>?</i>
+			</button>
+			<p>help</p>
+		</div>
 	</div>
-	<div class="helper-item">
-		<button>
-			<i>?</i>
-		</button>
-		<p>help</p>
-	</div>
-</div>
+{/if}
 
 <style>
 	.helper-container {

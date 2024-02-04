@@ -20,7 +20,7 @@
 {#if renderingData.length > 0}
 	<div class="minimap">
 		{#each renderingData as b}
-			{#if b.type === 'text'}
+			{#if b.type === 'text' && b.height > 0}
 				<button class="mini-text" />
 			{:else if b.type === 'graphic'}
 				<button
