@@ -5,7 +5,7 @@
   "private": true,
   "exports": {
     ".": {
-      "import": "./src/index.js"
+      "import": "./src/index.ts"
     }
   },
   "devDependencies": {
