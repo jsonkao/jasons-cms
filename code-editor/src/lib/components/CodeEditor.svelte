@@ -28,6 +28,7 @@
 	 * Create Y.Text
 	 */
 
+	let ydoc: Y.Doc;
 	let ytext: Y.Text;
 	let yarrayStore: YReadableArray<BlockMap>;
 	let yExtension: Extension;
@@ -41,7 +42,7 @@
 		});
 		destroy = leave;
 
-		const ydoc = new Y.Doc();
+		ydoc = new Y.Doc();
 		yProvider = new LiveblocksProvider(room, ydoc);
 		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
 		yarrayStore = readableArray(ydoc.getArray('blocks-test'));
@@ -74,10 +75,41 @@
 	function deleteComponent(e: CustomEvent) {
 		// First, find the index for the requested component name
 		const componentIndex = yFindGraphicIndex($yarrayStore, e.detail);
-		if (componentIndex === -1) throw new Error(`Could not find index of component to delete, ${e}`);
+		if (componentIndex === -1) throw new Error(`Could not find index of component to delete, ${e.detail}`);
+
+		// This should all work because we enforce having blank text before and after all components
+		const textBlockBefore = yarrayStore.y.get(componentIndex - 1) as BlockMap;
+		const textBlockAfter = yarrayStore.y.get(componentIndex + 1) as BlockMap;
+		if (textBlockBefore.get('type') !== 'text' || textBlockAfter.get('type') !== 'text')
+			throw new Error('Expected text before and after component');
+
+		// Clone textBlockBefore to create a new Y.
+		const textBefore = textBlockBefore.get('text') as Y.XmlFragment;
+		const textAfter = textBlockAfter.get('text') as Y.XmlFragment;
+		const newXmlFragment = new Y.XmlFragment();
+		for (let i = 0; i < textBefore.length; i++) {
+			newXmlFragment.push([textBefore.get(i)]);
+			console.log('pushed before', i)
+		}
+		for (let i = 0; i < textAfter.length; i++) {
+			newXmlFragment.push([textAfter.get(i)]);
+			console.log('pushed after', i)
+		}
+
+		const newMap = new Y.Map();
+		newMap.set('type', 'text');
+		newMap.set('text', newXmlFragment);
+
+		// Nothing is working here.
+		console.log(newMap);
+
+		return;
 
 		// Then, delete the component from the array
-		yarrayStore.y.delete(componentIndex);
+		ydoc.transact(() => {
+			yarrayStore.y.delete(componentIndex - 1, 3);
+			yarrayStore.y.insert(newMap);
+		});
 	}
 
 	/**
