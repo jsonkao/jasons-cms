@@ -1,4 +1,5 @@
 <script>
+	import { browser } from '$app/environment';
 	import Blocks from '$lib/components/Blocks.svelte';
 	import './styles.css';
 
@@ -16,4 +17,6 @@
 
 <svelte:window on:keydown={onKeydown} />
 
-<Blocks />
+{#if browser}
+	<Blocks />
+{/if}

@@ -10,8 +10,6 @@
 	const DEFAULT_BLOCK_HEIGHT = 30;
 	const dispatch = createEventDispatcher();
 
-	$: console.log(blocks[blocks.length - 1].get('text'));
-
 	/**
 	 * Compute the height of a single graphic block
 	 * @param {import('shared').BlockMap} b

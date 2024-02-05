@@ -1,21 +1,14 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { postHeights, startHMRListening } from '$lib/hmr.js';
-	import {
-		IndestructibleUndoManager,
-		createLiveblocksProvider,
-		prepareInsertion
-	} from '$lib/ydoc';
+	import { postHeights, startHMRListening } from '$lib/post-heights.js';
+	import { create, prepareInsertion } from '$lib/ydoc';
+	import { yFindIndex, type BlockMap } from 'shared';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor/index.svelte';
 
-	import { createEditor, cursorBuilder, selectionBuilder } from '$lib/prosemirror/index.js';
-	import type { EditorState } from 'prosemirror-state';
-	import { readableArray, yFindIndex, type BlockMap, type YReadableArray } from 'shared';
-	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
-	import * as Y from 'yjs';
+	if (!browser) throw new Error('This component is only meant to be used in the browser');
 
 	let lastTextFocused: string;
 
@@ -23,68 +16,32 @@
 	 * Listen for messages from the parent window
 	 */
 	function onMessage(event: MessageEvent) {
-		if (event.data.type === 'focusText') {
-			pmEditors[lastTextFocused]?.focus();
-		}
-		if (event.data.type === 'scrollTo') {
-			contentEl
-				?.querySelector(`[data-name="${event.data.name}"]`)
-				?.scrollIntoView({ behavior: 'smooth' });
+		switch (event.data.type) {
+			case 'focusText':
+				pmEditors[lastTextFocused]?.focus();
+				break;
+			case 'scrollTo':
+				contentEl
+					?.querySelector(`[data-name="${event.data.name}"]`)
+					?.scrollIntoView({ behavior: 'smooth' });
+				break;
 		}
 	}
 
-	let destroy = () => {};
-	let createEditorForBlock: (blockMap: BlockMap) => EditorState;
-	let ydoc: Y.Doc;
-	let yarrayStore: YReadableArray<BlockMap>;
-	let transactionOrigin: number;
-
-	if (browser) {
-		// TODO: Move this logic into a separate JavaScript file?
-		ydoc = new Y.Doc();
-		transactionOrigin = ydoc.clientID;
-		const { awareness, leave } = createLiveblocksProvider(ydoc);
-		destroy = leave;
-
-		const yarray: Y.Array<BlockMap> = ydoc.getArray('blocks-test');
-		yarrayStore = readableArray(yarray);
-
-		const undoManager = new (IndestructibleUndoManager as typeof Y.UndoManager)(yarray, {
-			trackedOrigins: new Set([ySyncPluginKey, transactionOrigin]),
-			captureTransaction: (tr) => tr.meta.get('addToHistory') !== false
-		});
-
-		destroy = () => {
-			leave();
-			ydoc.destroy();
-			(undoManager as IndestructibleUndoManager).actuallyDestroy();
-		};
-
-		createEditorForBlock = (blockMap: BlockMap) => {
-			return createEditor([
-				ySyncPlugin(blockMap.get('text') as Y.XmlFragment),
-				yCursorPlugin(awareness, { cursorBuilder, selectionBuilder }),
-				yUndoPlugin({ undoManager })
-			]);
-		};
-	}
+	const { ydoc, transactionOrigin, yarrayStore, createEditorForBlock, destroy } = create();
 
 	let contentEl: HTMLElement;
 
 	$: if ($yarrayStore?.length > 0) {
-		postHeights(contentEl);
-
 		// On first prosemirror editor mount, text from ysyncplugin might not have populated yet
 		setTimeout(() => postHeights(contentEl), 500);
+		postHeights(contentEl);
 	}
 
 	onMount(() => {
 		startHMRListening(contentEl);
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
-
-		return () => {
-			destroy();
-		};
+		return destroy;
 	});
 
 	const pmEditors: Record<string, any> = {};
@@ -99,10 +56,7 @@
 	 * Insert new graphic block
 	 */
 	function insertNewGraphic(e: CustomEvent<BlockInsertionParams>) {
-		const ymapIndex = yFindIndex(
-			yarrayStore.y as Y.Array<BlockMap>,
-			e.detail.activeYXmlFragment.parent as BlockMap
-		);
+		const ymapIndex = yFindIndex(yarrayStore.y, e.detail.activeYXmlFragment.parent as BlockMap);
 		if (ymapIndex === -1) throw new Error('Could not find the current index');
 
 		const idAboutToBeDeleted = getInternalId(yarrayStore.y.get(ymapIndex));
