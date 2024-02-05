@@ -1,6 +1,7 @@
 import { LIVEBLOCKS_ROOM } from '$lib/constants.js';
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
+import { BLOCKS_KEY } from 'shared/src/constants.js';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
 
@@ -21,7 +22,7 @@ export async function getInitialGraphics() {
 
 	const ydoc = new Y.Doc();
 	new LiveblocksProvider(room, ydoc);
-	const yarray = ydoc.getArray('blocks-test');
+	const yarray = ydoc.getArray(BLOCKS_KEY);
 
 	const populatePromise = new Promise((resolve) => {
 		yarray.observe((event) => {

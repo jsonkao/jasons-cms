@@ -1,7 +1,7 @@
 <script>
 	import { browser } from '$app/environment';
 	import { postHeights, startHMRListening } from '$lib/post-heights.js';
-	import initialize from '$lib/ydoc/initialize.js';
+	import { SharedDocForProsemirror } from '$lib/ydoc/index.js';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
@@ -21,8 +21,10 @@
 
 	if (!browser) throw new Error('This component is only meant to be used in the browser');
 
-	const { doc, createEditorForBlock, destroy } = initialize();
+	const doc = new SharedDocForProsemirror();
 	const { yarrayStore } = doc;
+
+	$: console.log(doc, $yarrayStore)
 
 	/**
 	 * Listen for messages from the parent window
@@ -50,7 +52,7 @@
 	onMount(() => {
 		startHMRListening(contentEl);
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
-		return destroy;
+		return doc.destroy;
 	});
 
 	/** @param {BlockMap} blockMap */
@@ -89,19 +91,17 @@
 <svelte:window on:message={onMessage} />
 
 <div class="content" bind:this={contentEl}>
-	{#if createEditorForBlock && $yarrayStore}
-		{#each $yarrayStore || [] as blockMap (getId(blockMap))}
-			{#if blockMap.get('type') === 'graphic'}
-				<Component name={getName(blockMap)} />
-			{:else if blockMap.get('type') === 'text'}
-				<ProsemirrorEditor
-					bind:this={pmEditors[getId(blockMap)]}
-					on:blur={() => (lastTextFocused = getId(blockMap))}
-					editorStateCreator={() => createEditorForBlock(blockMap)}
-				/>
-			{/if}
-		{/each}
-	{/if}
+	{#each $yarrayStore || [] as blockMap (getId(blockMap))}
+		{#if blockMap.get('type') === 'graphic'}
+			<Component name={getName(blockMap)} />
+		{:else if blockMap.get('type') === 'text'}
+			<ProsemirrorEditor
+				bind:this={pmEditors[getId(blockMap)]}
+				on:blur={() => (lastTextFocused = getId(blockMap))}
+				editorStateCreator={() => doc.createEditorForBlock(blockMap)}
+			/>
+		{/if}
+	{/each}
 </div>
 
 <FloatingMenu on:insert={insertNewGraphic} />

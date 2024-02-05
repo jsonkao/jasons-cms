@@ -1,6 +1,7 @@
 import { createClient } from "@liveblocks/client";
-import * as Y from "yjs";
 import LiveblocksProvider from "@liveblocks/yjs";
+import * as Y from "yjs";
+import { BLOCKS_KEY } from "./constants.js";
 import { readableArray } from "./readable-array.js";
 
 console.log("shared/src/shared-doc.js");
@@ -19,9 +20,6 @@ export class SharedDoc {
   /** @type {Y.Array<BlockMap>} */
   yarray;
 
-  /** @type {() => void} */
-  destroy;
-
   /** @type {Y.Doc} */
   ydoc;
 
@@ -36,23 +34,26 @@ export class SharedDoc {
       publicApiKey: "pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A",
     });
     const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, { initialPresence: { user } });
+    this.leave = leave;
 
     this.ydoc = new Y.Doc();
     this.awareness = new LiveblocksProvider(room, this.ydoc).awareness;
 
-    this.yarray = this.ydoc.getArray("blocks-test");
+    this.yarray = this.ydoc.getArray(BLOCKS_KEY);
     this.yarrayStore = readableArray(this.yarray);
 
     this.transactionOrigin = this.ydoc.clientID;
 
-    this.destroy = () => {
-      leave();
-      this.ydoc.destroy();
-    };
+    this.destroy = this.destroy.bind(this);
 
     // TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
     // persistence for? (e.g. Blocks.svelte, but not +page.server.js)
     // TODO: Create a ydoc top-level map for non-block files we do want persistance for (e.g. +page.server.js)
+  }
+
+  destroy() {
+    this.leave();
+    this.ydoc.destroy();
   }
 
   /**

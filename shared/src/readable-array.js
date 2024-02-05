@@ -97,5 +97,5 @@ export function readableArray(arr) {
     };
   };
 
-  return { subscribe, y: arr, hi: 3 };
+  return { subscribe, y: arr };
 }

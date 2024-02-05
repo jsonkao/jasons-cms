@@ -1,5 +1,5 @@
-import type { Map, XmlFragment, Text } from "yjs";
+import type * as Y from "yjs";
 
-export type BlockMap = Map<XmlFragment | Text | string>;
+export type BlockMap = Y.Map<Y.XmlFragment | Y.Text | string>;
 
 export type BlockHeights = { [name: string]: number };

@@ -1,6 +1,7 @@
 import { createClient } from '@liveblocks/client';
 import { Liveblocks as LiveblocksNode } from '@liveblocks/node';
 import LiveblocksProvider from '@liveblocks/yjs';
+import { BLOCKS_KEY } from 'shared/src/constants.js';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
 import { LIVEBLOCKS_ROOM } from '../src/lib/constants.js';
@@ -47,7 +48,7 @@ async function populateRoomWithData() {
 
 	const ydoc = new Y.Doc();
 	new LiveblocksProvider(room, ydoc);
-	const yarray = ydoc.getArray('blocks-test');
+	const yarray = ydoc.getArray(BLOCKS_KEY);
 
 	if (!TESTING) await seedArray();
 	await testArray();
