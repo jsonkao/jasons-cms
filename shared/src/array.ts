@@ -1,10 +1,10 @@
+import type { Array } from "yjs";
+import type { BlockMap } from "./types.d.ts";
+
 /**
  * Finds the index of a specified element in a Yjs array.
- * @param {import('yjs').Array<BlockMap>} array
- * @param {BlockMap} targetElement
- * @returns {number}
  */
-export function yFindIndex(array, targetElement) {
+export function yFindIndex(array: Array<BlockMap>, targetElement: BlockMap): number {
   let i = 0;
   for (const element of array) {
     if (element === targetElement) return i;
@@ -15,11 +15,8 @@ export function yFindIndex(array, targetElement) {
 
 /**
  * Finds the index of the element in a Yjs array with a graphic name.
- * @param {import('yjs').Array<BlockMap>} array
- * @param {string} name
- * @returns {number}
  */
-export function yFindGraphicIndex(array, name) {
+export function yFindGraphicIndex(array: Array<BlockMap>, name: string): number {
   let i = 0;
   for (const element of array) {
     if (element.get("name") === name) return i;

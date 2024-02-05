@@ -27,7 +27,7 @@
 		"prosemirror-model": "^1.19.4",
 		"prosemirror-state": "^1.4.3",
 		"prosemirror-view": "^1.32.7",
-		"shared": "file:shared-0.0.1.tgz",
+		"shared": "file:../shared",
 		"y-prosemirror": "^1.2.2",
 		"yjs": "^13.6.11"
 	},

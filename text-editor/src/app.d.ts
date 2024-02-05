@@ -25,12 +25,6 @@ declare global {
 		cursorPosition: number;
 		activeYXmlFragment: Y.XmlFragment;
 	};
-
-	// TODO: put all these in shared
-
-	type BlockMap = Y.Map<Y.XmlFragment | string>;
-
-	type BlockHeights = { [name: string]: number };
 }
 
 export {};

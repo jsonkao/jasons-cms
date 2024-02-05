@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { startHMRListening, postHeights } from '$lib/hmr.js';
+	import { postHeights, startHMRListening } from '$lib/hmr.js';
 	import {
-		createLiveblocksProvider,
 		IndestructibleUndoManager,
+		createLiveblocksProvider,
 		prepareInsertion
 	} from '$lib/yjs.js';
 	import { onMount } from 'svelte';
@@ -13,7 +13,7 @@
 
 	import { createEditor, cursorBuilder, selectionBuilder } from '$lib/prosemirror/index.js';
 	import type { EditorState } from 'prosemirror-state';
-	import { readableArray, type YReadableArray, yFindIndex } from 'shared';
+	import { readableArray, yFindIndex, type BlockMap, type YReadableArray } from 'shared';
 	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
 	import * as Y from 'yjs';
 	import './prosemirror.css';
