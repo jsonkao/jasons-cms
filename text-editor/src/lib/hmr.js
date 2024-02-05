@@ -33,7 +33,7 @@ export function startHMRListening(contentElement) {
  * @param {HTMLElement} contentElement The element containing content (text and graphics)
  */
 export function postHeights(contentElement) {
-	/** @type {BlockHeights} Get the heights of all graphics */
+	/** @type {import('shared').BlockHeights} Get the heights of all graphics */
 	const blockHeights = {};
 	Array.from(contentElement.children).forEach((div) => {
 		const name = div.getAttribute('data-name');

@@ -5,18 +5,17 @@
 		IndestructibleUndoManager,
 		createLiveblocksProvider,
 		prepareInsertion
-	} from '$lib/yjs.js';
+	} from '$lib/ydoc';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
-	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
+	import ProsemirrorEditor from './ProsemirrorEditor/index.svelte';
 
 	import { createEditor, cursorBuilder, selectionBuilder } from '$lib/prosemirror/index.js';
 	import type { EditorState } from 'prosemirror-state';
 	import { readableArray, yFindIndex, type BlockMap, type YReadableArray } from 'shared';
 	import { yCursorPlugin, ySyncPlugin, ySyncPluginKey, yUndoPlugin } from 'y-prosemirror';
 	import * as Y from 'yjs';
-	import './prosemirror.css';
 
 	let lastTextFocused: string;
 

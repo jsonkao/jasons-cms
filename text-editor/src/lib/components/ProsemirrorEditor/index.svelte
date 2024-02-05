@@ -4,8 +4,9 @@
 	 * - Use an editor state creator function instead of a static editor state
 	 * - Clean up type annotations and styles
 	 * - Propogate blur events to parent (this might've not been needed)
+	 * - Import a custom CSS file
 	 *
-	 * And finally, there is a slight change prosemirror-svelte was causing a duplicate import of yjs.
+	 * And finally, there is a slight chance that prosemirror-svelte was causing a duplicate import of yjs.
 	 *
 	 * Copyright 2019 Christian Heine
 	 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -15,6 +16,7 @@
 
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { EditorView } from 'prosemirror-view';
+	import './index.css';
 
 	const dispatch = createEventDispatcher();
 
