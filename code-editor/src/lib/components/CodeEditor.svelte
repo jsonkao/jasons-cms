@@ -70,8 +70,12 @@
 			throw new Error(`Could not find index of component to delete, ${e.detail}`);
 
 		// This should all work because we enforce having blank text before and after all components
-		const textBlockBefore = /** @type {import('shared').BlockMap} */ (yarrayStore.y.get(componentIndex - 1));
-		const textBlockAfter = /** @type {import('shared').BlockMap} */ (yarrayStore.y.get(componentIndex + 1));
+		const textBlockBefore = /** @type {import('shared').BlockMap} */ (
+			yarrayStore.y.get(componentIndex - 1)
+		);
+		const textBlockAfter = /** @type {import('shared').BlockMap} */ (
+			yarrayStore.y.get(componentIndex + 1)
+		);
 		if (textBlockBefore.get('type') !== 'text' || textBlockAfter.get('type') !== 'text')
 			throw new Error('Expected text before and after component');
 
