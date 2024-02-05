@@ -1,57 +1,39 @@
-<script lang="ts">
-	import { heights } from '$lib/stores/heights.js';
+<script>
+	import { blockHeights } from '$lib/stores/block-heights.js';
 	import { openComponentName } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher } from 'svelte';
 
 	const TOTAL_HEIGHT = 300;
 
-	$: renderingData = createRenderingData($heights);
+	$: totalHeight = $blockHeights.reduce((acc, blockHeight) => acc + blockHeight.height, 0);
 
-	function createRenderingData($heights: Array<BlockHeight>) {
-		const totalHeight = $heights.reduce((acc, blockHeight) => acc + blockHeight.height, 0);
-		const heightScale = (height: number) => (height / totalHeight) * TOTAL_HEIGHT;
-		return $heights.map((blockHeight) => ({
-			type: blockHeight.type,
-			name: blockHeight.type === 'graphic' ? blockHeight.name : undefined,
-			height: heightScale(blockHeight.height)
-		}));
-	}
+	/** @param {number} scaledHeight */
+	const notTooBigOrSmall = (scaledHeight) =>
+		Math.max(10, Math.min(TOTAL_HEIGHT * 0.7, scaledHeight));
 
 	const dispatch = createEventDispatcher();
-
-	function selectGraphic(name: string) {
-		openComponentName.set(name);
-		dispatch('select-graphic', name);
-	}
-
-	function deleteGraphic(name: string) {
-		// openComponentName.set(name);
-		dispatch('delete-graphic', name);
-	}
 </script>
 
-{#if renderingData.length > 0}
-	<div class="minimap">
-		{#each renderingData as b}
-			{#if b.type === 'text' && b.height > 0}
-				<div class="mini-text" />
-			{:else if b.type === 'graphic'}
-				<div class="mini-graphic" class:focused={b.name === $openComponentName}>
-					<button
-						style:height="{Math.max(10, Math.min(TOTAL_HEIGHT * 0.7, b.height))}px"
-						on:click={() => selectGraphic(b.name)}
-					/>
+<div class="minimap">
+	{#each $blockHeights as b}
+		{#if b.type === 'text' && b.height > 0}
+			<div class="mini-text" />
+		{:else if b.type === 'graphic'}
+			<div class="mini-graphic" class:focused={b.name === $openComponentName}>
+				<button
+					style:height="{notTooBigOrSmall(b.height / totalHeight) * TOTAL_HEIGHT}px"
+					on:click={() => 'name' in b && dispatch('select-graphic', b.name)}
+				/>
 
-					<div class="mini-menu">
-						<button on:click={() => deleteGraphic(b.name)} title="Delete">
-							<i class="delete-icon" />
-						</button>
-					</div>
+				<div class="mini-menu">
+					<button on:click={() => 'name' in b && dispatch('delete-graphic', b.name)} title="Delete">
+						<i class="delete-icon" />
+					</button>
 				</div>
-			{/if}
-		{/each}
-	</div>
-{/if}
+			</div>
+		{/if}
+	{/each}
+</div>
 
 <style>
 	.minimap {

@@ -3,8 +3,8 @@
  */
 export const STEPS = {
 	INITIALIZING: { number: 0, label: 'welcome' },
-	BOOTING: { number: 1, label: 'starting up' },
-	MOUNTING: { number: 2, label: 'initializing' },
+	BOOTING: { number: 1, label: 'booting' },
+	MOUNTING: { number: 2, label: 'creating files' },
 	INSTALLING: { number: 3, label: 'installing dependencies' },
 	RUNNING: { number: 4, label: 'starting server' },
 	SERVER_READY: { number: 5, label: 'mounting editor' },

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	/**
 	 * This is the highest-level component. It defines the layout of the iframe and the code editor.
 	 * It handles all communication with the iframe. It listens for keyboard shortcuts to toggle the editor.
@@ -9,18 +9,21 @@
 	import Loading from '$lib/components/Loading.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import { STEPS } from '$lib/constants.js';
-	import { codeEditorPosition } from '$lib/stores/code-editor.js';
-	import { heights } from '$lib/stores/heights.js';
-	import { iframeUrl, progress } from '$lib/stores/status.ts';
+	import { blockHeights } from '$lib/stores/block-heights.js';
+	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
+	import { currentStep, iframeUrl } from '$lib/stores/status.js';
+	import { onMount } from 'svelte';
 
+	/** @type {HTMLIFrameElement} */
+	let iframeElement;
 	let showCodeEditor = false;
-	let iframeElement: HTMLIFrameElement;
+	let setSrcAfterMount = false;
 
 	$: {
 		console.log($iframeUrl, iframeElement);
-		if ($iframeUrl && iframeElement) {
-			// Here, I think we need to destroy and recreate the iframe
-			iframeElement.src = $iframeUrl.url;
+		if ($iframeUrl) {
+			if (iframeElement) iframeElement.src = $iframeUrl.url;
+			else setSrcAfterMount = true;
 		}
 	}
 
@@ -28,8 +31,9 @@
 
 	/**
 	 * Pressing Cmd+E toggles the editor
+	 * @param {KeyboardEvent} e
 	 */
-	function onKeyDown(e: KeyboardEvent) {
+	function onKeyDown(e) {
 		if (e.metaKey && e.key === 'e') {
 			e.preventDefault();
 			toggleEditor();
@@ -43,20 +47,25 @@
 
 	/**
 	 * This function handles all messages from the iframe
+	 * @param {MessageEvent} event
 	 */
-	function onMessage(event: MessageEvent) {
+	function onMessage(event) {
 		switch (event.data.type) {
 			case 'toggleEditor':
 				toggleEditor();
 				break;
 			case 'editorMounted':
-				progress.set(STEPS.EDITOR_READY);
+				currentStep.set(STEPS.EDITOR_READY);
 				break;
-			case 'heights':
-				heights.set(event.data.heights);
+			case 'blockHeights':
+				blockHeights.set(event.data.blockHeights);
 				break;
 		}
 	}
+
+	onMount(() => {
+		if (setSrcAfterMount && $iframeUrl) iframeElement.src = $iframeUrl.url;
+	});
 </script>
 
 <svelte:window on:message={onMessage} on:keydown={onKeyDown} />
@@ -65,15 +74,17 @@
 	<div class="code-container">
 		<CodeEditor
 			{showCodeEditor}
-			on:select-graphic={(e) =>
-				iframeElement?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*')}
+			on:select-graphic={(e) => {
+				openComponentName.set(e.detail);
+				iframeElement?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*');
+			}}
 		/>
 	</div>
 
 	<div class="iframe-container">
 		<iframe bind:this={iframeElement} title="" />
 		<Loading />
-		<Menubar on:toggle={toggleEditor} />
+		<Menubar on:toggle-editor={toggleEditor} />
 	</div>
 </div>
 

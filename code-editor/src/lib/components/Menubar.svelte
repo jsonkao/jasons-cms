@@ -1,24 +1,27 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { otherCoders } from '$lib/stores/code-editor.js';
-	import { progress } from '$lib/stores/status.ts';
-	import {  STEPS } from '$lib/constants.js';
+	import { currentStep } from '$lib/stores/status';
+	import { STEPS } from '$lib/constants.js';
 	import { fly } from 'svelte/transition';
 
 	const dispatch = createEventDispatcher();
 
 	/** Wait for booting before showing helpers because booting blocks the event loop, freezing all UI */
-	$: isVisible = $progress.number > STEPS.BOOTING.number;
+	$: isVisible = $currentStep.number > STEPS.BOOTING.number;
+
+	/** After the editor loads, we want to keep the UI minimal */
+	$: showOnlyFirstButton = $currentStep.number < STEPS.EDITOR_READY.number;
 </script>
 
 {#if isVisible}
 	<div
 		class="helper-container"
-		class:show-all={$progress.number < STEPS.EDITOR_READY.number}
+		class:show-only-first-button={!showOnlyFirstButton}
 		in:fly={{ x: -40 }}
 	>
 		<div class="helper-item">
-			<button on:click={() => dispatch('toggle')}>
+			<button on:click={() => dispatch('toggle-editor')}>
 				<i class="code-icon" />
 
 				{#if $otherCoders.length > 0}
@@ -31,6 +34,7 @@
 			</button>
 			<p>code editor (cmd+e)</p>
 		</div>
+
 		<div class="helper-item">
 			<button>
 				<i>?</i>
@@ -60,8 +64,8 @@
 	}
 
 	.helper-item:first-child button,
-	.helper-container.show-all button,
-	.helper-container.show-all i {
+	.helper-container:not(.show-only-first-button) button,
+	.helper-container:not(.show-only-first-button) i {
 		pointer-events: all;
 		opacity: 1;
 	}

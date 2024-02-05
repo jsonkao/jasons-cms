@@ -1,13 +1,13 @@
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
 import { GENERATED_PATH, STEPS } from '$lib/constants.js';
-import { iframeUrl, progress } from '$lib/stores/status.ts';
+import { iframeUrl, currentStep } from '$lib/stores/status.js';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
 import { fetchTemplateFiles, writeGlobals } from './files.js';
 
 /** @type {WebContainer} The WebContainer instance. */
-let webcontainerInstance;
+let webcontainer;
 
 /** @type {Awaited<ReturnType<typeof fetchTemplateFiles>>} The template files. */
 let templateFiles;
@@ -40,13 +40,13 @@ let ready = browser ? initialize() : new Promise(() => {});
  * Initialize the WebContainer and fetch the template files.
  */
 export async function initialize() {
-	progress.set(STEPS.BOOTING);
+	currentStep.set(STEPS.BOOTING);
 
 	const promises = [];
 
 	// Reuse the same webcontainer in dev HMR
-	if (import.meta.hot?.data.webcontainerInstance) {
-		webcontainerInstance = import.meta.hot.data.webcontainerInstance;
+	if (import.meta.hot?.data.webcontainer) {
+		webcontainer = import.meta.hot.data.webcontainer;
 	} else {
 		promises.push(boot());
 	}
@@ -72,23 +72,22 @@ export async function initialize() {
 }
 
 /**
- * Boot a new webcontainer instance. Persist the instance in HMR.
+ * Boot a new webcontainer instance. Persist it in HMR.
  */
 async function boot() {
-	const instance = await WebContainer.boot();
-	webcontainerInstance = instance;
-	if (import.meta.hot) import.meta.hot.data.webcontainerInstance = instance;
+	webcontainer = await WebContainer.boot();
+	if (import.meta.hot) import.meta.hot.data.webcontainer = webcontainer;
 
-	webcontainerInstance.on('server-ready', (port, url) => {
-		progress.set(STEPS.SERVER_READY);
+	webcontainer.on('server-ready', (port, url) => {
+		currentStep.set(STEPS.SERVER_READY);
 		// Invalidate previous base URL because the URL might be the same, but we want to re-source the iframe.
 		// I'm not exactly sure what's going on but this makes it work
 		iframeUrl.set({ url, timeUpdated: Date.now() });
 		console.log('setting base to', { url, timeUpdated: Date.now() });
 		console.log('k ready at', url, port);
 	});
-	webcontainerInstance.on('error', ({ message }) => {
-		console.error('WebContainer instance error:', message);
+	webcontainer.on('error', ({ message }) => {
+		console.error('WebContainer error:', message);
 	});
 }
 
@@ -97,22 +96,22 @@ async function boot() {
  * TODO (maybe): on HMR, diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
  */
 async function mount() {
-	progress.set(STEPS.MOUNTING);
-	await webcontainerInstance.mount(templateFiles);
+	currentStep.set(STEPS.MOUNTING);
+	await webcontainer.mount(templateFiles);
 
 	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
 
 	// Clear the /src/lib/generated directory
-	await webcontainerInstance.fs.rm(GENERATED_PATH, { recursive: true });
-	await webcontainerInstance.fs.mkdir(GENERATED_PATH);
-	await writeGlobals(webcontainerInstance);
+	await webcontainer.fs.rm(GENERATED_PATH, { recursive: true });
+	await webcontainer.fs.mkdir(GENERATED_PATH);
+	await writeGlobals(webcontainer);
 }
 
 /**
  * Call this function to mount the WebContainer and start the dev server.
  */
 export async function startWebContainer() {
-	progress.set(STEPS.RUNNING);
+	currentStep.set(STEPS.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
 }
 
@@ -125,7 +124,7 @@ export async function startWebContainer() {
 export async function syncWebContainerFileSystem(yarray) {
 	await ready;
 
-	const currentGraphics = await webcontainerInstance.fs.readdir(GENERATED_PATH);
+	const currentGraphics = await webcontainer.fs.readdir(GENERATED_PATH);
 
 	/** @type {Array<{ filename: string, code: string, alreadyExists: boolean }>} */
 	const allGraphics = [];
@@ -208,7 +207,7 @@ function log_stream() {
  * @param {string} contents - The content of the file
  */
 export async function writeFile(path, contents) {
-	await webcontainerInstance.fs.writeFile(path, contents);
+	await webcontainer.fs.writeFile(path, contents);
 }
 
 /**
@@ -232,7 +231,7 @@ async function spawn(command, args, errorMessage, logOutput = false) {
 	if (currentProcess)
 		throw new Error(`A process is already running. Had tried to spawn ${command} ${args}`);
 
-	const process = await webcontainerInstance.spawn(command, args);
+	const process = await webcontainer.spawn(command, args);
 	currentProcess = process;
 
 	if (logOutput) process.output.pipeTo(log_stream());

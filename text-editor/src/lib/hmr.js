@@ -34,7 +34,7 @@ export function startHMRListening(contentElement) {
  */
 export function postHeights(contentElement) {
 	/** @type {Array<BlockHeight>} Get the heights of all graphics */
-	const heights = Array.from(contentElement.children).map(
+	const blockHeights = Array.from(contentElement.children).map(
 		/** @returns {BlockHeight} */ (div) => {
 			const name = div.getAttribute('data-name');
 			if (name) {
@@ -52,5 +52,5 @@ export function postHeights(contentElement) {
 	);
 
 	// Notify the parent window of the new dimensions
-	window.parent.postMessage({ type: 'heights', heights }, '*');
+	window.parent.postMessage({ type: 'blockHeights', blockHeights }, '*');
 }
