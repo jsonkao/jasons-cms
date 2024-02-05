@@ -33,23 +33,12 @@ export function startHMRListening(contentElement) {
  * @param {HTMLElement} contentElement The element containing content (text and graphics)
  */
 export function postHeights(contentElement) {
-	/** @type {Array<BlockHeight>} Get the heights of all graphics */
-	const blockHeights = Array.from(contentElement.children).map(
-		/** @returns {BlockHeight} */ (div) => {
-			const name = div.getAttribute('data-name');
-			if (name) {
-				return {
-					type: 'graphic',
-					name,
-					height: div.clientHeight
-				};
-			} else if (div.classList.contains('ui-editor')) {
-				return { type: 'text', height: div.clientHeight };
-			} else {
-				throw new Error('Completely unexpected!');
-			}
-		}
-	);
+	/** @type {BlockHeights} Get the heights of all graphics */
+	const blockHeights = {};
+	Array.from(contentElement.children).forEach((div) => {
+		const name = div.getAttribute('data-name');
+		if (name) blockHeights[name] = div.clientHeight;
+	});
 
 	// Notify the parent window of the new dimensions
 	window.parent.postMessage({ type: 'blockHeights', blockHeights }, '*');

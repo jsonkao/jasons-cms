@@ -142,7 +142,7 @@
 				}}
 			/>
 			<PlacementButtons />
-			<Minimap on:select-graphic on:delete-graphic={deleteComponent} />
+			<Minimap on:select-graphic on:delete-graphic={deleteComponent} blocks={$yarrayStore} />
 		{/if}
 	</div>
 </div>

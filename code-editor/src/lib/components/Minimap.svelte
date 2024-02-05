@@ -3,30 +3,54 @@
 	import { openComponentName } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher } from 'svelte';
 
-	const MAX_HEIGHT = 300;
-	$: totalHeight = $blockHeights.reduce((acc, blockHeight) => acc + blockHeight.height, 0);
+	/** @type {Array<BlockMap>} */
+	export let blocks;
 
-	$: console.log($blockHeights)
-
-	/** We don't want the height to be too small or too big @param {number} scaledHeight */
-	const clampHeight = (scaledHeight) => Math.max(10, Math.min(MAX_HEIGHT * 0.7, scaledHeight));
-
+	const SCALAR = 1 / 10;
+	const DEFAULT_BLOCK_HEIGHT = 30;
 	const dispatch = createEventDispatcher();
+
+	$: console.log(blocks[blocks.length - 1].get('text'));
+
+	/**
+	 * Compute the height of a single graphic block
+	 * @param {BlockMap} b
+	 * @param {BlockHeights} $blockHeights
+	 */
+	function getHeight(b, $blockHeights) {
+		if (Object.keys($blockHeights).length === 0) return DEFAULT_BLOCK_HEIGHT;
+
+		const blockHeight = $blockHeights[/** @type {string} */ (b.get('name'))];
+
+		if (blockHeight === undefined) {
+			console.error(`It's concerning that the height for ${b.get('name')} is undefined`);
+			return DEFAULT_BLOCK_HEIGHT;
+		}
+
+		// We don't want the height to be too small or too big
+		return Math.max(10, Math.min(180, blockHeight * SCALAR));
+	}
+
+	/** @param {import('yjs').XmlFragment} fragment */
+	function fragmentIsNotEmpty(fragment) {
+		const string = fragment.toString();
+		return string !== '<paragraph></paragraph>' && string !== '';
+	}
 </script>
 
 <div class="minimap">
-	{#each $blockHeights as b}
-		{#if b.type === 'text' && b.height > 0}
+	{#each blocks as b}
+		{#if b.get('type') === 'text' && fragmentIsNotEmpty(/** @type {import('yjs').XmlFragment} */ (b.get('text')))}
 			<div class="mini-text" />
-		{:else if b.type === 'graphic'}
-			<div class="mini-graphic" class:focused={b.name === $openComponentName}>
+		{:else if b.get('type') === 'graphic'}
+			<div class="mini-graphic" class:focused={b.get('name') === $openComponentName}>
 				<button
-					style:height="{clampHeight((b.height / totalHeight) * MAX_HEIGHT)}px"
-					on:click={() => 'name' in b && dispatch('select-graphic', b.name)}
+					style:height="{getHeight(b, $blockHeights)}px"
+					on:click={() => dispatch('select-graphic', b.get('name'))}
 				/>
 
 				<div class="mini-menu">
-					<button on:click={() => 'name' in b && dispatch('delete-graphic', b.name)} title="Delete">
+					<button on:click={() => dispatch('delete-graphic', b.get('name'))} title="Delete">
 						<i class="delete-icon" />
 					</button>
 				</div>

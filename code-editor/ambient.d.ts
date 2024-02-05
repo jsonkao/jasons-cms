@@ -20,6 +20,4 @@ interface InitialGraphic {
 
 type BlockMap = import('yjs').Map<import('yjs').XmlFragment | import('yjs').Text | string>;
 
-type BlockHeight =
-	| { type: 'text'; height: number }
-	| { type: 'graphic'; name: string; height: number };
+type BlockHeights = { [name: string]: number };
