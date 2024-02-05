@@ -4,12 +4,10 @@
 
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Plugin } from 'prosemirror-state';
-import { redo, undo, ySyncPluginKey } from 'y-prosemirror';
+import { redo, undo } from 'y-prosemirror';
+import { FloatingMenuPlugin } from './floating-menu.js';
 import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
-import { floatingMenuStore } from '$lib/stores.js';
-
-/** @typedef {import('prosemirror-view').EditorView} EditorView */
 
 /**
  * A helper function to create a minimal rich text editor.
@@ -79,103 +77,3 @@ export const selectionBuilder = (user) => {
 		class: 'ProseMirror-yjs-selection'
 	};
 };
-
-/**
- * Creates a floating menu plugin
- */
-function FloatingMenuPlugin() {
-	return new Plugin({
-		view: (editorView) => new FloatingMenuView(editorView)
-	});
-}
-
-/**
- * A view for the floating menu plugin.
- * References:
- *   - https://github.com/ueberdosis/tiptap/blob/main/packages/extension-floating-menu/src/floating-menu-plugin.ts
- *   - https://github.com/ProseMirror/prosemirror-dropcursor/blob/master/src/dropcursor.ts
- */
-class FloatingMenuView {
-	/** @type {EditorView} The editor view */
-	editorView;
-
-	/** @type {boolean} Whether to prevent hiding on next blur */
-	preventHide = false;
-
-	/**
-	 * @param {EditorView} editorView
-	 */
-	constructor(editorView) {
-		this.editorView = editorView;
-		// On focus, also call update
-		editorView.dom.addEventListener('focus', this.focusHandler);
-		// On blur, hide the floating menu (in some cases)
-		editorView.dom.addEventListener('blur', this.blurHandler);
-		// On mousedown, prevent blur from hiding the floating menu
-		editorView.dom.addEventListener('mousedown', this.mousedownHandler, { capture: true });
-	}
-
-	focusHandler = () => {
-		// Tiptap code says this `setTimeout` makes sure `selection` is already updated
-		setTimeout(() => this.update(this.editorView));
-	};
-
-	/**
-	 * @param {FocusEvent} event
-	 */
-	blurHandler = (event) => {
-		if (this.preventHide) {
-			// Prevent a blur event caused by clicking the floating menu from hiding the floating menu
-			this.preventHide = false;
-			return;
-		}
-
-		const targetNode = /** @type {Node} */ (event.target);
-		const relatedTarget = /** @type {Node} */ (event.relatedTarget);
-
-		if (targetNode?.parentNode?.contains(relatedTarget)) return;
-
-		floatingMenuStore.set({ visible: false });
-	};
-
-	mousedownHandler = () => {
-		this.preventHide = true;
-	};
-
-	/**
-	 * @param {EditorView} editorView
-	 */
-	update(editorView) {
-		const { selection } = editorView.state;
-		const { $anchor, empty } = selection;
-		const isRootDepth = $anchor.depth === 1;
-		const isEmptyTextBlock =
-			$anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
-		const textElement = editorView.domAtPos($anchor.pos).node;
-
-		if (!editorView.hasFocus() || !empty || !isRootDepth || !isEmptyTextBlock) {
-			floatingMenuStore.set({ visible: false });
-			return;
-		}
-
-		const ysyncPlugin = ySyncPluginKey.get(editorView.state);
-		if (ysyncPlugin === undefined) throw new Error('ySyncPlugin not found');
-		const ysyncPluginState = ysyncPlugin.getState(editorView.state);
-
-		const docNode = editorView.state.doc;
-		const cursorPosition = $anchor.pos;
-
-		// TODO: add a resize event listener
-		// TODO: Use cursor pos method?
-		const rect = /** @type {HTMLElement} */ (textElement).getBoundingClientRect();
-
-		floatingMenuStore.set({
-			visible: true,
-			left: rect.left + window.scrollX,
-			top: rect.top + window.scrollY,
-			docNode,
-			cursorPosition,
-			activeYXmlFragment: ysyncPluginState.type
-		});
-	}
-}

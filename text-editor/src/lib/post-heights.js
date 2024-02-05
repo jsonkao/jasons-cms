@@ -1,6 +1,6 @@
 /**
- * I only need to import the HMR script, which notifies the parent window
- * of coding area dimensions on HMR reload for the parent's code editor minimap.
+ * On HMR update, notify the parent window of coding area dimensions. The parent
+ * needs this data to make the minimap.
  */
 
 /**
@@ -8,33 +8,30 @@
  * @param {HTMLElement} contentElement The element containing content (text and graphics)
  */
 export function startHMRListening(contentElement) {
-	if (import.meta.hot) {
-		import.meta.hot.on(
-			'vite:afterUpdate',
-			/** @param {import('vite').UpdatePayload} payload */ ({ updates }) => {
-				// Could make it more fine-grained by checking and getting dimensions only for the specific file that changed
-				if (
-					!updates.some(
-						(update) =>
-							update.path.startsWith('/src/lib/generated/') || // Changes in graphics
-							update.path === '/src/lib/components/Component.svelte' // Changes in the graphics index, which Component.svelte imports
-					)
-				)
-					return;
+	import.meta.hot?.on('vite:afterUpdate', hmrCallback);
 
-				postHeights(contentElement);
-			}
-		);
+	/**
+	 * Post new heights if anything graphics-related changed
+	 * @param {import('vite').UpdatePayload} payload
+	 */
+	function hmrCallback({ updates }) {
+		const graphicsChanged = updates.some(({ path }) => path.startsWith('/src/lib/generated/'));
+		const indexChanged = updates
+			.map((u) => u.path)
+			.includes('/src/lib/components/Component.svelte');
+
+		if (graphicsChanged || indexChanged) postHeights(contentElement);
 	}
 }
 
 /**
  * Compute client heights of all content blocks on the page and post them to parent
- * @param {HTMLElement} contentElement The element containing content (text and graphics)
+ * @param {HTMLElement} contentElement
  */
 export function postHeights(contentElement) {
-	/** @type {import('shared').BlockHeights} Get the heights of all graphics */
+	/** @type {import('shared').BlockHeights} */
 	const blockHeights = {};
+
 	Array.from(contentElement.children).forEach((div) => {
 		const name = div.getAttribute('data-name');
 		if (name) blockHeights[name] = div.clientHeight;

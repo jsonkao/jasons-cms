@@ -1,21 +1,34 @@
-<script lang="ts">
+<script>
 	import { browser } from '$app/environment';
 	import { postHeights, startHMRListening } from '$lib/post-heights.js';
-	import { create, prepareInsertion } from '$lib/ydoc';
-	import { yFindIndex, type BlockMap } from 'shared';
+	import initialize from '$lib/ydoc/initialize.js';
+	import { prepareInsertion } from '$lib/ydoc/insert.js';
+	import { yFindIndex } from 'shared';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor/index.svelte';
 
+	/** @typedef {import('shared').BlockMap} BlockMap */
+
+	/** @type {string} */
+	let lastTextFocused;
+
+	/** @type {HTMLElement} */
+	let contentEl;
+
+	/** @type {Object<string, any>} */
+	const pmEditors = {};
+
 	if (!browser) throw new Error('This component is only meant to be used in the browser');
 
-	let lastTextFocused: string;
+	const { ydoc, transactionOrigin, yarrayStore, createEditorForBlock, destroy } = initialize();
 
 	/**
 	 * Listen for messages from the parent window
+	 * @param {MessageEvent} event
 	 */
-	function onMessage(event: MessageEvent) {
+	function onMessage(event) {
 		switch (event.data.type) {
 			case 'focusText':
 				pmEditors[lastTextFocused]?.focus();
@@ -27,10 +40,6 @@
 				break;
 		}
 	}
-
-	const { ydoc, transactionOrigin, yarrayStore, createEditorForBlock, destroy } = create();
-
-	let contentEl: HTMLElement;
 
 	$: if ($yarrayStore?.length > 0) {
 		// On first prosemirror editor mount, text from ysyncplugin might not have populated yet
@@ -44,22 +53,28 @@
 		return destroy;
 	});
 
-	const pmEditors: Record<string, any> = {};
+	/** @param {BlockMap} blockMap */
+	const getName = (blockMap) => /** @type {string} */ (blockMap.get('name'));
 
-	const getName = (blockMap: BlockMap) => blockMap.get('name') as string;
-	const getInternalId = (blockMap: BlockMap) => {
+	/**
+	 * Uses internal ID to create a unique key for each block
+	 * @param {BlockMap} blockMap
+	 */
+	const getId = (blockMap) => {
 		if (blockMap._item === null) throw new Error('I thought Y.Map._item would never be null');
 		return Object.values(blockMap._item.id).join('_');
 	};
 
 	/**
 	 * Insert new graphic block
+	 * @param {CustomEvent<BlockInsertionParams>} e
 	 */
-	function insertNewGraphic(e: CustomEvent<BlockInsertionParams>) {
-		const ymapIndex = yFindIndex(yarrayStore.y, e.detail.activeYXmlFragment.parent as BlockMap);
-		if (ymapIndex === -1) throw new Error('Could not find the current index');
+	function insertNewGraphic(e) {
+		const currentBlockMap = /** @type {BlockMap} */ (e.detail.activeYXmlFragment.parent);
+		const ymapIndex = yFindIndex(yarrayStore.y, currentBlockMap);
+		if (ymapIndex === -1) throw new Error('Could not find the current block map');
 
-		const idAboutToBeDeleted = getInternalId(yarrayStore.y.get(ymapIndex));
+		const idAboutToBeDeleted = getId(yarrayStore.y.get(ymapIndex));
 		const newElements = prepareInsertion(e.detail, 'graphic' + idAboutToBeDeleted);
 
 		ydoc.transact(() => {
@@ -73,13 +88,13 @@
 
 <div class="content" bind:this={contentEl}>
 	{#if createEditorForBlock && $yarrayStore}
-		{#each $yarrayStore || [] as blockMap (getInternalId(blockMap))}
+		{#each $yarrayStore || [] as blockMap (getId(blockMap))}
 			{#if blockMap.get('type') === 'graphic'}
 				<Component name={getName(blockMap)} />
 			{:else if blockMap.get('type') === 'text'}
 				<ProsemirrorEditor
-					bind:this={pmEditors[getInternalId(blockMap)]}
-					on:blur={() => (lastTextFocused = getInternalId(blockMap))}
+					bind:this={pmEditors[getId(blockMap)]}
+					on:blur={() => (lastTextFocused = getId(blockMap))}
 					editorStateCreator={() => createEditorForBlock(blockMap)}
 				/>
 			{/if}
