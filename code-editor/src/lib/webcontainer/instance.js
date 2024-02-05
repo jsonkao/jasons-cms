@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
-import { GENERATED_PATH, steps } from '$lib/constants.js';
-import { base, progress } from '$lib/stores/status.ts';
+import { GENERATED_PATH, STEPS } from '$lib/constants.js';
+import { iframeUrl, progress } from '$lib/stores/status.ts';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
 import { fetchTemplateFiles, writeGlobals } from './files.js';
@@ -40,7 +40,7 @@ let ready = browser ? initialize() : new Promise(() => {});
  * Initialize the WebContainer and fetch the template files.
  */
 export async function initialize() {
-	progress.set(steps.BOOTING);
+	progress.set(STEPS.BOOTING);
 
 	const promises = [];
 
@@ -80,10 +80,10 @@ async function boot() {
 	if (import.meta.hot) import.meta.hot.data.webcontainerInstance = instance;
 
 	webcontainerInstance.on('server-ready', (port, url) => {
-		progress.set(steps.SERVER_READY);
+		progress.set(STEPS.SERVER_READY);
 		// Invalidate previous base URL because the URL might be the same, but we want to re-source the iframe.
 		// I'm not exactly sure what's going on but this makes it work
-		base.set({ url, timeUpdated: Date.now() });
+		iframeUrl.set({ url, timeUpdated: Date.now() });
 		console.log('setting base to', { url, timeUpdated: Date.now() });
 		console.log('k ready at', url, port);
 	});
@@ -97,7 +97,7 @@ async function boot() {
  * TODO (maybe): on HMR, diff with previous files and only mount/unzip what's changed. See https://github.com/nuxt/learn.nuxt.com/blob/main/stores/playground.ts#L200
  */
 async function mount() {
-	progress.set(steps.MOUNTING);
+	progress.set(STEPS.MOUNTING);
 	await webcontainerInstance.mount(templateFiles);
 
 	await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
@@ -112,7 +112,7 @@ async function mount() {
  * Call this function to mount the WebContainer and start the dev server.
  */
 export async function startWebContainer() {
-	progress.set(steps.RUNNING);
+	progress.set(STEPS.RUNNING);
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
 }
 

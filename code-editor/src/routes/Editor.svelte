@@ -1,23 +1,30 @@
 <script lang="ts">
+	/**
+	 * This is the highest-level component. It defines the layout of the iframe and the code editor.
+	 * It handles all communication with the iframe. It listens for keyboard shortcuts to toggle the editor.
+	 * It also places the Loading and Menubar components on top of the iframe.
+	 */
+
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
-	import Helper from '$lib/components/Helper.svelte';
 	import Loading from '$lib/components/Loading.svelte';
-	import { steps } from '$lib/constants.js';
+	import Menubar from '$lib/components/Menubar.svelte';
+	import { STEPS } from '$lib/constants.js';
 	import { codeEditorPosition } from '$lib/stores/code-editor.js';
 	import { heights } from '$lib/stores/heights.js';
-	import { base, progress } from '$lib/stores/status.ts';
+	import { iframeUrl, progress } from '$lib/stores/status.ts';
 
 	let showCodeEditor = false;
+	let iframeElement: HTMLIFrameElement;
 
-	/**
-	 * Handling the iframe
-	 */
-	let iframe: HTMLIFrameElement;
-	$: if ($base && iframe) {
-		// Here, I think we need to destroy and recreate the iframe
-		iframe.src = $base.url;
+	$: {
+		console.log($iframeUrl, iframeElement);
+		if ($iframeUrl && iframeElement) {
+			// Here, I think we need to destroy and recreate the iframe
+			iframeElement.src = $iframeUrl.url;
+		}
 	}
-	$: console.log($base, iframe);
+
+	const toggleEditor = () => (showCodeEditor = !showCodeEditor);
 
 	/**
 	 * Pressing Cmd+E toggles the editor
@@ -29,14 +36,13 @@
 		}
 	}
 
-	function toggleEditor() {
-		showCodeEditor = !showCodeEditor;
-	}
-
-	$: if (!showCodeEditor) iframe?.contentWindow?.postMessage({ type: 'focusText' }, '*');
+	/**
+	 * Tell the iframe to focus on text when the editor is hidden
+	 */
+	$: if (!showCodeEditor) iframeElement?.contentWindow?.postMessage({ type: 'focusText' }, '*');
 
 	/**
-	 * Handles all messages from the iframe
+	 * This function handles all messages from the iframe
 	 */
 	function onMessage(event: MessageEvent) {
 		switch (event.data.type) {
@@ -44,10 +50,11 @@
 				toggleEditor();
 				break;
 			case 'editorMounted':
-				progress.set(steps.EDITOR_READY);
+				progress.set(STEPS.EDITOR_READY);
 				break;
 			case 'heights':
 				heights.set(event.data.heights);
+				break;
 		}
 	}
 </script>
@@ -59,14 +66,14 @@
 		<CodeEditor
 			{showCodeEditor}
 			on:select-graphic={(e) =>
-				iframe?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*')}
+				iframeElement?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*')}
 		/>
 	</div>
 
 	<div class="iframe-container">
-		<iframe bind:this={iframe} title="" />
+		<iframe bind:this={iframeElement} title="" />
 		<Loading />
-		<Helper on:toggle={toggleEditor} />
+		<Menubar on:toggle={toggleEditor} />
 	</div>
 </div>
 

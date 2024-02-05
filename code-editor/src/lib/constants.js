@@ -1,7 +1,7 @@
 /**
  * Steps for progress
  */
-export const steps = {
+export const STEPS = {
 	INITIALIZING: { number: 0, label: 'welcome' },
 	BOOTING: { number: 1, label: 'starting up' },
 	MOUNTING: { number: 2, label: 'initializing' },

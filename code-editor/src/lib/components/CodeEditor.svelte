@@ -75,7 +75,8 @@
 	function deleteComponent(e: CustomEvent) {
 		// First, find the index for the requested component name
 		const componentIndex = yFindGraphicIndex($yarrayStore, e.detail);
-		if (componentIndex === -1) throw new Error(`Could not find index of component to delete, ${e.detail}`);
+		if (componentIndex === -1)
+			throw new Error(`Could not find index of component to delete, ${e.detail}`);
 
 		// This should all work because we enforce having blank text before and after all components
 		const textBlockBefore = yarrayStore.y.get(componentIndex - 1) as BlockMap;
@@ -89,11 +90,11 @@
 		const newXmlFragment = new Y.XmlFragment();
 		for (let i = 0; i < textBefore.length; i++) {
 			newXmlFragment.push([textBefore.get(i)]);
-			console.log('pushed before', i)
+			console.log('pushed before', i);
 		}
 		for (let i = 0; i < textAfter.length; i++) {
 			newXmlFragment.push([textAfter.get(i)]);
-			console.log('pushed after', i)
+			console.log('pushed after', i);
 		}
 
 		const newMap = new Y.Map();

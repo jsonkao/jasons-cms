@@ -1,12 +1,12 @@
 <script>
 	import { fade, slide } from 'svelte/transition';
 	import { progress } from '$lib/stores/status.ts';
-	import { steps } from '$lib/constants.js';
+	import { STEPS } from '$lib/constants.js';
 
-	const numberOfSteps = Object.keys(steps).length - 1;
+	const numberOfSteps = Object.keys(STEPS).length - 1;
 </script>
 
-{#if $progress.number !== steps.EDITOR_READY.number}
+{#if $progress.number !== STEPS.EDITOR_READY.number}
 	<div class="loading-container" transition:fade>
 		<div class="progress-container">
 			<div class="progress-bar" style="width: {($progress.number / numberOfSteps) * 100}%" />

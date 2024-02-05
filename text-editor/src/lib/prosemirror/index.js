@@ -7,7 +7,7 @@ import { EditorState, Plugin } from 'prosemirror-state';
 import { redo, undo, ySyncPluginKey } from 'y-prosemirror';
 import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
-import { popupStore } from '$lib/stores.js';
+import { floatingMenuStore } from '$lib/stores.js';
 
 /** @typedef {import('prosemirror-view').EditorView} EditorView */
 
@@ -135,7 +135,7 @@ class FloatingMenuView {
 
 		if (targetNode?.parentNode?.contains(relatedTarget)) return;
 
-		popupStore.set({ visible: false });
+		floatingMenuStore.set({ visible: false });
 	};
 
 	mousedownHandler = () => {
@@ -154,7 +154,7 @@ class FloatingMenuView {
 		const textElement = editorView.domAtPos($anchor.pos).node;
 
 		if (!editorView.hasFocus() || !empty || !isRootDepth || !isEmptyTextBlock) {
-			popupStore.set({ visible: false });
+			floatingMenuStore.set({ visible: false });
 			return;
 		}
 
@@ -169,7 +169,7 @@ class FloatingMenuView {
 		// TODO: Use cursor pos method?
 		const rect = /** @type {HTMLElement} */ (textElement).getBoundingClientRect();
 
-		popupStore.set({
+		floatingMenuStore.set({
 			visible: true,
 			left: rect.left + window.scrollX,
 			top: rect.top + window.scrollY,

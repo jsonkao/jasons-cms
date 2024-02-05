@@ -2,19 +2,19 @@
 	import { createEventDispatcher } from 'svelte';
 	import { otherCoders } from '$lib/stores/code-editor.js';
 	import { progress } from '$lib/stores/status.ts';
-	import { steps } from '$lib/constants.js';
+	import {  STEPS } from '$lib/constants.js';
 	import { fly } from 'svelte/transition';
 
 	const dispatch = createEventDispatcher();
 
 	/** Wait for booting before showing helpers because booting blocks the event loop, freezing all UI */
-	$: isVisible = $progress.number > steps.BOOTING.number;
+	$: isVisible = $progress.number > STEPS.BOOTING.number;
 </script>
 
 {#if isVisible}
 	<div
 		class="helper-container"
-		class:show-all={$progress.number < steps.EDITOR_READY.number}
+		class:show-all={$progress.number < STEPS.EDITOR_READY.number}
 		in:fly={{ x: -40 }}
 	>
 		<div class="helper-item">

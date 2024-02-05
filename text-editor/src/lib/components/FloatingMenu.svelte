@@ -1,21 +1,21 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { popupStore } from '$lib/stores';
+	import { floatingMenuStore } from '$lib/stores';
 
 	const dispatch = createEventDispatcher<{ insert: BlockInsertionParams }>();
 
 	function handleClick() {
 		dispatch('insert', {
-			docNode: $popupStore.docNode!,
-			cursorPosition: $popupStore.cursorPosition!,
-			activeYXmlFragment: $popupStore.activeYXmlFragment!
+			docNode: $floatingMenuStore.docNode!,
+			cursorPosition: $floatingMenuStore.cursorPosition!,
+			activeYXmlFragment: $floatingMenuStore.activeYXmlFragment!
 		});
-		popupStore.set({ visible: false });
+		floatingMenuStore.set({ visible: false });
 	}
 </script>
 
-{#if $popupStore.visible && $popupStore.left && $popupStore.top}
-	<div class="popup" style="top: {$popupStore.top}px; left: {$popupStore.left}px">
+{#if $floatingMenuStore.visible && $floatingMenuStore.left && $floatingMenuStore.top}
+	<div class="popup" style="top: {$floatingMenuStore.top}px; left: {$floatingMenuStore.left}px">
 		<p>
 			Write or
 			<button on:click={handleClick}>code here</button>...
