@@ -1,149 +1,125 @@
-<script lang="ts">
-	import type { Extension } from '@codemirror/state';
+<script>
 	import { svelte } from '@replit/codemirror-lang-svelte';
-	import { readableArray, type YReadableArray, yFindGraphicIndex } from 'shared';
+	import { yFindGraphicIndex } from 'shared';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
 
 	// @ts-ignore
 	import { yCollab } from 'y-codemirror.next';
-	import { createClient } from '@liveblocks/client';
-	import LiveblocksProvider from '@liveblocks/yjs';
 	import * as Y from 'yjs';
 
 	import { browser } from '$app/environment';
-	import { LIVEBLOCKS_ROOM, userColor, userName } from '$lib/constants.js';
-	import { listenToNumberOfCoders } from '$lib/yjs.js';
 	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
 	import { syncWebContainerFileSystem, saveComponent } from '$lib/webcontainer/instance.js';
 	import { onDestroy } from 'svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import Minimap from './Minimap.svelte';
+	import { createYDoc } from '$lib/ydoc';
 
-	const client = createClient({
-		publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
-	});
+	if (!browser) throw new Error('This component should only be used in the browser.');
+
+	export let showCodeEditor = false;
+
+	/** @type {HTMLElement} */
+	let codeEditorElement;
 
 	/**
 	 * Create Y.Text
 	 */
 
-	let ydoc: Y.Doc;
-	let ytext: Y.Text;
-	let yarrayStore: YReadableArray<BlockMap>;
-	let yExtension: Extension;
-	let yProvider: LiveblocksProvider<any, any, any, any>;
+	/** @type {import('@codemirror/state').Extension} */
+	let yExtension;
+	/** @type {Y.Text} */
+	let ytext;
 
-	let destroy = () => {};
-
-	if (browser) {
-		const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, {
-			initialPresence: {}
-		});
-		destroy = leave;
-
-		ydoc = new Y.Doc();
-		yProvider = new LiveblocksProvider(room, ydoc);
-		yProvider.awareness.setLocalStateField('user', { color: userColor, name: userName });
-		yarrayStore = readableArray(ydoc.getArray('blocks-test'));
-
-		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
-		// persistence for? (e.g. Blocks.svelte, but not +page.server.js)
-		// TODO: Create a ydoc top-level map for non-block files we do want persistance for (e.g. +page.server.js)
-
-		listenToNumberOfCoders(yProvider.awareness);
-	}
-
-	onDestroy(() => destroy());
-
-	$: if ($yarrayStore && $openComponentName) setExtension($openComponentName);
+	let { ydoc, leave, yarrayStore, awareness, updateCodingPresence } = createYDoc();
+	onDestroy(() => leave());
 
 	$: syncWebContainerFileSystem($yarrayStore);
+	$: setComponentInEditor($openComponentName);
+	$: updateCodingPresence(showCodeEditor);
+	$: focusCodeEditing(showCodeEditor);
 
-	function setExtension(name: string) {
-		// First, find the Y.Text for the requested component name
-		let foundYtext: Y.Text | undefined;
+	/**
+	 * Set the ytext and ycollab extension for the open component
+	 * @param {string | null} name
+	 */
+	function setComponentInEditor(name) {
+		if (name === null) return;
+
+		/** @type {Y.Text | undefined} Find the Y.Text for the requested component name */
+		let foundYtext;
 		for (const ymap of $yarrayStore) {
-			if (ymap.get('name') === name) foundYtext = ymap.get('code') as Y.Text;
+			if (ymap.get('name') === name) foundYtext = /** @type {Y.Text} */ (ymap.get('code'));
 		}
+
 		if (foundYtext !== undefined) {
 			ytext = foundYtext;
-			yExtension = yCollab(ytext, yProvider.awareness);
+			yExtension = yCollab(ytext, awareness);
 		}
 	}
 
-	function deleteComponent(e: CustomEvent) {
+	/**
+	 * Delete a component from the yarray
+	 * @param {CustomEvent} e
+	 */
+	function deleteComponent(e) {
 		// First, find the index for the requested component name
 		const componentIndex = yFindGraphicIndex($yarrayStore, e.detail);
 		if (componentIndex === -1)
 			throw new Error(`Could not find index of component to delete, ${e.detail}`);
 
 		// This should all work because we enforce having blank text before and after all components
-		const textBlockBefore = yarrayStore.y.get(componentIndex - 1) as BlockMap;
-		const textBlockAfter = yarrayStore.y.get(componentIndex + 1) as BlockMap;
+		const textBlockBefore = /** @type {BlockMap} */ (yarrayStore.y.get(componentIndex - 1));
+		const textBlockAfter = /** @type {BlockMap} */ (yarrayStore.y.get(componentIndex + 1));
 		if (textBlockBefore.get('type') !== 'text' || textBlockAfter.get('type') !== 'text')
 			throw new Error('Expected text before and after component');
 
-		// Clone textBlockBefore to create a new Y.
-		const textBefore = textBlockBefore.get('text') as Y.XmlFragment;
-		const textAfter = textBlockAfter.get('text') as Y.XmlFragment;
+		// Clone textBlockBefore to create a new Y.XmlFragment
+		const textBefore = /** @type {Y.XmlFragment} */ (textBlockBefore.get('text'));
+		const textAfter = /** @type {Y.XmlFragment} */ (textBlockAfter.get('text'));
+
 		const newXmlFragment = new Y.XmlFragment();
-		for (let i = 0; i < textBefore.length; i++) {
-			newXmlFragment.push([textBefore.get(i)]);
-			console.log('pushed before', i);
-		}
-		for (let i = 0; i < textAfter.length; i++) {
-			newXmlFragment.push([textAfter.get(i)]);
-			console.log('pushed after', i);
-		}
+		for (let i = 0; i < textBefore.length; i++) newXmlFragment.push([textBefore.get(i).clone()]);
+		for (let i = 0; i < textAfter.length; i++) newXmlFragment.push([textAfter.get(i).clone()]);
 
 		const newMap = new Y.Map();
 		newMap.set('type', 'text');
 		newMap.set('text', newXmlFragment);
 
-		// Nothing is working here.
-		console.log(newMap);
-
-		return;
-
 		// Then, delete the component from the array
 		ydoc.transact(() => {
-			yarrayStore.y.delete(componentIndex - 1, 3);
-			yarrayStore.y.insert(newMap);
+			yarrayStore.y.insert(componentIndex - 1, [newMap]);
+			yarrayStore.y.delete(componentIndex, 3);
 		});
 	}
 
 	/**
-	 * Set up elements and dispatchers
+	 * Focus the code editor when it is shown
+	 * @param {boolean} showCodeEditor
 	 */
+	function focusCodeEditing(showCodeEditor) {
+		if (showCodeEditor) {
+			/** @type {HTMLElement} */
+			(codeEditorElement?.querySelector('[contenteditable=true]'))?.focus();
+		}
+	}
 
-	export let showCodeEditor: boolean;
-
-	let containerElement: HTMLElement;
-
-	// If the editor gets shown, focus the contenteditable element
-	// TODO: This is null for some reason
-	$: if (showCodeEditor && containerElement)
-		(containerElement.querySelector('[contenteditable=true]') as HTMLElement)?.focus();
-
-	function onKeyDown(e: KeyboardEvent) {
+	/**
+	 * Save the component when the user presses cmd+s
+	 * @param {KeyboardEvent} e
+	 */
+	function onKeyDown(e) {
 		if (e.metaKey && e.key === 's') {
 			e.preventDefault();
 			saveComponent($openComponentName, ytext.toString());
 		}
 	}
-
-	$: yProvider &&
-		yProvider.awareness.setLocalStateField('user', {
-			color: userColor,
-			name: userName,
-			coding: showCodeEditor
-		});
 </script>
 
 <div
 	class="code-editor position-{$codeEditorPosition}"
-	bind:this={containerElement}
+	bind:this={codeEditorElement}
 	class:show-editor={$codeEditorPosition !== 'center' || showCodeEditor}
 	role="none"
 	on:keydown={onKeyDown}

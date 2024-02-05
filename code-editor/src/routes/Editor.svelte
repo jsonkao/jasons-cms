@@ -5,6 +5,7 @@
 	 * It also places the Loading and Menubar components on top of the iframe.
 	 */
 
+	import { browser } from '$app/environment';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import Loading from '$lib/components/Loading.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
@@ -72,13 +73,15 @@
 
 <div class="container layout-{$codeEditorPosition}" class:showing-editor={showCodeEditor}>
 	<div class="code-container">
-		<CodeEditor
-			{showCodeEditor}
-			on:select-graphic={(e) => {
-				openComponentName.set(e.detail);
-				iframeElement?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*');
-			}}
-		/>
+		{#if browser}
+			<CodeEditor
+				{showCodeEditor}
+				on:select-graphic={(e) => {
+					openComponentName.set(e.detail);
+					iframeElement?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*');
+				}}
+			/>
+		{/if}
 	</div>
 
 	<div class="iframe-container">

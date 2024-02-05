@@ -3,13 +3,13 @@
 	import { openComponentName } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher } from 'svelte';
 
-	const TOTAL_HEIGHT = 300;
-
+	const MAX_HEIGHT = 300;
 	$: totalHeight = $blockHeights.reduce((acc, blockHeight) => acc + blockHeight.height, 0);
 
-	/** @param {number} scaledHeight */
-	const notTooBigOrSmall = (scaledHeight) =>
-		Math.max(10, Math.min(TOTAL_HEIGHT * 0.7, scaledHeight));
+	$: console.log($blockHeights)
+
+	/** We don't want the height to be too small or too big @param {number} scaledHeight */
+	const clampHeight = (scaledHeight) => Math.max(10, Math.min(MAX_HEIGHT * 0.7, scaledHeight));
 
 	const dispatch = createEventDispatcher();
 </script>
@@ -21,7 +21,7 @@
 		{:else if b.type === 'graphic'}
 			<div class="mini-graphic" class:focused={b.name === $openComponentName}>
 				<button
-					style:height="{notTooBigOrSmall(b.height / totalHeight) * TOTAL_HEIGHT}px"
+					style:height="{clampHeight((b.height / totalHeight) * MAX_HEIGHT)}px"
 					on:click={() => 'name' in b && dispatch('select-graphic', b.name)}
 				/>
 
