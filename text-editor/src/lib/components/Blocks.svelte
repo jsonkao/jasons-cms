@@ -2,12 +2,11 @@
 	import { browser } from '$app/environment';
 	import { postHeights, startHMRListening } from '$lib/post-heights.js';
 	import initialize from '$lib/ydoc/initialize.js';
-	import { prepareInsertion } from '$lib/ydoc/insert.js';
-	import { yFindIndex } from 'shared';
 	import { onMount } from 'svelte';
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor/index.svelte';
+	import { prosemirrorToYXmlFragment } from 'y-prosemirror';
 
 	/** @typedef {import('shared').BlockMap} BlockMap */
 
@@ -22,7 +21,8 @@
 
 	if (!browser) throw new Error('This component is only meant to be used in the browser');
 
-	const { ydoc, transactionOrigin, yarrayStore, createEditorForBlock, destroy } = initialize();
+	const { doc, createEditorForBlock, destroy } = initialize();
+	const { yarrayStore } = doc;
 
 	/**
 	 * Listen for messages from the parent window
@@ -41,8 +41,8 @@
 		}
 	}
 
+	// On first prosemirror editor mount, text from ysyncplugin might not have populated yet
 	$: if ($yarrayStore?.length > 0) {
-		// On first prosemirror editor mount, text from ysyncplugin might not have populated yet
 		setTimeout(() => postHeights(contentEl), 500);
 		postHeights(contentEl);
 	}
@@ -71,16 +71,18 @@
 	 */
 	function insertNewGraphic(e) {
 		const currentBlockMap = /** @type {BlockMap} */ (e.detail.activeYXmlFragment.parent);
-		const ymapIndex = yFindIndex(yarrayStore.y, currentBlockMap);
+		const ymapIndex = doc.indexOf(currentBlockMap);
 		if (ymapIndex === -1) throw new Error('Could not find the current block map');
 
-		const idAboutToBeDeleted = getId(yarrayStore.y.get(ymapIndex));
-		const newElements = prepareInsertion(e.detail, 'graphic' + idAboutToBeDeleted);
+		const { docNode, cursorPosition } = e.detail;
 
-		ydoc.transact(() => {
-			yarrayStore.y.delete(ymapIndex);
-			yarrayStore.y.insert(ymapIndex, newElements);
-		}, transactionOrigin);
+		const idAboutToBeDeleted = getId(yarrayStore.y.get(ymapIndex));
+
+		doc.insertGraphic(ymapIndex, {
+			name: 'graphic' + idAboutToBeDeleted,
+			textBefore: prosemirrorToYXmlFragment(docNode.cut(0, cursorPosition - 1)),
+			textAfter: prosemirrorToYXmlFragment(docNode.cut(cursorPosition + 1))
+		});
 	}
 </script>
 

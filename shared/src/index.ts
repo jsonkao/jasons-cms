@@ -1,3 +1,3 @@
-export * from "./readable-array.ts";
-export * from "./array.ts";
+export * from "./readable-array.js";
+export * from "./shared-doc.js";
 export type * from "./types.d.ts";

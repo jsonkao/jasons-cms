@@ -1,24 +1,24 @@
 <script>
 	import { svelte } from '@replit/codemirror-lang-svelte';
-	import { yFindGraphicIndex } from 'shared';
+	import { SharedDoc } from 'shared';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
 
 	// @ts-ignore
 	import { yCollab } from 'y-codemirror.next';
-	import * as Y from 'yjs';
 
 	import { browser } from '$app/environment';
-	import { codeEditorPosition, openComponentName } from '$lib/stores/code-editor.js';
-	import { syncWebContainerFileSystem, saveComponent } from '$lib/webcontainer/instance.js';
+	import { userColor, userName } from '$lib/constants.js';
+	import { codeEditorPosition, openComponentName, otherCoders } from '$lib/stores/code-editor.js';
+	import { saveComponent, syncWebContainerFileSystem } from '$lib/webcontainer/instance.js';
 	import { onDestroy } from 'svelte';
-	import PlacementButtons from './PlacementButtons.svelte';
 	import Minimap from './Minimap.svelte';
-	import { createYDoc } from '$lib/ydoc';
+	import PlacementButtons from './PlacementButtons.svelte';
 
 	if (!browser) throw new Error('This component should only be used in the browser.');
 
 	export let showCodeEditor = false;
+	const user = { color: userColor, name: userName };
 
 	/** @type {HTMLElement} */
 	let codeEditorElement;
@@ -29,11 +29,20 @@
 
 	/** @type {import('@codemirror/state').Extension} */
 	let yExtension;
-	/** @type {Y.Text} */
+	/** @type {import('yjs').Text} */
 	let ytext;
 
-	let { ydoc, leave, yarrayStore, awareness, updateCodingPresence } = createYDoc();
-	onDestroy(() => leave());
+	const doc = new SharedDoc(user);
+	const { yarrayStore } = doc;
+	doc.awareness.on('change', () =>
+		otherCoders.set(
+			[...doc.awareness.getStates().values()]
+				.map((state) => state.user)
+				.filter((user) => user && user.coding)
+		)
+	);
+
+	onDestroy(() => doc.destroy());
 
 	$: syncWebContainerFileSystem($yarrayStore);
 	$: setComponentInEditor($openComponentName);
@@ -47,15 +56,24 @@
 	function setComponentInEditor(name) {
 		if (name === null) return;
 
-		/** @type {Y.Text | undefined} Find the Y.Text for the requested component name */
+		/** @type {import('yjs').Text | undefined} Find the Y.Text for the requested component name */
 		let foundYtext;
 		for (const ymap of $yarrayStore) {
-			if (ymap.get('name') === name) foundYtext = /** @type {Y.Text} */ (ymap.get('code'));
+			if (ymap.get('name') === name) foundYtext = /** @type {import('yjs').Text} */ (ymap.get('code'));
 		}
 
 		if (foundYtext !== undefined) {
 			ytext = foundYtext;
-			yExtension = yCollab(ytext, awareness);
+			yExtension = yCollab(ytext, doc.awareness);
+		}
+	}
+
+	/**
+	 * @param {boolean} showCodeEditor
+	 */
+	function updateCodingPresence(showCodeEditor) {
+		if (showCodeEditor) {
+			doc.awareness.setLocalStateField('user', { ...user, coding: showCodeEditor });
 		}
 	}
 
@@ -64,38 +82,7 @@
 	 * @param {CustomEvent} e
 	 */
 	function deleteComponent(e) {
-		// First, find the index for the requested component name
-		const componentIndex = yFindGraphicIndex($yarrayStore, e.detail);
-		if (componentIndex === -1)
-			throw new Error(`Could not find index of component to delete, ${e.detail}`);
-
-		// This should all work because we enforce having blank text before and after all components
-		const textBlockBefore = /** @type {import('shared').BlockMap} */ (
-			yarrayStore.y.get(componentIndex - 1)
-		);
-		const textBlockAfter = /** @type {import('shared').BlockMap} */ (
-			yarrayStore.y.get(componentIndex + 1)
-		);
-		if (textBlockBefore.get('type') !== 'text' || textBlockAfter.get('type') !== 'text')
-			throw new Error('Expected text before and after component');
-
-		// Clone textBlockBefore to create a new Y.XmlFragment
-		const textBefore = /** @type {Y.XmlFragment} */ (textBlockBefore.get('text'));
-		const textAfter = /** @type {Y.XmlFragment} */ (textBlockAfter.get('text'));
-
-		const newXmlFragment = new Y.XmlFragment();
-		for (let i = 0; i < textBefore.length; i++) newXmlFragment.push([textBefore.get(i).clone()]);
-		for (let i = 0; i < textAfter.length; i++) newXmlFragment.push([textAfter.get(i).clone()]);
-
-		const newMap = new Y.Map();
-		newMap.set('type', 'text');
-		newMap.set('text', newXmlFragment);
-
-		// Then, delete the component from the array
-		ydoc.transact(() => {
-			yarrayStore.y.insert(componentIndex - 1, [newMap]);
-			yarrayStore.y.delete(componentIndex, 3);
-		});
+		doc.deleteComponent(e.detail);
 	}
 
 	/**
