@@ -11,23 +11,23 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/kit": "^2.0.0",
-		"esbuild-wasm": "0.20.0",
 		"prettier": "^3.2.4",
-		"prettier-plugin-svelte": "^3.1.2",
-		"svelte": "^4.2.7",
-		"vite": "^5.0.3"
+		"prettier-plugin-svelte": "^3.1.2"
 	},
 	"type": "module",
 	"dependencies": {
 		"@liveblocks/client": "^1.9.7",
 		"@liveblocks/yjs": "^1.9.7",
+		"@sveltejs/kit": "^2.5.0",
+		"esbuild-wasm": "^0.20.0",
 		"prosemirror-commands": "^1.5.2",
 		"prosemirror-keymap": "^1.2.2",
 		"prosemirror-model": "^1.19.4",
 		"prosemirror-state": "^1.4.3",
 		"prosemirror-view": "^1.32.7",
 		"shared": "file:shared-0.0.1.tgz",
+		"svelte": "^4.2.9",
+		"vite": "^5.0.12",
 		"y-prosemirror": "^1.2.2",
 		"yjs": "^13.6.11"
 	},
