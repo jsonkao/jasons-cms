@@ -17,8 +17,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@liveblocks/client": "^1.9.7",
-		"@liveblocks/yjs": "^1.9.7",
 		"@sveltejs/kit": "^2.5.0",
 		"esbuild-wasm": "^0.20.0",
 		"prosemirror-commands": "^1.5.2",

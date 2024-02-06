@@ -5,17 +5,18 @@
   "private": true,
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.d.ts"
+      "import": "./src/index.ts"
     },
     "./src/*": "./src/*"
   },
   "devDependencies": {
-    "typescript": "^4.9.5",
-    "yjs": "^13.6.11"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "@liveblocks/client": "^1.9.7",
     "@liveblocks/yjs": "^1.9.7"
+  },
+  "peerDependencies": {
+    "yjs": "13.x"
   }
 }

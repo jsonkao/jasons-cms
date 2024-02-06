@@ -1,6 +1,5 @@
 <script>
 	import { browser } from '$app/environment';
-	import Blocks from '$lib/components/Blocks.svelte';
 	import './styles.css';
 
 	/**
@@ -18,5 +17,7 @@
 <svelte:window on:keydown={onKeydown} />
 
 {#if browser}
-	<Blocks />
+	{#await import(`$lib/components/Blocks.svelte`) then { default: Blocks }}
+		<Blocks />
+	{/await}
 {/if}

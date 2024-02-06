@@ -34,6 +34,3 @@ export const userColor = colors[Math.floor(Math.random() * colors.length)];
 
 /** @type {string} Liveblocks room name (later will be dynamic) */
 export const LIVEBLOCKS_ROOM = 'my-room';
-
-/** @type {string} The key on a yjs doc where blocks data is stored */
-export const YJS_DATA_KEY = 'blocks';

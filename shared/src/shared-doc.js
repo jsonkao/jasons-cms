@@ -4,8 +4,6 @@ import * as Y from "yjs";
 import { BLOCKS_KEY } from "./constants.js";
 import { readableArray } from "./readable-array.js";
 
-console.log("shared/src/shared-doc.js");
-
 /** @typedef {import("./types.d.ts").BlockMap} BlockMap */
 
 const LIVEBLOCKS_ROOM = "my-room";
@@ -109,7 +107,7 @@ export class SharedDoc {
    * @param {number} index
    * @param {{ name: string, textBefore: Y.XmlFragment, textAfter: Y.XmlFragment }} configuration
    */
-  insertGraphic(index, { name, textBefore, textAfter }) {
+  insertGraphicSandwich(index, { name, textBefore, textAfter }) {
     const newElements = [
       makeTextBlock(textBefore),
       makeCodingBlock(

@@ -80,9 +80,8 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 			const packageFilePath =
 				`${cwd}/${file}` + packageFile.path.split('shared')[1] + '/' + packageFile.name;
 
-			console.log(`Adding ${packageFilePath}`);
-
 			if (packageFile.isFile()) {
+				console.log(`Adding ${packageFilePath}`);
 				zip.addFile(packageFilePath.replace('../text-editor/', ''), fs.readFileSync(packageFilePath));
 			}
 		}

@@ -1,12 +1,12 @@
 <script>
 	import { browser } from '$app/environment';
 	import { postHeights, startHMRListening } from '$lib/post-heights.js';
-	import { SharedDocForProsemirror } from '$lib/ydoc/index.js';
+	import { SharedDocForProsemirror, getId } from '$lib/prosemirror/index.js';
 	import { onMount } from 'svelte';
+
 	import Component from './Component.svelte';
 	import FloatingMenu from './FloatingMenu.svelte';
 	import ProsemirrorEditor from './ProsemirrorEditor/index.svelte';
-	import { prosemirrorToYXmlFragment } from 'y-prosemirror';
 
 	/** @typedef {import('shared').BlockMap} BlockMap */
 
@@ -23,8 +23,6 @@
 
 	const doc = new SharedDocForProsemirror();
 	const { yarrayStore } = doc;
-
-	$: console.log(doc, $yarrayStore)
 
 	/**
 	 * Listen for messages from the parent window
@@ -57,35 +55,6 @@
 
 	/** @param {BlockMap} blockMap */
 	const getName = (blockMap) => /** @type {string} */ (blockMap.get('name'));
-
-	/**
-	 * Uses internal ID to create a unique key for each block
-	 * @param {BlockMap} blockMap
-	 */
-	const getId = (blockMap) => {
-		if (blockMap._item === null) throw new Error('I thought Y.Map._item would never be null');
-		return Object.values(blockMap._item.id).join('_');
-	};
-
-	/**
-	 * Insert new graphic block
-	 * @param {CustomEvent<BlockInsertionParams>} e
-	 */
-	function insertNewGraphic(e) {
-		const currentBlockMap = /** @type {BlockMap} */ (e.detail.activeYXmlFragment.parent);
-		const ymapIndex = doc.indexOf(currentBlockMap);
-		if (ymapIndex === -1) throw new Error('Could not find the current block map');
-
-		const { docNode, cursorPosition } = e.detail;
-
-		const idAboutToBeDeleted = getId(yarrayStore.y.get(ymapIndex));
-
-		doc.insertGraphic(ymapIndex, {
-			name: 'graphic' + idAboutToBeDeleted,
-			textBefore: prosemirrorToYXmlFragment(docNode.cut(0, cursorPosition - 1)),
-			textAfter: prosemirrorToYXmlFragment(docNode.cut(cursorPosition + 1))
-		});
-	}
 </script>
 
 <svelte:window on:message={onMessage} />
@@ -104,4 +73,4 @@
 	{/each}
 </div>
 
-<FloatingMenu on:insert={insertNewGraphic} />
+<FloatingMenu on:insert={(e) => doc.insertGraphic(e.detail)} />
