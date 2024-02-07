@@ -6,7 +6,7 @@ import { userColor, userName } from '$lib/generated/globals.js';
 
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Plugin } from 'prosemirror-state';
-import { IndestructibleUndoManager, SharedDoc } from 'shared/src/shared-doc.js';
+import { IndestructibleUndoManager, SharedDoc } from '$lib/shared-doc.js';
 import {
 	redo,
 	undo,
