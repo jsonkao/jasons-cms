@@ -9,7 +9,12 @@ export default defineConfig({
 			'prosemirror-transform',
 			'prosemirror-model',
 			'prosemirror-view',
-			'shared' // prevents double-mounting from vite optimizing
+			'prosemirror-keymap',
+			'y-prosemirror',
+			'prosemirror-commands',
+			'@liveblocks/client',
+			'@liveblocks/yjs',
+			'yjs'
 		]
 	},
 	// Normally this would be unnecessary, but we

@@ -83,8 +83,6 @@ async function boot() {
 		// Invalidate previous base URL because the URL might be the same, but we want to re-source the iframe.
 		// I'm not exactly sure what's going on but this makes it work
 		iframeUrl.set({ url, timeUpdated: Date.now() });
-		console.log('setting base to', { url, timeUpdated: Date.now() });
-		console.log('k ready at', url, port);
 	});
 	webcontainer.on('error', ({ message }) => {
 		console.error('WebContainer error:', message);
@@ -128,7 +126,7 @@ export async function syncWebContainerFileSystem(yarray) {
 
 	/** @type {Array<{ filename: string, code: string, alreadyExists: boolean }>} */
 	const allGraphics = [];
-	console.log('yarray', yarray);
+
 	yarray.forEach((blockMap) => {
 		if (blockMap.get('type') !== 'graphic') return;
 
@@ -138,7 +136,6 @@ export async function syncWebContainerFileSystem(yarray) {
 		allGraphics.push({ filename, code, alreadyExists: currentGraphics.includes(filename) });
 	});
 
-	// console.log({ currentGraphics, allGraphics });
 	const graphicsToDelete = currentGraphics.filter(
 		(filename) => filename.endsWith('.svelte') && !allGraphics.some((b) => b.filename === filename)
 	);

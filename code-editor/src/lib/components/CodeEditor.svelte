@@ -1,6 +1,6 @@
 <script>
 	import { svelte } from '@replit/codemirror-lang-svelte';
-	import { SharedDoc } from 'shared';
+	import { SharedDoc } from '$lib/shared/shared-doc.js';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
 

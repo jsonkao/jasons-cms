@@ -46,7 +46,6 @@
 		"@liveblocks/yjs": "^1.9.7",
 		"@replit/codemirror-lang-svelte": "^6.0.0",
 		"@webcontainer/api": "^1.1.8",
-		"shared": "file:../shared",
 		"svelte-codemirror-editor": "^1.2.0",
 		"thememirror": "^2.0.1",
 		"y-codemirror.next": "^0.3.2",
