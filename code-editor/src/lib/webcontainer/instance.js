@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
-import { GENERATED_PATH, STEPS } from '$lib/constants.js';
+import { GENERATED_PATH, STEPS, LIVEBLOCKS_ROOM } from '$lib/constants.js';
 import { iframeUrl, currentStep } from '$lib/stores/status.js';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
@@ -102,7 +102,7 @@ async function mount() {
 	// Clear the /src/lib/generated directory
 	await webcontainer.fs.rm(GENERATED_PATH, { recursive: true });
 	await webcontainer.fs.mkdir(GENERATED_PATH);
-	await writeGlobals(webcontainer);
+	await writeGlobals(webcontainer, LIVEBLOCKS_ROOM);
 }
 
 /**

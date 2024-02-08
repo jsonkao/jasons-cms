@@ -25,9 +25,10 @@ export async function fetchTemplateFiles() {
 /**
  * Write a globals file with constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
  * @param {import('@webcontainer/api').WebContainer} webcontainerInstance - The WebContainer instance
+ * @param {string} liveblocksRoom - The Liveblocks room ID
  */
-export function writeGlobals(webcontainerInstance) {
-	const variables = { userName, userColor, LIVEBLOCKS_ROOM };
+export function writeGlobals(webcontainerInstance, liveblocksRoom) {
+	const variables = { userName, userColor, LIVEBLOCKS_ROOM: liveblocksRoom };
 	return webcontainerInstance.fs.writeFile(
 		`${GENERATED_PATH}/globals.js`,
 		Object.keys(variables)

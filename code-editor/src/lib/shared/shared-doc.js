@@ -2,11 +2,10 @@ import { createClient } from "@liveblocks/client";
 import LiveblocksProvider from "@liveblocks/yjs";
 import * as Y from "yjs";
 import { BLOCKS_KEY } from "./constants.js";
+import { LIVEBLOCKS_ROOM } from "$lib/constants.js";
 import { readableArray } from "./readable-array.js";
 
 /** @typedef {import("./types.d.ts").BlockMap} BlockMap */
-
-const LIVEBLOCKS_ROOM = "my-room";
 
 export class SharedDoc {
   /** @type {import('y-protocols').Awareness} */
