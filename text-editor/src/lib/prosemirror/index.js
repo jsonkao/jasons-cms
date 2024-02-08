@@ -21,8 +21,6 @@ import { FloatingMenuPlugin } from './floating-menu.js';
 import { richTextKeyMap } from './keymap.js';
 import { richTextSchema } from './schema.ts';
 
-/** @typedef {import('shared').BlockMap} BlockMap */
-
 export class SharedDocForProsemirror extends SharedDoc {
 	constructor() {
 		super({ color: userColor, name: userName });
@@ -40,10 +38,10 @@ export class SharedDocForProsemirror extends SharedDoc {
 		/** @type {IndestructibleUndoManager} */ (this.undoManager).actuallyDestroy();
 	};
 
-	/** @param {BlockMap} blockMap */
-	createEditorForBlock(blockMap) {
+	/** @param {import('yjs').XmlFragment} fragment */
+	createEditorForBlock(fragment) {
 		return createEditor([
-			ySyncPlugin(/** @type {import('yjs').XmlFragment} */ (blockMap.get('text'))),
+			ySyncPlugin(fragment),
 			yCursorPlugin(this.awareness, { cursorBuilder, selectionBuilder }),
 			yUndoPlugin({ undoManager: this.undoManager })
 		]);
@@ -65,13 +63,15 @@ export class SharedDocForProsemirror extends SharedDoc {
 	}
 }
 
+export const doc = new SharedDocForProsemirror();
+
 /**
  * Uses internal ID to create a unique key for each block
- * @param {BlockMap} blockMap
+ * @param {import('yjs').Map<any> | import('yjs').XmlFragment} yjsThing
  */
-export function getId(blockMap) {
-	if (blockMap._item === null) throw new Error('I thought Y.Map._item would never be null');
-	return Object.values(blockMap._item.id).join('_');
+export function getId(yjsThing) {
+	if (yjsThing._item === null) throw new Error('I thought Y.Map._item would never be null');
+	return Object.values(yjsThing._item.id).join('_');
 }
 
 /**

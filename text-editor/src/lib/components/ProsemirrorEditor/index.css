@@ -1,12 +1,16 @@
+p {
+	margin: 0;
+}
+
 /* Styles for internal prosemirror DOM elements */
 
-.ui-editor:not(.editor_empty):first-child,
-.ui-editor.ProseMirror-focused:first-child {
+.content > .ui-editor:not(.editor_empty):first-child,
+.content > .ui-editor.ProseMirror-focused:first-child {
 	margin-top: 60px;
 }
 
-.ui-editor:not(.editor_empty):last-child,
-.ui-editor.ProseMirror-focused:last-child {
+.content > .ui-editor:not(.editor_empty):last-child,
+.content > .ui-editor.ProseMirror-focused:last-child {
 	padding-bottom: 60px;
 }
 
@@ -15,13 +19,13 @@
 	margin: 0 auto;
 }
 
-.ui-editor p,
-.ui-editor h1 {
+.content > .ui-editor p,
+.content > .ui-editor h1 {
 	margin: 1.5rem auto;
 	width: calc(100% - 30px);
 }
 
-.ui-editor p {
+.content > .ui-editor p {
 	max-width: 520px;
 }
 
@@ -52,7 +56,7 @@
 }
 
 /* Empty ui-editors should take up zero space */
-.ui-editor.editor_empty:not(.ProseMirror-focused) p:not(:has(.cm-ySelectionCaret)) {
+.content > .ui-editor.editor_empty:not(.ProseMirror-focused) p:not(:has(.cm-ySelectionCaret)) {
 	height: 0;
 	margin: 0;
 }

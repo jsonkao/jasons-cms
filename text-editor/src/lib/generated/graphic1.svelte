@@ -1,4 +1,7 @@
 <script>
+	/** @type {import('yjs').Map<any>} */
+	export let prose;
+
 	import { onMount } from 'svelte';
 
 	let count = 0;
