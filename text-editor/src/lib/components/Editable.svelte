@@ -1,7 +1,8 @@
 <script>
 	import { lastTextFocused } from '$lib/stores.js';
 	import { doc, getId } from '$lib/prosemirror/index.js';
-	import ProsemirrorEditor from './ProsemirrorEditor/index.svelte';
+	import { makeFragment } from '$lib/shared/shared-doc.js';
+	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
 	/** @type {import('yjs').XmlFragment | undefined} */
 	export let fragment = undefined;
@@ -17,6 +18,7 @@
 
 	if (!fragment) {
 		if (prose && key) {
+			if (!prose.has(key)) prose.set(key, makeFragment('Write here...'));
 			fragment = prose.get(key);
 		} else {
 			throw new Error('fragment or prose and key must be provided');

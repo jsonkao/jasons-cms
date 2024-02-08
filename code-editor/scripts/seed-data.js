@@ -132,8 +132,6 @@ async function populateRoomWithData() {
 		ymap.set('code', new Y.Text(code));
 
 		const proseMap = new Y.Map();
-		// TODO: do not hardcode these keys
-		['setup', 'detail', 'sweep', 'prose'].forEach((key) => proseMap.set(key, makeFragment('testvalue ' + key)));
 		ymap.set('prose', proseMap);
 
 		return ymap;

@@ -28,11 +28,12 @@ export class SharedDoc {
 		const client = createClient({
 			publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
 		});
-		const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, { initialPresence: { user } });
+		const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, { initialPresence: {} });
 		this.leave = leave;
 
 		this.ydoc = new Y.Doc();
 		this.awareness = new LiveblocksProvider(room, this.ydoc).awareness;
+		this.awareness.setLocalStateField('user', user);
 
 		this.yarray = this.ydoc.getArray(BLOCKS_KEY);
 		this.yarrayStore = readableArray(this.yarray);
@@ -194,4 +195,23 @@ export function makeCodingBlock(name, code) {
 	ymap.set('name', name);
 	ymap.set('code', new Y.Text(code));
 	return ymap;
+}
+
+/**
+ * TODO: dedupe
+ * @param {string} initialContent
+ * @param {string} [headline]
+ * @returns {import('yjs').XmlFragment}
+ */
+export function makeFragment(initialContent, headline = '') {
+	const yxmlFragment = new Y.XmlFragment();
+	const yxmlElement = new Y.XmlElement('paragraph');
+	yxmlElement.insert(0, [new Y.XmlText(initialContent)]);
+	yxmlFragment.insert(0, [yxmlElement]);
+	if (headline) {
+		const yxmlElement = new Y.XmlElement('headline');
+		yxmlElement.insert(0, [new Y.XmlText(headline)]);
+		yxmlFragment.insert(0, [yxmlElement]);
+	}
+	return yxmlFragment;
 }

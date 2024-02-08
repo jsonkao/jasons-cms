@@ -16,7 +16,6 @@
 
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { EditorView } from 'prosemirror-view';
-	import './index.css';
 
 	const dispatch = createEventDispatcher();
 

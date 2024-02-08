@@ -2,8 +2,6 @@
 	/** @type {import('yjs').Map<any>} */ export let prose;
 
 	import Editable from '$lib/components/Editable.svelte';
-
-	console.log(prose);
 </script>
 
 <div class="container">
@@ -11,7 +9,7 @@
 		<div />
 	</div>
 	<div class="foreground">
-		{#each ['setup', 'detail', 'sweep'] as key}
+		{#each ['can', 'be', 'any', 'thing'] as key}
 			<section>
 				<Editable {prose} {key} />
 			</section>

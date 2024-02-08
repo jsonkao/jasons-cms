@@ -1,5 +1,6 @@
 <script>
 	import { browser } from '$app/environment';
+	import './prosemirror.css';
 	import './styles.css';
 
 	/**
