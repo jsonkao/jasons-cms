@@ -11,12 +11,5 @@
   },
   "devDependencies": {
     "typescript": "^4.9.5"
-  },
-  "dependencies": {
-    "@liveblocks/client": "^1.9.7",
-    "@liveblocks/yjs": "^1.9.7"
-  },
-  "peerDependencies": {
-    "yjs": "13.x"
   }
 }
