@@ -1,10 +1,10 @@
 import { createClient } from '@liveblocks/client';
 import { Liveblocks as LiveblocksNode } from '@liveblocks/node';
 import LiveblocksProvider from '@liveblocks/yjs';
-import { BLOCKS_KEY } from 'shared/src/constants.js';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
 import { LIVEBLOCKS_ROOM } from '../src/lib/constants.js';
+import { BLOCKS_KEY } from '../src/lib/shared/constants.js';
 
 const TESTING = process.argv.includes('--test');
 
@@ -85,11 +85,9 @@ async function populateRoomWithData() {
 	/**
 	 * @param {string} initialContent
 	 * @param {string} [headline]
-	 * @returns {Y.Map<Y.XmlFragment>}
+	 * @returns {Y.XmlFragment}
 	 */
-	function makeTextBlock(initialContent, headline = '') {
-		const ymap = new Y.Map();
-
+	function makeFragment(initialContent, headline = '') {
 		const yxmlFragment = new Y.XmlFragment();
 		const yxmlElement = new Y.XmlElement('paragraph');
 		yxmlElement.insert(0, [new Y.XmlText(initialContent)]);
@@ -99,9 +97,18 @@ async function populateRoomWithData() {
 			yxmlElement.insert(0, [new Y.XmlText(headline)]);
 			yxmlFragment.insert(0, [yxmlElement]);
 		}
+		return yxmlFragment;
+	}
 
+	/**
+	 * @param {string} initialContent
+	 * @param {string} [headline]
+	 * @returns {Y.Map<Y.XmlFragment>}
+	 */
+	function makeTextBlock(initialContent, headline = '') {
+		const ymap = new Y.Map();
 		ymap.set('type', 'text');
-		ymap.set('text', yxmlFragment);
+		ymap.set('text', makeFragment(initialContent, headline));
 
 		return ymap;
 	}
@@ -110,19 +117,25 @@ async function populateRoomWithData() {
 		await new Promise((r) => setTimeout(r, 2000));
 		console.log('Testing...');
 		console.log('  - length:', yarray.length);
-		console.log('  - content:', JSON.stringify(yarray.toJSON()));
+		console.log('  - content:', JSON.stringify(yarray.toJSON(), null, 2));
 	}
-}
 
-/**
- * @param {string} name
- * @param {string} code
- * @returns {BlockMap}
- */
-export function makeCodingBlock(name, code) {
-	const ymap = new Y.Map();
-	ymap.set('type', 'graphic');
-	ymap.set('name', name);
-	ymap.set('code', new Y.Text(code));
-	return ymap;
+	/**
+	 * @param {string} name
+	 * @param {string} code
+	 * @returns {BlockMap}
+	 */
+	function makeCodingBlock(name, code) {
+		const ymap = new Y.Map();
+		ymap.set('type', 'graphic');
+		ymap.set('name', name);
+		ymap.set('code', new Y.Text(code));
+
+		const proseMap = new Y.Map();
+		// TODO: do not hardcode these keys
+		['setup', 'detail', 'sweep', 'prose'].forEach((key) => proseMap.set(key, makeFragment('testvalue ' + key)));
+		ymap.set('prose', proseMap);
+
+		return ymap;
+	}
 }

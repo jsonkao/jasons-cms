@@ -204,7 +204,31 @@ function log_stream() {
  * @param {string} contents - The content of the file
  */
 export async function writeFile(path, contents) {
+	if (path.endsWith('.svelte')) {
+		contents = reallyHackyStuff(contents);
+	}
+
 	await webcontainer.fs.writeFile(path, contents);
+}
+
+/**
+ * A helper to do some really hacky stuff to the contents of a file.
+ * @param {string} contents - The content of the file
+ * @returns {string} - The content of the file with some really hacky stuff done to it
+ */
+function reallyHackyStuff(contents) {
+	// Accept props to remove warnings
+	contents = contents.replace(
+		'<script>',
+		`<script>/** @type {import('yjs').Map<any>} */ export let prose;`
+	);
+
+	// Shove in prose prop to Editable componets for convenience
+	if (contents.includes('<Editable ')) {
+		contents = contents.replace('<Editable ', `<Editable {prose}`);
+	}
+
+	return contents;
 }
 
 /**
