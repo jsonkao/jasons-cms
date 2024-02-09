@@ -14,12 +14,12 @@ const cwd = '../text-editor';
 
 console.time('install');
 if (!!process.env.VERCEL) {
-	// Delete symlink to shared package
-	execSync('npm uninstall shared');
+	// Delete symlink to shared package (COMMENTED OUT BC WE'RE NOT USING SHARED ANYMORE)
+	// execSync('npm uninstall shared');
 	// Omitting prettier dev dependencies reduces bundle size by 2MB lol (is now 7MB).
 	execSync('rm -rf node_modules package-lock.json && npm i --omit=dev', { cwd });
-	// Install shared package as real local package
-	execSync('npm install $(npm pack ../shared | tail -1)', { cwd });
+	// Install shared package as real local package (COMMENTED OUT BC WE'RE NOT USING SHARED ANYMORE)
+	// execSync('npm install $(npm pack ../shared | tail -1)', { cwd });
 } else if (!fs.existsSync(cwd + '/node_modules')) {
 	execSync('npm ci', { cwd });
 }
@@ -35,7 +35,17 @@ const ignored_directories = [
 	'.svelte-kit',
 	'node_modules/.bin',
 	'node_modules/rollup/dist/shared',
-	'lib0/coverage'
+	'lib0/coverage',
+
+	// In local development, we do want dev dependencies installed; but we don't need them in the webcontainer
+	'node_modules/typescript',
+	'node_modules/prettier',
+	'node_modules/svelte-check',
+	'node_modules/prettier-plugin-svelte',
+
+	// Vite requires esbuild, but we use the esbuild-wasm package instead
+	'node_modules/esbuild',
+	'node_modules/@esbuild'
 ];
 
 const ignored_files = new Set([
@@ -53,14 +63,6 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 
 	if (ignored_files.has(file)) {
 		ignored_files.delete(file);
-		continue;
-	}
-
-	if (
-		file.startsWith('node_modules/esbuild/') ||
-		file.startsWith('node_modules/@esbuild/') ||
-		(false && file.startsWith('node_modules/yjs/dist/') && file.endsWith('.map'))
-	) {
 		continue;
 	}
 
