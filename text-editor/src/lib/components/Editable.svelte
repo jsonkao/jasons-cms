@@ -4,6 +4,9 @@
 	import { makeFragment } from '$lib/shared/shared-doc.js';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
+	/** @type {boolean} */
+	export let hasFloatingMenu = false;
+
 	/** @type {import('yjs').XmlFragment | undefined} */
 	export let fragment = undefined;
 
@@ -29,5 +32,5 @@
 <ProsemirrorEditor
 	bind:this={pmEditors[getId(fragment)]}
 	on:blur={() => lastTextFocused.set(getId(fragment))}
-	editorStateCreator={() => doc.createEditorForBlock(fragment)}
+	editorStateCreator={() => doc.createEditorForBlock(fragment, { hasFloatingMenu })}
 />

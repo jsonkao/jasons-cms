@@ -60,7 +60,7 @@
 			<Component name={getName(blockMap)} {blockMap} />
 		{:else if blockMap.get('type') === 'text'}
 			{@const fragment = /** @type {import('yjs').XmlFragment} */ (blockMap.get('text'))}
-			<Editable {pmEditors} {fragment} />
+			<Editable {pmEditors} {fragment} hasFloatingMenu />
 		{/if}
 	{/each}
 </div>

@@ -38,13 +38,18 @@ export class SharedDocForProsemirror extends SharedDoc {
 		/** @type {IndestructibleUndoManager} */ (this.undoManager).actuallyDestroy();
 	};
 
-	/** @param {import('yjs').XmlFragment} fragment */
-	createEditorForBlock(fragment) {
-		return createEditor([
+	/**
+	 * @param {import('yjs').XmlFragment} fragment
+	 * @param {{ hasFloatingMenu?: boolean }} [options]
+	 */
+	createEditorForBlock(fragment, { hasFloatingMenu = false } = {}) {
+		const plugins = [
 			ySyncPlugin(fragment),
 			yCursorPlugin(this.awareness, { cursorBuilder, selectionBuilder }),
 			yUndoPlugin({ undoManager: this.undoManager })
-		]);
+		];
+		if (hasFloatingMenu) plugins.push(FloatingMenuPlugin());
+		return createEditor(plugins);
 	}
 
 	/** @param {BlockInsertionParams} params */
@@ -89,8 +94,7 @@ export function createEditor(plugins) {
 				'Mod-y': redo,
 				'Mod-Shift-z': redo
 			}),
-			richTextKeyMap(richTextSchema),
-			FloatingMenuPlugin()
+			richTextKeyMap(richTextSchema)
 		]
 	});
 }

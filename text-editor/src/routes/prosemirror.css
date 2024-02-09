@@ -46,13 +46,15 @@ p {
 	letter-spacing: -0.04em;
 }
 
-/* Use this instead of Prosemirror's built in placeholder to account for multiline content */
-.ui-editor.ProseMirror-focused p:has(br:only-child):before {
-	/* position: absolute;
-	content: 'Press ‘/’ for commands…';
+/*
+ * Use CSS to create a placeholder inside of graphic Editables, which don't use the floating menu placeholder.
+ * Also, this is better than Prosemirror's built in placeholder bc it accounts for multiline content 
+ */
+div[data-name] .ui-editor.ProseMirror-focused p:has(br:only-child):before {
+	position: absolute;
+	content: 'Write something…';
 	pointer-events: none;
 	color: #aaa;
-	z-index: -1; */
 }
 
 /* Empty ui-editors should take up zero space */
