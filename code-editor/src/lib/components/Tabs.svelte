@@ -34,7 +34,6 @@
 	}
 
 	button {
-		-webkit-font-smoothing: antialiased;
 		background: none;
 		padding: 0;
 		cursor: pointer;
@@ -42,7 +41,6 @@
 		display: block;
 		margin-right: 7px;
 		color: white;
-		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 		font-size: 0.7rem;
 		opacity: 0.6;
 		transition-duration: 0.3s;

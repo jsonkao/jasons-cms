@@ -1,7 +1,7 @@
 <script>
 	// SEED REMOVE START
 	/** @type {import('yjs').Map<any>} */ export let prose;
-	import Editable from '$lib/components/Editable.svelte';
+	// import Editable from '$lib/components/Editable.svelte';
 	// SEED REMOVE END
 
 	const copy = [
@@ -9,10 +9,12 @@
 		'This is the story of a horrendous injustice and the three people who tried to expose it. It begins with a suicide note.'
 	];
 
-	const images = [
-		'PPUB-001-louisiana_fifth-papers-1',
-		'PPUB-001-louisiana_fifth-papers-2',
-		'PPUB-001-louisiana_fifth-papers-3'
+	const backgroundImage =
+		'https://static.propublica.org/projects/graphics/2023-la-5th-circuit/backgrounds/1200.webp';
+	const foregroundImages = [
+		'https://static.propublica.org/projects/graphics/2023-la-5th-circuit/layers/PPUB-001-louisiana_fifth-papers-1.webp',
+		'https://static.propublica.org/projects/graphics/2023-la-5th-circuit/layers/PPUB-001-louisiana_fifth-papers-2.webp',
+		'https://static.propublica.org/projects/graphics/2023-la-5th-circuit/layers/PPUB-001-louisiana_fifth-papers-3.webp'
 	];
 
 	let scrollY = 0;
@@ -22,23 +24,17 @@
 
 <div class="paper-opener">
 	<div class="images">
-		<img
-			src="https://static.propublica.org/projects/graphics/2023-la-5th-circuit/backgrounds/1200.webp"
-		/>
+		<img src={backgroundImage} />
 
-		{#each images as name, i}
-			<img
-				src="https://static.propublica.org/projects/graphics/2023-la-5th-circuit/layers/{name}.webp"
-				style="transform: translateY({(0.15 + i * 0.1) * scrollY}px);"
-			/>
+		{#each foregroundImages as src, i}
+			<img {src} style="transform: translateY({(0.15 + i * 0.1) * scrollY}px);" />
 		{/each}
 	</div>
 
 	<div class="copy">
 		{#each [0, 1] as index}
-			<div style="top: {index === 0 ? 6 : 53}%">
+			<div>
 				<p>{copy[index]}</p>
-				<!-- <Editable {prose} key={index.toString()} /> -->
 			</div>
 		{/each}
 	</div>
@@ -72,9 +68,11 @@
 		max-width: 520px;
 		left: 50%;
 		transform: translateX(-50%);
+		top: 6%;
 	}
 
 	.copy div:last-child {
 		color: white;
+		top: 53%;
 	}
 </style>

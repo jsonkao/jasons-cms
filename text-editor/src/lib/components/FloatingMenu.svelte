@@ -33,10 +33,6 @@
 		padding: 0;
 		border: none;
 		background: none;
-		-webkit-font-smoothing: antialiased;
-		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-		font-size: 1.1rem;
-		line-height: 1.5;
 		color: #aaa;
 		margin: 0;
 	}

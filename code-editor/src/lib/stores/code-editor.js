@@ -16,7 +16,7 @@ export const openGlobalFile = writable(null);
  * @type {import('svelte/store').Writable<'center' | 'left' | 'bottom'>}
  * The graphic in focus (and whose code is in the CodeEditor)
  */
-export const codeEditorPosition = writable('center');
+export const codeEditorPosition = writable('left');
 
 /**
  * @type {import('svelte/store').Writable<Array<{ user: string, color: string }>}

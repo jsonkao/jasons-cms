@@ -14,6 +14,7 @@
 	import { onDestroy } from 'svelte';
 	import Minimap from './Minimap.svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
+	import './index.css';
 
 	if (!browser) throw new Error('This component should only be used in the browser.');
 

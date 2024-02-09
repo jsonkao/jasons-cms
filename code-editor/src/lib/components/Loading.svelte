@@ -56,11 +56,6 @@
 	}
 
 	p {
-		-webkit-font-smoothing: antialiased;
-		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-		font-size: 1.1rem;
-		line-height: 1.5;
-		color: #121212;
 		margin: 0;
 	}
 

@@ -2,23 +2,38 @@
 	import { codeEditorPosition } from '$lib/stores/code-editor.js';
 </script>
 
-<div class="placement-buttons">
-	{#each ['center', 'left', 'bottom'] as position}
-		<button class="position-{position}" on:click={() => codeEditorPosition.set(position)} />
-	{/each}
+<div class="footer">
+	<p title="Updates the page">cmd+s saves</p>
+	<div class="placement-buttons">
+		{#each ['center', 'left', 'bottom'] as position}
+			<button class="position-{position}" on:click={() => codeEditorPosition.set(position)} />
+		{/each}
+	</div>
 </div>
 
 <style>
-	.placement-buttons {
+	.footer {
 		margin-right: 15px;
 		margin-bottom: 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 5px;
-		z-index: 3;
 		position: absolute;
 		bottom: 0;
 		right: 0;
+		z-index: 3;
+		display: flex;
+		align-items: flex-end;
+		gap: 8px;
+	}
+
+	p {
+		color: white;
+		opacity: 0.6;
+		margin: 0;
+	}
+
+	.placement-buttons {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
 	}
 
 	button {

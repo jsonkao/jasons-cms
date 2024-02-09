@@ -1,18 +1,18 @@
 <script>
-	/** @type {import('yjs').Map<any>} */ export let prose;
-
-	import Editable from '$lib/components/Editable.svelte';
+	const copy = [
+		'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis risus ullamcorper massa ullamcorper euismod.',
+		'Nam quis elementum tortor. Proin eleifend orci vitae turpis bibendum, ultricies consectetur ex fermentum.',
+	]
 </script>
 
 <div class="container">
 	<div class="background">
-		<div />
+		<img src="https://static01.nytimes.com/newsgraphics/2023-01-20-asian-american-vote/171b03eeed7dcd32bb30326f4767e229c13601e6/_assets/basemaps/Brooklyn-fs8.png" />
+		<img src="https://static01.nytimes.com/newsgraphics/2023-01-20-asian-american-vote/171b03eeed7dcd32bb30326f4767e229c13601e6/_assets/precincts/Brooklyn/2022.svg" />
 	</div>
 	<div class="foreground">
-		{#each ['can', 'be', 'any', 'thing'] as key}
-			<section>
-				<Editable {prose} {key} />
-			</section>
+		{#each copy as text}
+			<p>{text}</p>
 		{/each}
 	</div>
 </div>
@@ -27,15 +27,16 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 100vh;
-		top: 0;
+		height: 90vh;
+		top: 5vh;
 		z-index: -1;
 	}
 
-	.background div {
-		height: calc(100vh - 40px);
-		width: min(840px, calc(100% - 40px));
-		background: wheat;
+	.background img {
+		height: 100%;
+		width: 100%;
+		object-fit: contain;
+		position: absolute;
 	}
 
 	.foreground {
@@ -43,10 +44,7 @@
 		padding-bottom: 10vh;
 	}
 
-	section {
-		font-family: Arial;
-		font-size: 20px;
-		line-height: 1.5;
+	p {
 		background: white;
 		margin: 0 auto 60vh;
 		max-width: 520px;

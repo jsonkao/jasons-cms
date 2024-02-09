@@ -68,7 +68,7 @@
 		left: 0;
 		display: flex;
 		flex-direction: column-reverse;
-		gap: 8px;
+		gap: 4px;
 	}
 
 	.manual-container {
@@ -86,10 +86,6 @@
 	}
 
 	.manual-container p {
-		-webkit-font-smoothing: antialiased;
-		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-		font-size: 1.1rem;
-		line-height: 1.5;
 		width: auto;
 		margin-top: 0;
 	}
@@ -143,9 +139,6 @@
 		display: inline;
 		font-size: 1rem;
 		line-height: 1;
-		-webkit-font-smoothing: antialiased;
-		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-		color: black;
 	}
 
 	button,
