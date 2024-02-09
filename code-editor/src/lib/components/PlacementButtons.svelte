@@ -26,7 +26,9 @@
 
 	p {
 		color: white;
-		opacity: 0.6;
+		opacity: 0.3;
+		line-height: 1;
+		font-size: 1em;
 		margin: 0;
 	}
 

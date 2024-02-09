@@ -35,6 +35,7 @@
 		background: none;
 		color: #aaa;
 		margin: 0;
+		font-size: inherit;
 	}
 
 	button {
