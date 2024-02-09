@@ -30,11 +30,12 @@ export class SharedDoc {
     const client = createClient({
       publicApiKey: "pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A",
     });
-    const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, { initialPresence: { user } });
+    const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, { initialPresence: {} });
     this.leave = leave;
 
     this.ydoc = new Y.Doc();
     this.awareness = new LiveblocksProvider(room, this.ydoc).awareness;
+		this.awareness.setLocalStateField('user', user);
 
     this.yarray = this.ydoc.getArray(BLOCKS_KEY);
     this.yarrayStore = readableArray(this.yarray);

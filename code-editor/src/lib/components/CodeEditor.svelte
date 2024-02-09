@@ -59,7 +59,8 @@
 		/** @type {import('yjs').Text | undefined} Find the Y.Text for the requested component name */
 		let foundYtext;
 		for (const ymap of $yarrayStore) {
-			if (ymap.get('name') === name) foundYtext = /** @type {import('yjs').Text} */ (ymap.get('code'));
+			if (ymap.get('name') === name)
+				foundYtext = /** @type {import('yjs').Text} */ (ymap.get('code'));
 		}
 
 		if (foundYtext !== undefined) {
@@ -132,9 +133,11 @@
 					}
 				}}
 			/>
-			<PlacementButtons />
-			<Minimap on:select-graphic on:delete-graphic={deleteComponent} blocks={$yarrayStore} />
 		{/if}
+	</div>
+	<div class="overlay">
+		<PlacementButtons />
+		<Minimap on:select-graphic on:delete-graphic={deleteComponent} blocks={$yarrayStore} />
 	</div>
 </div>
 
@@ -142,9 +145,13 @@
 	.code-editor {
 		position: relative;
 		height: 100%;
+		width: 100%;
 		margin: 0 auto;
 		pointer-events: none;
 		display: grid;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.1s;
 	}
 
 	:global(.codemirror-wrapper) {
@@ -156,15 +163,16 @@
 		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	}
 
+	.code-mirror-container, .overlay {
+		grid-area: 1 / 1;
+	}
+
 	.code-mirror-container {
 		display: grid;
 		height: 100%;
 		overflow-y: scroll;
 		align-self: center;
-		transition: opacity 0.1s;
 		border-radius: 6px;
-		opacity: 0;
-		pointer-events: none;
 		position: relative;
 	}
 
@@ -172,17 +180,25 @@
 		grid-area: 1 / 1;
 	}
 
-	.code-editor.show-editor .code-mirror-container {
+	.code-editor.show-editor {
 		opacity: 1;
 		pointer-events: all;
 	}
 
-	.code-editor.position-center .code-mirror-container {
+	.code-editor.position-center {
 		max-height: min(80%, calc(100vh - 30px));
 	}
 
 	.code-editor:not(.position-center) .code-mirror-container,
 	.code-editor:not(.position-center) :global(.cm-editor) {
 		border-radius: 0;
+	}
+
+	.overlay {
+		pointer-events: none;
+	}
+
+	.overlay > :global(*) {
+		pointer-events: all;
 	}
 </style>

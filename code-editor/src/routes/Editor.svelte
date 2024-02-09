@@ -116,6 +116,8 @@
 		z-index: 10;
 		pointer-events: none;
 		height: 100vh;
+		display: flex;
+		align-items: center;
 	}
 
 	.iframe-container {

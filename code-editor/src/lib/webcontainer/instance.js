@@ -225,7 +225,7 @@ function reallyHackyStuff(contents) {
 
 	// Shove in prose prop to Editable componets for convenience
 	if (contents.includes('<Editable ')) {
-		contents = contents.replace('<Editable ', `<Editable {prose}`);
+		contents = contents.replace(/<Editable /g, `<Editable {prose}`);
 	}
 
 	return contents;

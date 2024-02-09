@@ -16,9 +16,9 @@
 		flex-direction: column;
 		gap: 5px;
 		z-index: 3;
-		align-self: flex-end;
-		justify-self: flex-end;
 		position: absolute;
+		bottom: 0;
+		right: 0;
 	}
 
 	button {
