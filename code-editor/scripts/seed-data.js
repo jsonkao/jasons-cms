@@ -75,10 +75,10 @@ async function populateRoomWithData() {
 			),
 			makeCodingBlock(
 				'graphic2',
-				'<script>\n\tconst copy = [\n\t\t\'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis risus ullamcorper massa ullamcorper euismod.\',\n\t\t\'Nam quis elementum tortor. Proin eleifend orci vitae turpis bibendum, ultricies consectetur ex fermentum.\',\n\t]\n</script>\n\n<div class="container">\n\t<div class="background">\n\t\t<div />\n\t</div>\n\t<div class="foreground">\n\t\t{#each copy as text}\n\t\t\t<p>{text}</p>\n\t\t{/each}\n\t</div>\n</div>\n\n<style>\n\t.container {\n\t\tposition: relative;\n\t}\n\n\t.background {\n\t\tposition: sticky;\n\t\tdisplay: flex;\n\t\tjustify-content: center;\n\t\talign-items: center;\n\t\theight: 100vh;\n\t\ttop: 0;\n\t\tz-index: -1;\n\t}\n\n\t.background div {\n\t\theight: calc(100vh - 40px);\n\t\twidth: min(840px, calc(100% - 40px));\n\t\tbackground: wheat;\t\t\n\t}\n\n\t.foreground {\n\t\tmargin-top: -50vh;\n\t\tpadding-bottom: 10vh;\n\t}\n\n\tp {\n\t\tfont-family: Arial;\n\t\tfont-size: 20px;\n\t\tline-height: 1.5;\n\t\tbackground: white;\n\t\tmargin: 0 auto 60vh;\n\t\tmax-width: 520px;\n\t\tpadding: 10px 14px;\n\t\tbox-shadow: 0px 2px 5px 0px #0003;\n\t}\n</style>'
+				await useLocalFile('../text-editor/src/lib/generated/graphic2.svelte')
 			),
 			makeTextBlock(
-				'Lorem ipsum dolor sit amtet, consectetur adipiscing elit. Maecenas ac varius lacus, eget pharetra urna. Praesent blandit felis eu nulla posuere tempus. Integer orci sapien, bibendum at dui vel, luctus ornare lacus.'
+				'In the governor’s race, large swaths of satellite Chinatowns in Brooklyn flipped party support. Many precincts in Flushing and Bayside in Queens, which are predominantly Chinese and Korean, turned red as well.'
 			)
 		]);
 	}

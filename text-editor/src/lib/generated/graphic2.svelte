@@ -29,7 +29,6 @@
 		align-items: center;
 		height: 90vh;
 		top: 5vh;
-		z-index: -1;
 	}
 
 	.background img {
@@ -45,6 +44,8 @@
 	}
 
 	p {
+		position: relative;
+		z-index: 1;
 		background: white;
 		margin: 0 auto 60vh;
 		max-width: 520px;
