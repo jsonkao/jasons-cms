@@ -105,7 +105,10 @@ async function mount() {
 	await webcontainer.fs.rm(GENERATED_PATH, { recursive: true });
 	await webcontainer.fs.mkdir(GENERATED_PATH);
 
-	// Write the globals file
+	/*
+	 * Write the globals file with the slug of the page. Not great that there are two places where the slug is
+	 * being retrieved (once in page server load, once with the page store), is there a better way to do this?
+	 */
 	const { params } = get(page);
 	if (!params?.slug) throw new Error('I really thought a slug would be in page params');
 	await writeGlobals(webcontainer, params.slug);
