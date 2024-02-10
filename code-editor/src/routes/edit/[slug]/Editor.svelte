@@ -15,13 +15,16 @@
 	import { currentStep, iframeUrl } from '$lib/stores/status.js';
 	import { onMount } from 'svelte';
 
+	/** @type {string} */
+	export let slug;
+
 	/** @type {HTMLIFrameElement} */
 	let iframeElement;
 	let showCodeEditor = false;
 	let setSrcAfterMount = false;
 
 	$: {
-		console.log($iframeUrl, iframeElement);
+		// console.log($iframeUrl, iframeElement);
 		if ($iframeUrl) {
 			if (iframeElement) iframeElement.src = $iframeUrl.url;
 			else setSrcAfterMount = true;
@@ -76,6 +79,7 @@
 		{#if browser}
 			<CodeEditor
 				{showCodeEditor}
+				{slug}
 				on:select-graphic={(e) => {
 					openComponentName.set(e.detail);
 					iframeElement?.contentWindow?.postMessage({ type: 'scrollTo', name: e.detail }, '*');

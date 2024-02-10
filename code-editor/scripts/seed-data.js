@@ -4,8 +4,9 @@ import LiveblocksProvider from '@liveblocks/yjs';
 import fs from 'fs/promises';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
-import { LIVEBLOCKS_ROOM } from '../src/lib/constants.js';
 import { BLOCKS_KEY } from '../src/lib/shared/constants.js';
+
+const LIVEBLOCKS_ROOM = 'my-room'; // TODO: Make this an array of multiple slugs
 
 const TESTING = process.argv.includes('--test');
 

@@ -1,4 +1,4 @@
-import { GENERATED_PATH, LIVEBLOCKS_ROOM, userColor, userName } from '$lib/constants.js';
+import { GENERATED_PATH, userColor, userName } from '$lib/constants.js';
 import zipped from './files.zip?url';
 import unzip from './unzip.cjs?url';
 
@@ -28,7 +28,7 @@ export async function fetchTemplateFiles() {
  * @param {string} liveblocksRoom - The Liveblocks room ID
  */
 export function writeGlobals(webcontainerInstance, liveblocksRoom) {
-	const variables = { userName, userColor, LIVEBLOCKS_ROOM: liveblocksRoom };
+	const variables = { userName, userColor, liveblocksRoom };
 	return webcontainerInstance.fs.writeFile(
 		`${GENERATED_PATH}/globals.js`,
 		Object.keys(variables)

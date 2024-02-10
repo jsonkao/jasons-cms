@@ -2,7 +2,6 @@ import { createClient } from "@liveblocks/client";
 import LiveblocksProvider from "@liveblocks/yjs";
 import * as Y from "yjs";
 import { BLOCKS_KEY } from "./constants.js";
-import { LIVEBLOCKS_ROOM } from "$lib/constants.js";
 import { readableArray } from "./readable-array.js";
 
 /** @typedef {import("./types.d.ts").BlockMap} BlockMap */
@@ -25,12 +24,13 @@ export class SharedDoc {
 
   /**
    * @param {{ color: string, name: string }} user
+   * @param {string} slug
    */
-  constructor(user) {
+  constructor(user, slug) {
     const client = createClient({
       publicApiKey: "pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A",
     });
-    const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, { initialPresence: {} });
+    const { room, leave } = client.enterRoom(slug, { initialPresence: {} });
     this.leave = leave;
 
     this.ydoc = new Y.Doc();

@@ -1,4 +1,4 @@
-import { LIVEBLOCKS_ROOM } from '$lib/generated/globals.js';
+import { liveblocksRoom } from '$lib/generated/globals.js';
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import * as Y from 'yjs';
@@ -28,7 +28,7 @@ export class SharedDoc {
 		const client = createClient({
 			publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
 		});
-		const { room, leave } = client.enterRoom(LIVEBLOCKS_ROOM, { initialPresence: {} });
+		const { room, leave } = client.enterRoom(liveblocksRoom, { initialPresence: {} });
 		this.leave = leave;
 
 		this.ydoc = new Y.Doc();

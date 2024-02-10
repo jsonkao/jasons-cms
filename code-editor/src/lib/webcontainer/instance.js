@@ -1,10 +1,11 @@
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
-import { GENERATED_PATH, STEPS, LIVEBLOCKS_ROOM } from '$lib/constants.js';
+import { GENERATED_PATH, STEPS } from '$lib/constants.js';
 import { iframeUrl, currentStep } from '$lib/stores/status.js';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
 import { fetchTemplateFiles, writeGlobals } from './files.js';
+import { page } from '$app/stores';
 
 /** @type {WebContainer} The WebContainer instance. */
 let webcontainer;
@@ -31,6 +32,7 @@ if (import.meta.hot) {
 		console.log('[HMR] accept');
 	});
 }
+
 /**
  * In the browser, this promise resolves when the WebContainer is ready to be used and template files have been fetched.
  */
@@ -102,7 +104,11 @@ async function mount() {
 	// Clear the /src/lib/generated directory
 	await webcontainer.fs.rm(GENERATED_PATH, { recursive: true });
 	await webcontainer.fs.mkdir(GENERATED_PATH);
-	await writeGlobals(webcontainer, LIVEBLOCKS_ROOM);
+
+	// Write the globals file
+	const { params } = get(page);
+	if (!params?.slug) throw new Error('I really thought a slug would be in page params');
+	await writeGlobals(webcontainer, params.slug);
 }
 
 /**
@@ -224,10 +230,7 @@ function reallyHackyStuff(contents) {
 	);
 
 	// Make all images crossorigin anonymous because of iframe things
-	contents = contents.replace(
-		/<img\W/g,
-		'<img crossorigin="anonymous" '
-	);
+	contents = contents.replace(/<img\W/g, '<img crossorigin="anonymous" ');
 
 	// Shove in prose prop to Editable componets for convenience
 	if (contents.includes('<Editable ')) {

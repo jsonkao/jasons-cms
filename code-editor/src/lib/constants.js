@@ -1,3 +1,7 @@
+import { get } from 'svelte/store';
+import { page } from '$app/stores';
+import { browser } from '$app/environment';
+
 /**
  * Steps for progress
  */
@@ -27,10 +31,3 @@ export const userName = names[Math.floor(Math.random() * names.length)];
 const colors = ['#A32251', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
 /** The color for both CodeMirror and ProseMirror's collaborative cursors */
 export const userColor = colors[Math.floor(Math.random() * colors.length)];
-
-/**
- * Liveblocks and YJS constants
- */
-
-/** @type {string} Liveblocks room name (later will be dynamic) */
-export const LIVEBLOCKS_ROOM = 'my-room';

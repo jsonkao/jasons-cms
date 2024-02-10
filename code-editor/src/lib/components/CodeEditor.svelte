@@ -16,6 +16,9 @@
 	import PlacementButtons from './PlacementButtons.svelte';
 	import './index.css';
 
+	/** @type {string} */
+	export let slug;
+
 	if (!browser) throw new Error('This component should only be used in the browser.');
 
 	export let showCodeEditor = false;
@@ -33,7 +36,8 @@
 	/** @type {import('yjs').Text} */
 	let ytext;
 
-	const doc = new SharedDoc(user);
+	console.log("SLUG", slug);
+	const doc = new SharedDoc(user, slug);
 	const { yarrayStore } = doc;
 	doc.awareness.on('change', () =>
 		otherCoders.set(
@@ -164,7 +168,8 @@
 		font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	}
 
-	.code-mirror-container, .overlay {
+	.code-mirror-container,
+	.overlay {
 		grid-area: 1 / 1;
 	}
 
