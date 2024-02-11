@@ -8,7 +8,8 @@
 		"preview": "./node_modules/vite/bin/vite.js preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"generate-files": "SLUG=tutorial node scripts/generate-files.js"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.1",
