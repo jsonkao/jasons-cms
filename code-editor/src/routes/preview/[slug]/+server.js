@@ -1,6 +1,8 @@
 /** @type {import('./$types').RequestHandler} */
-export async function GET() {
-	const html = `<h1>Test</h1>`;
+export async function GET({ params: { slug } }) {
+	const vercelResponse = await fetch(`https://jasons-cms-text-editor.vercel.app/render/${slug}.html`);
+	let html = await vercelResponse.text();
+
 	return new Response(html, {
 		status: 200,
 		headers: {
