@@ -15,7 +15,7 @@
 
 {#if showHelp}
 	<div class="manual-container" transition:fly={{ x: '-100%' }}>
-		<p>In this experimental CMS, writing words is mixed with writing code.</p>
+		<p>Here, writing words is mixed with writing code.</p>
 		<p>You can write words as you normally would, as if this were a Google Doc.</p>
 		<p>
 			You can also code as you normally would, as if this were your local dev server. If you open
