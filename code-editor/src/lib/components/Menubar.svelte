@@ -2,7 +2,7 @@
 	import { STEPS } from '$lib/constants.js';
 	import { otherCoders } from '$lib/stores/code-editor.js';
 	import { currentStep } from '$lib/stores/status';
-	import { buildAndUpload } from '$lib/webcontainer/instance.js';
+	import { createDeployment } from '$lib/vercel.js';
 	import { createEventDispatcher } from 'svelte';
 	import { fly } from 'svelte/transition';
 
@@ -57,7 +57,7 @@
 		</div>
 
 		<div class="helper-item">
-			<button on:click={buildAndUpload}>
+			<button on:click={createDeployment}>
 				<i class="article-icon" />
 			</button>
 			<p>publish</p>
