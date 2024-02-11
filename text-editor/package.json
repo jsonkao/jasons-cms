@@ -4,13 +4,15 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "./node_modules/vite/bin/vite.js build",
+		"build": "SLUG=tutorial ./node_modules/vite/bin/vite.js build",
 		"preview": "./node_modules/vite/bin/vite.js preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@sveltejs/adapter-static": "^3.0.1",
+		"@types/node": "^20.11.17",
 		"prettier": "^3.2.4",
 		"prettier-plugin-svelte": "^3.1.2",
 		"svelte-check": "^3.6.3"
@@ -18,6 +20,7 @@
 	"type": "module",
 	"dependencies": {
 		"@liveblocks/client": "^1.9.7",
+		"@liveblocks/node": "^1.9.7",
 		"@liveblocks/yjs": "^1.9.7",
 		"@sveltejs/kit": "^2.5.0",
 		"esbuild-wasm": "^0.20.0",

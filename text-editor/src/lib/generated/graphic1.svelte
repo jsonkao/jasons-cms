@@ -1,6 +1,6 @@
 <script>
 	// SEED REMOVE START
-	/** @type {import('yjs').Map<any>} */ export let prose;
+	// /** @type {import('yjs').Map<any>} */ export let prose;
 	// import Editable from '$lib/components/Editable.svelte';
 	// SEED REMOVE END
 
@@ -24,10 +24,10 @@
 
 <div class="paper-opener">
 	<div class="images">
-		<img src={backgroundImage} />
+		<img src={backgroundImage} alt="" />
 
 		{#each foregroundImages as src, i}
-			<img {src} style="transform: translateY({(0.15 + i * 0.1) * scrollY}px);" />
+			<img {src} style="transform: translateY({(0.15 + i * 0.1) * scrollY}px);" alt="" />
 		{/each}
 	</div>
 

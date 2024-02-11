@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-/build
+*/build
 .svelte-kit
 /package
 .env
@@ -12,3 +12,4 @@ vite.config.ts.timestamp-*
 
 *.zip
 unzip.cjs
+text-editor/src/routes/render/\[slug\]/generated

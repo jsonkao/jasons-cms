@@ -7,8 +7,8 @@
 
 <div class="container">
 	<div class="background">
-		<img src="https://static01.nytimes.com/newsgraphics/2023-01-20-asian-american-vote/171b03eeed7dcd32bb30326f4767e229c13601e6/_assets/basemaps/Brooklyn-fs8.png" />
-		<img src="https://static01.nytimes.com/newsgraphics/2023-01-20-asian-american-vote/171b03eeed7dcd32bb30326f4767e229c13601e6/_assets/precincts/Brooklyn/2022.svg" />
+		<img alt="" src="https://static01.nytimes.com/newsgraphics/2023-01-20-asian-american-vote/171b03eeed7dcd32bb30326f4767e229c13601e6/_assets/basemaps/Brooklyn-fs8.png" />
+		<img alt="" src="https://static01.nytimes.com/newsgraphics/2023-01-20-asian-american-vote/171b03eeed7dcd32bb30326f4767e229c13601e6/_assets/precincts/Brooklyn/2022.svg" />
 	</div>
 	<div class="foreground">
 		{#each copy as text}
