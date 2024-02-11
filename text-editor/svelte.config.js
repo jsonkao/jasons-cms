@@ -1,7 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-console.log(process.env.VERCEL_URL)
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: vitePreprocess(),
@@ -10,13 +9,14 @@ const config = {
 		// Don't do this in your own apps unless you know what you're doing!
 		// See https://kit.svelte.dev/docs/configuration#csrf for more info.
 		csrf: false,
-		files: {
-			assets: process.env.VERCEL_URL || ''
+
+		paths: {
+			assets: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
 		},
 
 		adapter: adapter({
 			strict: false
-		}),
+		})
 	},
 
 	vitePlugin: {
