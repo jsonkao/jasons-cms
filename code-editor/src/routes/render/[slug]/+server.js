@@ -6,7 +6,9 @@ export async function GET({ params: { slug } }) {
 	return new Response(html, {
 		status: 200,
 		headers: {
-			'Content-Type': 'text/html; charset=UTF-8'
+			'Content-Type': 'text/html; charset=UTF-8',
+			'Access-Control-Allow-Origin': '*',
+			'Cross-Origin-Resource-Policy': 'cross-origin',
 		}
 	});
 }
