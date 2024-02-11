@@ -4,8 +4,6 @@ import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import { resolve, join } from 'path';
 
-main().catch(console.error);
-
 async function main() {
 	const { SLUG: slug, LIVEBLOCKS_SECRET_KEY } = process.env;
 
@@ -43,3 +41,5 @@ async function main() {
 		blocks
 	};
 }
+
+main().catch(console.error);
