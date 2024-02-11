@@ -123,6 +123,14 @@ export async function startWebContainer() {
 }
 
 /**
+ * This function starts a build, then uploads it to file storage
+ */
+export async function buildAndUpload() {
+	await spawn('./node_modules/vite/bin/vite.js', ['build'], 'Failed to build', true);
+	await spawn ('ls', ['build'], 'Failed to list build directory', true);
+}
+
+/**
  * Given a Yjs array of blocks, make sure that the WebContainer's file system is synced (i.e. Svelte components exist
  * for all components, and Svelte components are deleted for components that have been removed).
  * Also generate an `index.js` file that imports and exports all the graphic components.

@@ -36,7 +36,6 @@
 	/** @type {import('yjs').Text} */
 	let ytext;
 
-	console.log("SLUG", slug);
 	const doc = new SharedDoc(user, slug);
 	const { yarrayStore } = doc;
 	doc.awareness.on('change', () =>

@@ -1,8 +1,9 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { STEPS } from '$lib/constants.js';
 	import { otherCoders } from '$lib/stores/code-editor.js';
 	import { currentStep } from '$lib/stores/status';
-	import { STEPS } from '$lib/constants.js';
+	import { buildAndUpload } from '$lib/webcontainer/instance.js';
+	import { createEventDispatcher } from 'svelte';
 	import { fly } from 'svelte/transition';
 
 	const dispatch = createEventDispatcher();
@@ -53,6 +54,13 @@
 				<i>?</i>
 			</button>
 			<p>help</p>
+		</div>
+
+		<div class="helper-item">
+			<button on:click={buildAndUpload}>
+				<i class="article-icon" />
+			</button>
+			<p>publish</p>
 		</div>
 	</div>
 {/if}
@@ -119,9 +127,7 @@
 		transition-duration: 0.3s;
 	}
 
-	.helper-item:first-child button,
-	.helper-container button,
-	.helper-container i {
+	.helper-item:first-child button {
 		pointer-events: all;
 		opacity: 1;
 	}
@@ -166,6 +172,10 @@
 
 	.code-icon {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M24 12L18.3431 17.6569L16.9289 16.2426L21.1716 12L16.9289 7.75736L18.3431 6.34315L24 12ZM2.82843 12L7.07107 16.2426L5.65685 17.6569L0 12L5.65685 6.34315L7.07107 7.75736L2.82843 12ZM9.78845 21H7.66009L14.2116 3H16.3399L9.78845 21Z'%3E%3C/path%3E%3C/svg%3E");
+	}
+
+	.article-icon {
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z'%3E%3C/path%3E%3C/svg%3E");
 	}
 
 	.other-coders {
