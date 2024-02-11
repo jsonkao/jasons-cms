@@ -3,6 +3,7 @@ import { LIVEBLOCKS_SECRET_KEY } from '$env/static/private';
 import * as Y from 'yjs';
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
+import { resolve, join } from 'path';
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
@@ -16,14 +17,17 @@ export async function load({ params }) {
 
 	const blocks = ydoc.getArray('blocks').toJSON();
 	const graphicBlocks = blocks.filter(({ type }) => type === 'graphic');
-	const path = `./src/routes/render/[slug]/generated`;
+	const path = resolve(__dirname, 'generated');
 	if (!existsSync(path)) await fs.mkdir(path);
+
+	console.log(path);
+	console.log(graphicBlocks.map((block) => join(path, `${block.name}.svelte`)));
 
 	// Save all Svelte components to disk
 	await Promise.all([
-		...graphicBlocks.map((block) => fs.writeFile(`${path}/${block.name}.svelte`, block.code)),
+		...graphicBlocks.map((block) => fs.writeFile(join(path, `${block.name}.svelte`), block.code)),
 		fs.writeFile(
-			`${path}/index.js`,
+			join(path, 'index.js'),
 			graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
 				`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
 		)
