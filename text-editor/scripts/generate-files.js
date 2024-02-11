@@ -1,8 +1,12 @@
 import { Liveblocks as LiveblocksNode } from '@liveblocks/node';
-import * as Y from 'yjs';
-import fs from 'fs/promises';
 import { existsSync } from 'fs';
-import { resolve, join } from 'path';
+import fs from 'fs/promises';
+import { dirname, join, resolve } from 'path';
+import { fileURLToPath } from 'url';
+import * as Y from 'yjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 async function main() {
 	const { SLUG: slug, LIVEBLOCKS_SECRET_KEY } = process.env;
