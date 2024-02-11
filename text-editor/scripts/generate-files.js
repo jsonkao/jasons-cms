@@ -8,6 +8,9 @@ import * as Y from 'yjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+/**
+ * Generates Svelte components from the Yjs document and saves them to disk
+ */
 async function main() {
 	const { SLUG: slug, LIVEBLOCKS_SECRET_KEY } = process.env;
 
