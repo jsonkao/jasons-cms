@@ -74,7 +74,7 @@ async function generateFiles(liveblocks, generatedPath, slug) {
  */
 function hackyModifications(code) {
 	// Add crossorigin="anonymous" to all img tags
-	code = code.replace(/<img\W/g, '<imgWcrossorigin="anonymous" ');
+	code = code.replace(/<img\W/g, '<img\Wcrossorigin="anonymous" ');
 	return code;
 }
 
