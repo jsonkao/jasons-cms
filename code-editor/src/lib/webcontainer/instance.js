@@ -235,7 +235,7 @@ function reallyHackyStuff(contents) {
 	// Make all images crossorigin anonymous because of iframe things
 	contents = contents.replace(/<img\W/g, '<img crossorigin="anonymous" ');
 
-	// Shove in prose prop to Editable componets for convenience
+	// Shove in prose prop to Editable components for convenience
 	if (contents.includes('<Editable ')) {
 		contents = contents.replace(/<Editable /g, `<Editable {prose}`);
 	}

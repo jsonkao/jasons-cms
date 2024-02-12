@@ -29,9 +29,6 @@ async function main() {
 	const importLines = svelteFilenames.map(({ imports }) => imports).join('\n');
 	const exportLines = '{\n\t' + svelteFilenames.map(({ exports }) => exports).join(',\n\t') + '\n}';
 
-	console.log(importLines);
-	console.log(exportLines);
-
 	await fs.writeFile(
 		join(generatedPath, 'index.js'),
 		importLines + '\n\nexport default ' + exportLines + ';\n'
@@ -57,7 +54,9 @@ async function generateFiles(liveblocks, generatedPath, slug) {
 
 	// Save all Svelte components to disk
 	await Promise.all(
-		graphicBlocks.map((block) => fs.writeFile(join(path, `${block.name}.svelte`), block.code))
+		graphicBlocks.map((block) =>
+			fs.writeFile(join(path, `${block.name}.svelte`), hackyModifications(block.code))
+		)
 	);
 
 	return {
@@ -66,6 +65,17 @@ async function generateFiles(liveblocks, generatedPath, slug) {
 			.join('\n'),
 		exports: `'${slug}': {${graphicBlocks.map(({ name }) => `${name}: ${slug}_${name}`).join(', ')}}`
 	};
+}
+
+/**
+ * Applies same hacky modifications to the code as in the WebContainer, except without Editable stuff.
+ * Should probably be deduped
+ * @param {string} code
+ */
+function hackyModifications(code) {
+	// Add crossorigin="anonymous" to all img tags
+	code = code.replace(/<img\W/g, '<imgWcrossorigin="anonymous" ');
+	return code;
 }
 
 main().catch(console.error);
