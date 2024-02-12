@@ -12,9 +12,7 @@ const __dirname = dirname(__filename);
  * Generates Svelte components from the Yjs document and saves them to disk
  */
 async function main() {
-	const { SLUG: slug, LIVEBLOCKS_SECRET_KEY } = process.env;
-
-	if (slug === undefined) throw new Error('SLUG environment variable is not set');
+	const { LIVEBLOCKS_SECRET_KEY } = process.env;
 	if (LIVEBLOCKS_SECRET_KEY === undefined)
 		throw new Error('LIVEBLOCKS_SECRET_KEY environment variable is not set');
 
@@ -22,30 +20,51 @@ async function main() {
 		secret: LIVEBLOCKS_SECRET_KEY
 	});
 
+	const generatedPath = resolve(__dirname, `../src/routes/render/[slug]/generated`);
+	const rooms = (await liveblocks.getRooms()).data;
+	const svelteFilenames = await Promise.all(
+		rooms.map(({ id }) => generateFiles(liveblocks, generatedPath, id))
+	);
+
+	const importLines = svelteFilenames.map(({ imports }) => imports).join('\n');
+	const exportLines = '{\n\t' + svelteFilenames.map(({ exports }) => exports).join(',\n\t') + '\n}';
+
+	console.log(importLines);
+	console.log(exportLines);
+
+	await fs.writeFile(
+		join(generatedPath, 'index.js'),
+		importLines + '\n\nexport default ' + exportLines + ';\n'
+	);
+}
+
+/**
+ * Generate files for one document
+ * @param {LiveblocksNode} liveblocks
+ * @param {string} generatedPath
+ * @param {string} slug
+ */
+async function generateFiles(liveblocks, generatedPath, slug) {
 	const ydoc = new Y.Doc();
 	const update = await liveblocks.getYjsDocumentAsBinaryUpdate(slug);
 	Y.applyUpdate(ydoc, new Uint8Array(update));
 
 	const blocks = ydoc.getArray('blocks').toJSON();
 	const graphicBlocks = blocks.filter(({ type }) => type === 'graphic');
-	const path = resolve(__dirname, '../src/routes/render/[slug]/generated');
-	if (!existsSync(path)) await fs.mkdir(path);
 
-	console.log(path);
-	console.log(graphicBlocks.map((block) => join(path, `${block.name}.svelte`)));
+	const path = resolve(generatedPath, slug);
+	if (!existsSync(path)) await fs.mkdir(path, { recursive: true });
 
 	// Save all Svelte components to disk
-	await Promise.all([
-		...graphicBlocks.map((block) => fs.writeFile(join(path, `${block.name}.svelte`), block.code)),
-		fs.writeFile(
-			join(path, 'index.js'),
-			graphicBlocks.map(({ name }) => `import ${name} from './${name}.svelte';`).join('\n') +
-				`\nexport default { ${graphicBlocks.map(({ name }) => name).join(', ')} };`
-		)
-	]);
+	await Promise.all(
+		graphicBlocks.map((block) => fs.writeFile(join(path, `${block.name}.svelte`), block.code))
+	);
 
 	return {
-		blocks
+		imports: graphicBlocks
+			.map(({ name }) => `import ${slug}_${name} from './${slug}/${name}.svelte';`)
+			.join('\n'),
+		exports: `'${slug}': {${graphicBlocks.map(({ name }) => `${name}: ${slug}_${name}`).join(', ')}}`
 	};
 }
 

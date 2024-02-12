@@ -8,7 +8,7 @@
 <div class="content">
 	{#each data.blocks as block}
 		{#if block.type === 'graphic'}
-			<Component name={block.name} />
+			<Component name={block.name} slug={data.slug} />
 		{:else if block.type === 'text'}
 			<!-- These class names are to duplicate Prosemirror logic for styling -->
 			<div class="ui-editor" class:editor_empty={block.text === '<paragraph></paragraph>'}>

@@ -4,12 +4,12 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "SLUG=tutorial ./node_modules/vite/bin/vite.js build",
+		"build": "./node_modules/vite/bin/vite.js build",
 		"preview": "./node_modules/vite/bin/vite.js preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"generate-files": "SLUG=tutorial node scripts/generate-files.js"
+		"generate-files": "node scripts/generate-files.js"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.1",

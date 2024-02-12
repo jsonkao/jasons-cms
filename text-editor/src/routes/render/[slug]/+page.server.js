@@ -14,7 +14,8 @@ export async function load({ params }) {
 
 	const blocks = ydoc.getArray('blocks').toJSON();
 	return {
-		blocks
+		blocks,
+		slug: params.slug
 	};
 }
 
