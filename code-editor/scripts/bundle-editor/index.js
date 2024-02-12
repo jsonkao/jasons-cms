@@ -84,7 +84,10 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 
 			if (packageFile.isFile()) {
 				console.log(`Adding ${packageFilePath}`);
-				zip.addFile(packageFilePath.replace('../text-editor/', ''), fs.readFileSync(packageFilePath));
+				zip.addFile(
+					packageFilePath.replace('../text-editor/', ''),
+					fs.readFileSync(packageFilePath)
+				);
 			}
 		}
 		continue;

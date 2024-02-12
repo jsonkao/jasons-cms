@@ -13,7 +13,7 @@ const config = {
 		},
 
 		paths: {
-			assets: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+			assets: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''
 		},
 
 		adapter: adapter({

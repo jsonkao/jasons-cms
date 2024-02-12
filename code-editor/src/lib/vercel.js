@@ -6,5 +6,5 @@ export async function createDeployment() {
 		}
 	);
 
-  console.log(await response.json(), response.status);
+	console.log(await response.json(), response.status);
 }

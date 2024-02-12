@@ -110,7 +110,7 @@ export class SharedDoc {
 	 * @param {number} index
 	 * @param {{ name: string, textBefore: Y.XmlFragment, textAfter: Y.XmlFragment }} configuration
 	 */
-	sinsertGraphicSandwich(index, { name, textBefore, textAfter }) {
+	insertGraphicSandwich(index, { name, textBefore, textAfter }) {
 		const newElements = [
 			makeTextBlock(textBefore),
 			makeCodingBlock(

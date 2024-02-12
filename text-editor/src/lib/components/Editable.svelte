@@ -20,7 +20,9 @@
 	export let key = undefined;
 
 	if (!fragment) {
-		if (prose && key) {
+		if (prose !== undefined && key !== undefined) {
+			if (typeof key !== 'string') throw new Error('key must be a string');
+
 			if (!prose.has(key)) prose.set(key, makeFragment('Write here...'));
 			fragment = prose.get(key);
 		} else {
