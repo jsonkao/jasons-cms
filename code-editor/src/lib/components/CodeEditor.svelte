@@ -14,7 +14,6 @@
 	import { onDestroy } from 'svelte';
 	import Minimap from './Minimap.svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
-	import './index.css';
 
 	/** @type {string} */
 	export let slug;
