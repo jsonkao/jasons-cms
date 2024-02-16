@@ -47,12 +47,14 @@ function importResolve() {
 
 /**
  * Parses an npm specifier into its parts. Taken from https://github.com/observablehq/framework/blob/main/src/javascript/imports.ts#L299
+ * @param {string} specifier
+ * @returns {{ name: string; range?: string; path?: string }}
  */
-function parseNpmSpecifier(specifier: string): { name: string; range?: string; path?: string } {
+function parseNpmSpecifier(specifier) {
 	const parts = specifier.split('/');
-	const namerange = specifier.startsWith('@')
-		? [parts.shift()!, parts.shift()!].join('/')
-		: parts.shift()!;
+	const namerange = /** @type {string} */ (
+		specifier.startsWith('@') ? [parts.shift(), parts.shift()].join('/') : parts.shift()
+	);
 	const ranged = namerange.indexOf('@', 1);
 	return {
 		name: ranged > 0 ? namerange.slice(0, ranged) : namerange,
