@@ -4,6 +4,7 @@
 </script>
 
 <div class="container">
+	<h1>Stories</h1>
 	{#each data.slugs as slug}
 		<p><a href="/edit/{slug}">{slug}</a></p>
 	{/each}

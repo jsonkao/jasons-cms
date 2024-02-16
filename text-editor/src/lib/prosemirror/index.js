@@ -6,6 +6,7 @@ import { userColor, userName } from '$lib/generated/globals.js';
 
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Plugin } from 'prosemirror-state';
+import { smartQuotes, ellipsis, inputRules } from 'prosemirror-inputrules';
 import { IndestructibleUndoManager, SharedDoc } from '$lib/shared/shared-doc.js';
 import {
 	redo,
@@ -43,13 +44,13 @@ export class SharedDocForProsemirror extends SharedDoc {
 	 * @param {{ hasFloatingMenu?: boolean }} [options]
 	 */
 	createEditorForBlock(fragment, { hasFloatingMenu = false } = {}) {
-		const plugins = [
+		const yPlugins = [
 			ySyncPlugin(fragment),
 			yCursorPlugin(this.awareness, { cursorBuilder, selectionBuilder }),
 			yUndoPlugin({ undoManager: this.undoManager })
 		];
-		if (hasFloatingMenu) plugins.push(FloatingMenuPlugin());
-		return createEditor(plugins);
+		if (hasFloatingMenu) yPlugins.push(FloatingMenuPlugin());
+		return createEditor(yPlugins);
 	}
 
 	/** @param {BlockInsertionParams} params */
@@ -94,7 +95,8 @@ export function createEditor(plugins) {
 				'Mod-y': redo,
 				'Mod-Shift-z': redo
 			}),
-			richTextKeyMap(richTextSchema)
+			richTextKeyMap(richTextSchema),
+			inputRules({ rules: smartQuotes.concat(ellipsis) })
 		]
 	});
 }

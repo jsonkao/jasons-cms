@@ -10,6 +10,7 @@ export default defineConfig({
 			'prosemirror-model',
 			'prosemirror-view',
 			'prosemirror-keymap',
+			'prosemirror-inputrules',
 			'y-prosemirror',
 			'prosemirror-commands',
 			'@liveblocks/client',

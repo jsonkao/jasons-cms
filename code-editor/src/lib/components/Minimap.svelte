@@ -45,6 +45,7 @@
 				<button
 					style:height="{getHeight(b, $blockHeights)}px"
 					on:click={() => dispatch('select-graphic', b.get('name'))}
+					draggable="true"
 				/>
 
 				<div class="mini-menu">
