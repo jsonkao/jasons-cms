@@ -6,72 +6,44 @@ import WebSocket from 'ws';
 import * as Y from 'yjs';
 import { BLOCKS_KEY } from '../src/lib/shared/constants.js';
 
-/** @typedef {'demo' | 'tutorial'} RoomName */
+/** @typedef {'louisiana-fifth-circuit' | 'oil-wells' | 'tutorial'} RoomName */
 
 /** @type {Array<RoomName>} */
-const ROOMS = ['demo', 'tutorial'];
+const ROOMS = ['louisiana-fifth-circuit', 'oil-wells', 'tutorial'];
 
 const TESTING = process.argv.includes('--test');
 
 if (!TESTING) await createRoom();
 
-await populateRoomWithData('demo', [
+await populateRoomWithData('louisiana-fifth-circuit', [
 	makeTextBlock(''),
-	makeCodingBlock(
-		'graphic1',
-		await useLocalFile('../text-editor/src/lib/generated/graphic1.svelte')
-	),
+	await makeCodingBlock('graphic1'),
 	makeTextBlock(
 		'Hundreds of thousands of people poured into the streets of Hong Kong on Sunday, June 16, and marched almost two miles (three kilometers), protesting a proposed extradition bill and calling for the city’s leader to step down.',
 		'A Bird’s-Eye View of How Protesters Have Flooded Hong Kong Streets'
 	),
-	makeCodingBlock(
-		'graphic2',
-		await useLocalFile('../text-editor/src/lib/generated/graphic2.svelte')
-	),
+	await makeCodingBlock('graphic2'),
 	makeTextBlock(
 		'In the governor’s race, large swaths of satellite Chinatowns in Brooklyn flipped party support. Many precincts in Flushing and Bayside in Queens, which are predominantly Chinese and Korean, turned red as well.'
 	)
 ]);
+
+await populateRoomWithData('oil-wells', [
+	makeTextBlock(
+		'Hundreds of thousands of people poured into the streets of Hong Kong on Sunday, June 16, and marched almost two miles (three kilometers), protesting a proposed extradition bill and calling for the city’s leader to step down.',
+		'A Bird’s-Eye View of How Protesters Have Flooded Hong Kong Streets'
+	),
+	await makeCodingBlock('graphic4'),
+	makeTextBlock('Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
+	await makeCodingBlock('graphic5')
+]);
 await populateRoomWithData('tutorial', [
 	makeTextBlock(''),
-	makeCodingBlock(
-		'graphic1',
-		[
-			'<div>',
-			'\t<!-- Your code here -->',
-			'</div>',
-			'',
-			'<style>',
-			'\tdiv {',
-			'\t\theight: 300px;',
-			'\t\twidth: 100%;',
-			'\t\tbackground: #6495ed66;',
-			'\t}',
-			'</style>\n'
-		].join('\n')
-	),
+	await makeCodingBlock('graphic5'),
 	makeTextBlock(
 		'Hundreds of thousands of people poured into the streets of Hong Kong on Sunday, June 16, and marched almost two miles (three kilometers), protesting a proposed extradition bill and calling for the city’s leader to step down.',
 		'My Headline is Nice'
-	),
-	makeCodingBlock(
-		'graphic2',
-		[
-			'<div>',
-			'\t<!-- Your code here -->',
-			'</div>',
-			'',
-			'<style>',
-			'\tdiv {',
-			'\t\theight: 300px;',
-			'\t\twidth: 100%;',
-			'\t\tbackground: rgba(255, 0, 255, 0.1);',
-			'\t}',
-			'</style>\n'
-		].join('\n')
-	),
-	makeTextBlock('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')
+	)
 ]);
 
 /**
@@ -142,10 +114,11 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 
 /**
  * @param {string} name
- * @param {string} code
  * @returns {BlockMap}
  */
-function makeCodingBlock(name, code) {
+async function makeCodingBlock(name) {
+	const code = await useLocalFile(`../text-editor/src/lib/generated/${name}.svelte`);
+
 	const ymap = new Y.Map();
 	ymap.set('type', 'graphic');
 	ymap.set('name', name);
