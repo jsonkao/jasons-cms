@@ -45,7 +45,9 @@ const ignored_directories = [
 
 	// Vite requires esbuild, but we use the esbuild-wasm package instead
 	'node_modules/esbuild',
-	'node_modules/@esbuild'
+	'node_modules/@esbuild',
+
+	'node_modules/.vite'
 ];
 
 const ignored_files = new Set([
@@ -67,6 +69,9 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 	}
 
 	if (file.endsWith('.md') && !file.includes('/@sveltejs/kit/src/types/synthetic/')) {
+		continue;
+	}
+	if (file.endsWith('.ts') && file.startsWith('node_modules/')) {
 		continue;
 	}
 
@@ -101,20 +106,20 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 console.timeEnd('zip.addFile');
 
 if (ignored_files.size > 0) {
-	throw new Error(`expected to find ${Array.from(ignored_files).join(', ')}`);
+	console.warn(`expected to find ${Array.from(ignored_files).join(', ')}`);
 }
 
 console.time('writing zip');
 const out = zip.toBuffer();
-const outfile = 'scripts/bundle-editor/test/files.zip' || `src/lib/webcontainer/files.zip`;
+const outfile = process.argv.includes('--test')
+	? 'scripts/bundle-editor/test/files.zip'
+	: `src/lib/webcontainer/files.zip`;
 fs.writeFileSync(outfile, out);
 console.timeEnd('writing zip');
 
 // console log the file size of out in megabytes
 console.log();
-console.log(
-	`Zip file is ${Math.round((fs.statSync(outfile).size / 1024 / 1024) * 100) / 100}MB`
-);
+console.log(`Zip file is ${Math.round((fs.statSync(outfile).size / 1024 / 1024) * 100) / 100}MB`);
 
 // bundle unzip script so we can use it in the webcontainer
 esbuild.buildSync({

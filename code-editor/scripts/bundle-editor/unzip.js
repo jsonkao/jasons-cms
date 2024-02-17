@@ -6,9 +6,15 @@
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 
-const inputFile = 'scripts/bundle-editor/test/files.zip' || 'files.zip';
+const inputFile = process.argv.includes('--test')
+	? 'scripts/bundle-editor/test/files.zip'
+	: 'files.zip';
+	console.log(inputFile)
 const zip = new AdmZip(inputFile);
-zip.extractAllTo('.', true);
+
+zip.extractAllTo(process.argv.includes('--test') ? 'scripts/bundle-editor/test' : '.', true);
+
+if (process.argv.includes('--test')) process.exit(0);
 
 if (!fs.existsSync('node_modules/.bin')) {
 	fs.mkdirSync('node_modules/.bin');
