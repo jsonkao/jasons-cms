@@ -2,25 +2,27 @@
 	import { easeCircleIn, easeCircleInOut } from 'd3-ease';
 	import { onMount } from 'svelte';
 
-	let data = [];
+	export let data; data;
+
+	let oilData = [];
 	let maxCost = 1;
 
 	async function getData() {
 		const response = await fetch(
 			'https://static.propublica.org/projects/graphics/2024-oil-cleanup/testing/states.json'
 		);
-		const data = await response.json();
-		return data.sort((a, b) => b.cost - a.cost).slice(0, 12);
+		const oilData = await response.json();
+		return oilData.sort((a, b) => b.cost - a.cost).slice(0, 12);
 	}
 
 	onMount(async () => {
-		data = await getData();
-		maxCost = Math.max(...data.map((d) => d.cost));
+		oilData = await getData();
+		maxCost = Math.max(...oilData.map((d) => d.cost));
 	});
 </script>
 
 <div class="container">
-	{#each data as { cost, state, bonds }}
+	{#each oilData as { cost, state, bonds }}
 		{@const size = Math.pow(cost / maxCost, 0.5)}
 		<div class="square" style:--size={size}>
 			<p>{state}</p>

@@ -184,16 +184,22 @@ export async function syncWebContainerFileSystem(yarray) {
 }
 
 /**
- * Handles saving the file
- * TODO: Incorporate $openGlobalFile
- * @param {string | null} componentName - The name of the component to save
+ * Handles saving a componennt
+ * @param {string | null} componentNameOrGlobalFile - The name of the component to save
  * @param {string} content - The content of the component to save
  */
-export async function saveComponent(componentName, content) {
-	if (componentName === null) {
-		throw new Error('Attempted to save but openComponentName is null');
+export async function saveComponentOrGlobalFile(componentNameOrGlobalFile, content) {
+	if (componentNameOrGlobalFile === null) {
+		throw new Error('Attempted to save a component or global fille but filename is null');
 	}
-	await writeFile(`${GENERATED_PATH}/${componentName}.svelte`, content);
+
+	if (componentNameOrGlobalFile === '+page.server.js') {
+		// Global file
+		await writeFile(`/src/routes/${componentNameOrGlobalFile}`, content);
+	} else {
+		// Normal component
+		await writeFile(`${GENERATED_PATH}/${componentNameOrGlobalFile}.svelte`, content);
+	}
 }
 
 /**
@@ -214,7 +220,7 @@ function log_stream() {
  */
 export async function writeFile(path, contents) {
 	if (path.endsWith('.svelte')) {
-		contents = reallyHackyStuff(contents);
+		contents = unpleasantlyMagicalMagic(contents);
 	}
 
 	await webcontainer.fs.writeFile(path, contents);
@@ -225,17 +231,26 @@ export async function writeFile(path, contents) {
  * @param {string} contents - The content of the file
  * @returns {string} - The content of the file with some really hacky stuff done to it
  */
-function reallyHackyStuff(contents) {
-	// Accept props to remove warnings
+function unpleasantlyMagicalMagic(contents) {
+	/* Accept prose and data props (and "use" it) to remove warnings */
+
+	if (!contents.includes('<script>')) {
+		contents = '<script></script>' + contents;
+	}
 	contents = contents.replace(
 		'<script>',
-		`<script>/** @type {import('yjs').Map<any>} */ export let prose;`
+		`<script>/** @type {import('yjs').Map<any>} */ export let prose; prose;`
 	);
+	if (!contents.includes('export let data')) {
+		contents = contents.replace('<script>', `<script>export let data; data;`);
+	}
 
-	// Make all images crossorigin anonymous because of iframe things
+	/* Make all images crossorigin anonymous because of iframe things */
+
 	contents = contents.replace(/<img\W/g, '<img crossorigin="anonymous" ');
 
-	// Shove in prose prop to Editable components for convenience
+	/* Shove in prose prop to Editable components for magic convenience */
+
 	if (contents.includes('<Editable ')) {
 		contents = contents.replace(/<Editable /g, `<Editable {prose} `);
 	}

@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 
 /**
@@ -12,11 +13,12 @@ export const openComponentName = writable(null);
  */
 export const openGlobalFile = writable(null);
 
+const defaultPosition = browser && window.innerWidth < 800 ? 'bottom' : 'left';
 /**
  * @type {import('svelte/store').Writable<'center' | 'left' | 'bottom'>}
  * The graphic in focus (and whose code is in the CodeEditor)
  */
-export const codeEditorPosition = writable('left');
+export const codeEditorPosition = writable(defaultPosition);
 
 /**
  * @type {import('svelte/store').Writable<Array<{ user: string, color: string }>}

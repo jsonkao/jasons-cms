@@ -3,6 +3,9 @@
 	import './prosemirror.css';
 	import './styles.css';
 
+	/** @type {import('./$types').PageData} */
+	export let data;
+
 	/**
 	 * Listen for Cmd+E to toggle the editor or Cmd+S to save the file
 	 * @param {KeyboardEvent} e
@@ -19,6 +22,6 @@
 
 {#if browser}
 	{#await import(`$lib/components/Blocks.svelte`) then { default: Blocks }}
-		<Blocks />
+		<Blocks {data} />
 	{/await}
 {/if}

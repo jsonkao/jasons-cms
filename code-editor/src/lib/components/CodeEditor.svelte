@@ -9,11 +9,21 @@
 
 	import { browser } from '$app/environment';
 	import { userColor, userName } from '$lib/constants.js';
-	import { codeEditorPosition, openComponentName, otherCoders } from '$lib/stores/code-editor.js';
-	import { saveComponent, syncWebContainerFileSystem } from '$lib/webcontainer/instance.js';
+	import {
+		codeEditorPosition,
+		openComponentName,
+		openGlobalFile,
+		otherCoders
+	} from '$lib/stores/code-editor.js';
+	import {
+		saveComponentOrGlobalFile,
+		syncWebContainerFileSystem
+	} from '$lib/webcontainer/instance.js';
 	import { onDestroy } from 'svelte';
 	import Minimap from './Minimap.svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
+	import Tabs from './Tabs.svelte';
+	import { PAGE_FILES_KEY } from '$lib/shared/constants';
 
 	/** @type {string} */
 	export let slug;
@@ -48,22 +58,28 @@
 	onDestroy(() => doc.destroy());
 
 	$: syncWebContainerFileSystem($yarrayStore);
-	$: setComponentInEditor($openComponentName);
+	$: setComponentInEditor($openComponentName, $openGlobalFile);
 	$: updateCodingPresence(showCodeEditor);
 	$: focusCodeEditing(showCodeEditor);
 
 	/**
-	 * Set the ytext and ycollab extension for the open component
-	 * @param {string | null} name
+	 * Set the ytext and ycollab extension for the open component or global file
+	 * @param {string | null} componentName
+	 * @param {string | null} globalFile
 	 */
-	function setComponentInEditor(name) {
-		if (name === null) return;
+	function setComponentInEditor(componentName, globalFile) {
+		if (componentName === null && globalFile === null) return;
 
 		/** @type {import('yjs').Text | undefined} Find the Y.Text for the requested component name */
 		let foundYtext;
-		for (const ymap of $yarrayStore) {
-			if (ymap.get('name') === name)
-				foundYtext = /** @type {import('yjs').Text} */ (ymap.get('code'));
+
+		if (globalFile) {
+			foundYtext = doc.ydoc.getMap(PAGE_FILES_KEY).get(globalFile);
+		} else if (componentName) {
+			for (const ymap of $yarrayStore) {
+				if (ymap.get('name') === componentName)
+					foundYtext = /** @type {import('yjs').Text} */ (ymap.get('code'));
+			}
 		}
 
 		if (foundYtext !== undefined) {
@@ -107,7 +123,7 @@
 	function onKeyDown(e) {
 		if (e.metaKey && e.key === 's') {
 			e.preventDefault();
-			saveComponent($openComponentName, ytext.toString());
+			saveComponentOrGlobalFile($openGlobalFile || $openComponentName, ytext.toString());
 		}
 	}
 </script>
@@ -120,6 +136,7 @@
 	on:keydown={onKeyDown}
 >
 	<div class="code-mirror-container">
+		<Tabs />
 		{#if ytext && yExtension}
 			<CodeMirror
 				value={ytext.toString()}
@@ -130,7 +147,7 @@
 				tabSize={4}
 				styles={{
 					'&': {
-						padding: '12px 12px 12px',
+						padding: '36px 12px 12px',
 						borderRadius: '6px',
 						height: '100%'
 					}

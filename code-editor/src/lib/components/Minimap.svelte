@@ -12,8 +12,8 @@
 
 	/**
 	 * Compute the height of a single graphic block
-	 * @param {import('shared').BlockMap} b
-	 * @param {import('shared').BlockHeights} $blockHeights
+	 * @param {BlockMap} b
+	 * @param {BlockHeights} $blockHeights
 	 */
 	function getHeight(b, $blockHeights) {
 		if (Object.keys($blockHeights).length === 0) return DEFAULT_BLOCK_HEIGHT;

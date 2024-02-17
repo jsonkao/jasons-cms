@@ -9,6 +9,9 @@
 	import FloatingMenu from './FloatingMenu.svelte';
 	import Editable from './Editable.svelte';
 
+	/** @type {import('../../routes/$types').PageData} */
+	export let data;
+
 	/** @type {HTMLElement} */
 	let contentEl;
 
@@ -57,7 +60,7 @@
 <div class="content" bind:this={contentEl}>
 	{#each $yarrayStore || [] as blockMap (getId(blockMap))}
 		{#if blockMap.get('type') === 'graphic'}
-			<Component name={getName(blockMap)} {blockMap} />
+			<Component name={getName(blockMap)} {blockMap} {data} />
 		{:else if blockMap.get('type') === 'text'}
 			{@const fragment = /** @type {import('yjs').XmlFragment} */ (blockMap.get('text'))}
 			<Editable {pmEditors} {fragment} hasFloatingMenu />

@@ -4,7 +4,7 @@ import LiveblocksProvider from '@liveblocks/yjs';
 import fs from 'fs/promises';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
-import { BLOCKS_KEY } from '../../src/lib/shared/constants.js';
+import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../src/lib/shared/constants.js';
 
 /** @typedef {'louisiana-fifth-circuit' | 'oil-wells' | 'tutorial'} RoomName */
 /** @typedef {{text: string, hed?: string}} TextSeedData */
@@ -42,8 +42,8 @@ const seedingData = {
 		{
 			text: 'Since the program’s arrival to McKinney in 2005 as a club, seven of the district’s middle school students have been elected governor — the program’s top honor — at the statewide conference in Austin. In 2017, the district added an elective option: Seventh and eighth graders in two of the district’s middle schools could now receive course credit for participating in the program.'
 		},
-
-		{ graphic: 'graphic5' }
+		{ graphic: 'graphic5' },
+		{ text: '' }
 	],
 	tutorial: [
 		{ text: '' },
@@ -74,12 +74,11 @@ async function createRoom() {
 
 	// Create a new room
 	await Promise.all(
-		ROOMS.map(async (liveblocksRoom) => {
-			const room = await liveblocks.createRoom(liveblocksRoom, {
-				defaultAccesses: ['room:write']
-			});
-			console.log(`Created room: ${room.id}\n`);
-		})
+		ROOMS.map((liveblocksRoom) =>
+			liveblocks
+				.createRoom(liveblocksRoom, { defaultAccesses: ['room:write'] })
+				.then((room) => console.log(`Created room: ${room.id}\n`))
+		)
 	);
 }
 
@@ -89,6 +88,10 @@ async function createRoom() {
  * @param {Array<SeedData>} contents The contents to seed the room with
  */
 async function populateRoomWithData(liveblocksRoom, contents) {
+	if (!('text' in contents[0]) || !('text' in contents[contents.length - 1])) {
+		throw new Error('First and last elements must be text');
+	}
+
 	const client = createClient({
 		publicApiKey: /** @type {string} */ (process.env.LIVEBLOCKS_PUBLIC_KEY),
 		polyfills: { WebSocket }
@@ -102,11 +105,11 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 	new LiveblocksProvider(room, ydoc);
 	const yarray = ydoc.getArray(BLOCKS_KEY);
 
-	if (!TESTING) await seedArray();
+	if (!TESTING) await seedRoom();
 	await testArray();
 	leave();
 
-	async function seedArray() {
+	async function seedRoom() {
 		// Wait 1 second for ydoc to sync
 		await new Promise((r) => setTimeout(r, 1000));
 		if (yarray.length > 0) {
@@ -122,6 +125,9 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 			})
 		);
 		yarray.insert(0, blockMaps);
+
+		const yFilesMap = ydoc.getMap(PAGE_FILES_KEY);
+		yFilesMap.set('+page.server.js', new Y.Text('/* This is the page server file */\nexport function load() { return { testData: "hi" } }'));
 	}
 
 	async function testArray() {

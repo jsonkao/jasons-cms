@@ -4,8 +4,6 @@ import * as Y from 'yjs';
 import { BLOCKS_KEY } from './constants.js';
 import { readableArray } from './readable-array.js';
 
-/** @typedef {import("./types.d.ts").BlockMap} BlockMap */
-
 export class SharedDoc {
 	/** @type {import('y-protocols').Awareness} */
 	awareness;
@@ -79,10 +77,10 @@ export class SharedDoc {
 			throw new Error(`Could not find index of component to delete, ${name}`);
 
 		// This should all work because we enforce having blank text before and after all components
-		const textBlockBefore = /** @type {import('shared').BlockMap} */ (
+		const textBlockBefore = /** @type {BlockMap} */ (
 			this.yarrayStore.y.get(componentIndex - 1)
 		);
-		const textBlockAfter = /** @type {import('shared').BlockMap} */ (
+		const textBlockAfter = /** @type {BlockMap} */ (
 			this.yarrayStore.y.get(componentIndex + 1)
 		);
 		if (textBlockBefore.get('type') !== 'text' || textBlockAfter.get('type') !== 'text')

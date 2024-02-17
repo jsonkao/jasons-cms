@@ -8,9 +8,8 @@
 	$: openFile = $openGlobalFile || $openComponentName;
 
 	$: files = [
-		{ label: 'Client', filename: $openComponentName },
-		{ label: 'Data', filename: '/src/routes/+page.server.js' },
-		{ label: 'Styles', filename: '/src/routes/styles.css' }
+		{ label: 'visual', filename: $openComponentName },
+		{ label: 'data', filename: '+page.server.js' },
 	];
 </script>
 
@@ -18,7 +17,7 @@
 	{#each files as { label, filename }}
 		<button
 			class:current={filename === openFile}
-			on:click={() => openGlobalFile.set(label === 'Client' ? null : filename)}
+			on:click={() => openGlobalFile.set(label === 'visual' ? null : filename)}
 		>
 			{label}
 		</button>
@@ -28,9 +27,11 @@
 <style>
 	.tabs {
 		position: absolute;
-		top: 9px;
-		left: 12px;
+		top: 12px;
+		left: 50%;
+		transform: translateX(-50%);
 		display: flex;
+		z-index: 10;
 	}
 
 	button {
@@ -41,13 +42,13 @@
 		display: block;
 		margin-right: 7px;
 		color: white;
-		font-size: 0.7rem;
-		opacity: 0.6;
-		transition-duration: 0.3s;
+		font-size: 1em;
+		opacity: 0.3;
+		transition-duration: 0.2s;
 	}
 
 	button.current,
 	button:hover {
-		opacity: 0.9;
+		opacity: 0.6;
 	}
 </style>

@@ -1,5 +1,7 @@
 export function load() {
-	return {};
+	return {
+		test: 'hi'
+	};
 }
 
 export const prerender = false;
