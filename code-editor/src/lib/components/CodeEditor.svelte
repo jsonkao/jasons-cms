@@ -1,5 +1,6 @@
 <script>
 	import { svelte } from '@replit/codemirror-lang-svelte';
+	import { javascript } from '@codemirror/lang-javascript';
 	import { SharedDoc } from '$lib/shared/shared-doc.js';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
@@ -17,13 +18,13 @@
 	} from '$lib/stores/code-editor.js';
 	import {
 		saveComponentOrGlobalFile,
-		syncWebContainerFileSystem
+		syncWebContainerFileSystem,
+		initializeWebContainerPageFiles
 	} from '$lib/webcontainer/instance.js';
 	import { onDestroy } from 'svelte';
 	import Minimap from './Minimap.svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import Tabs from './Tabs.svelte';
-	import { PAGE_FILES_KEY } from '$lib/shared/constants';
 
 	/** @type {string} */
 	export let slug;
@@ -36,6 +37,8 @@
 	/** @type {HTMLElement} */
 	let codeEditorElement;
 
+	let language = svelte();
+
 	/**
 	 * Create Y.Text
 	 */
@@ -46,7 +49,7 @@
 	let ytext;
 
 	const doc = new SharedDoc(user, slug);
-	const { yarrayStore } = doc;
+	const { yarrayStore, yPageFilesStore } = doc;
 	doc.awareness.on('change', () =>
 		otherCoders.set(
 			[...doc.awareness.getStates().values()]
@@ -58,6 +61,7 @@
 	onDestroy(() => doc.destroy());
 
 	$: syncWebContainerFileSystem($yarrayStore);
+	$: initializeWebContainerPageFiles($yPageFilesStore);
 	$: setComponentInEditor($openComponentName, $openGlobalFile);
 	$: updateCodingPresence(showCodeEditor);
 	$: focusCodeEditing(showCodeEditor);
@@ -74,7 +78,7 @@
 		let foundYtext;
 
 		if (globalFile) {
-			foundYtext = doc.ydoc.getMap(PAGE_FILES_KEY).get(globalFile);
+			foundYtext = yPageFilesStore.y.get(globalFile);
 		} else if (componentName) {
 			for (const ymap of $yarrayStore) {
 				if (ymap.get('name') === componentName)
@@ -85,6 +89,7 @@
 		if (foundYtext !== undefined) {
 			ytext = foundYtext;
 			yExtension = yCollab(ytext, doc.awareness);
+			language = globalFile ? javascript() : svelte();
 		}
 	}
 
@@ -140,7 +145,7 @@
 		{#if ytext && yExtension}
 			<CodeMirror
 				value={ytext.toString()}
-				lang={svelte()}
+				lang={language}
 				nodebounce
 				theme={coolGlow}
 				extensions={[yExtension]}

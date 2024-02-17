@@ -127,7 +127,13 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 		yarray.insert(0, blockMaps);
 
 		const yFilesMap = ydoc.getMap(PAGE_FILES_KEY);
-		yFilesMap.set('+page.server.js', new Y.Text('/* This is the page server file */\nexport function load() { return { testData: "hi" } }'));
+		const pageLevelFiles = ['+page.server.js'];
+		pageLevelFiles.forEach(async (filename) =>
+			yFilesMap.set(
+				filename,
+				new Y.Text(await useLocalFile(`../text-editor/src/routes/${filename}`))
+			)
+		);
 	}
 
 	async function testArray() {

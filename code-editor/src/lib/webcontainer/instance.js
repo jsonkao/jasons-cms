@@ -122,11 +122,33 @@ export async function startWebContainer() {
 	await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
 }
 
+let pageFilesInitialized = false;
+
+/**
+ * Initializes page-level files of a webcontainer. Should only be run once.
+ * @param {Map<string, string>} pageFiles
+ */
+export async function initializeWebContainerPageFiles(pageFiles) {
+	if (pageFilesInitialized) return;
+	if (pageFiles.size === 0) return;
+
+	await ready;
+
+	await Promise.all(
+		[...pageFiles.entries()].map(([filename, contents]) =>
+			writeFile(`/src/routes/${filename}`, contents)
+		)
+	);
+
+	pageFilesInitialized = true;
+}
+
 /**
  * Given a Yjs array of blocks, make sure that the WebContainer's file system is synced (i.e. Svelte components exist
  * for all components, and Svelte components are deleted for components that have been removed).
  * Also generate an `index.js` file that imports and exports all the graphic components.
  * @param {Array<BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
+ *
  */
 export async function syncWebContainerFileSystem(yarray) {
 	await ready;

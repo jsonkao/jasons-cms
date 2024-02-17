@@ -9,7 +9,6 @@ import AdmZip from 'adm-zip';
 const inputFile = process.argv.includes('--test')
 	? 'scripts/bundle-editor/test/files.zip'
 	: 'files.zip';
-	console.log(inputFile)
 const zip = new AdmZip(inputFile);
 
 zip.extractAllTo(process.argv.includes('--test') ? 'scripts/bundle-editor/test' : '.', true);

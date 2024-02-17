@@ -41,6 +41,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@codemirror/lang-javascript": "^6.2.1",
 		"@liveblocks/client": "^1.9.7",
 		"@liveblocks/node": "^1.9.7",
 		"@liveblocks/yjs": "^1.9.7",

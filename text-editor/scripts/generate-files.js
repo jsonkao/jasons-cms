@@ -33,6 +33,8 @@ async function main() {
 		join(generatedPath, 'index.js'),
 		importLines + '\n\nexport default ' + exportLines + ';\n'
 	);
+
+	throw new Error('something u gotta do: dynamically generate page-level files like +page.server.js')
 }
 
 /**

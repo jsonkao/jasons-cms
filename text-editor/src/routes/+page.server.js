@@ -3,5 +3,3 @@ export function load() {
 		test: 'hi'
 	};
 }
-
-export const prerender = false;

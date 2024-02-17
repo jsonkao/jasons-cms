@@ -1,8 +1,9 @@
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import * as Y from 'yjs';
-import { BLOCKS_KEY } from './constants.js';
+import { BLOCKS_KEY, PAGE_FILES_KEY } from './constants.js';
 import { readableArray } from './readable-array.js';
+import { readableMap } from './readable-map.ts';
 
 export class SharedDoc {
 	/** @type {import('y-protocols').Awareness} */
@@ -37,6 +38,7 @@ export class SharedDoc {
 
 		this.yarray = this.ydoc.getArray(BLOCKS_KEY);
 		this.yarrayStore = readableArray(this.yarray);
+		this.yPageFilesStore = readableMap(this.ydoc.getMap(PAGE_FILES_KEY));
 
 		this.transactionOrigin = this.ydoc.clientID;
 
