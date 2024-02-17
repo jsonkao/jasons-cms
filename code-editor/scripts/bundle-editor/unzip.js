@@ -6,7 +6,8 @@
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 
-const zip = new AdmZip('files.zip');
+const inputFile = 'scripts/bundle-editor/test/files.zip' || 'files.zip';
+const zip = new AdmZip(inputFile);
 zip.extractAllTo('.', true);
 
 if (!fs.existsSync('node_modules/.bin')) {

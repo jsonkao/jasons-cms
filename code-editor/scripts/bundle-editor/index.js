@@ -106,13 +106,14 @@ if (ignored_files.size > 0) {
 
 console.time('writing zip');
 const out = zip.toBuffer();
-fs.writeFileSync(`src/lib/webcontainer/files.zip`, out);
+const outfile = 'scripts/bundle-editor/test/files.zip' || `src/lib/webcontainer/files.zip`;
+fs.writeFileSync(outfile, out);
 console.timeEnd('writing zip');
 
 // console log the file size of out in megabytes
 console.log();
 console.log(
-	`Zip file is ${Math.round((fs.statSync('src/lib/webcontainer/files.zip').size / 1024 / 1024) * 100) / 100}MB`
+	`Zip file is ${Math.round((fs.statSync(outfile).size / 1024 / 1024) * 100) / 100}MB`
 );
 
 // bundle unzip script so we can use it in the webcontainer
