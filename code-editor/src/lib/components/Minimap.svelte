@@ -39,7 +39,11 @@
 <div class="minimap">
 	{#each blocks as b}
 		{#if b.get('type') === 'text' && fragmentIsNotEmpty(/** @type {import('yjs').XmlFragment} */ (b.get('text')))}
-			<div class="mini-text" />
+			<div>
+				{#each Array.from({ length: Math.max(2, b.get('text').length) }) as _}
+					<div class="mini-text-line" />
+				{/each}
+			</div>
 		{:else if b.get('type') === 'graphic'}
 			<div class="mini-graphic" class:focused={b.get('name') === $openComponentName}>
 				<button
@@ -93,11 +97,14 @@
 		border: 1px solid rgba(255, 255, 255, 0.8);
 	}
 
-	.mini-text {
-		border: 4px solid rgba(255, 255, 255, 0.15);
-		border-left: none;
-		border-right: none;
-		padding: 2px 0;
+	.mini-text-line {
+		width: 100%;
+		height: 4px;
+		background: rgba(255, 255, 255, 0.15);
+	}
+
+	.mini-text-line:not(:last-child) {
+		margin-bottom: 4px;
 	}
 
 	.minimap > * {
