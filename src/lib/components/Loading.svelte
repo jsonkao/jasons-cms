@@ -74,7 +74,7 @@
 
 	.progress-bar {
 		height: 100%;
-		background: #ccc;
+		background: rgba(255, 0, 255, 0.3);
 		border-radius: 2.5px;
 		transition: width 0.2s ease-out;
 	}

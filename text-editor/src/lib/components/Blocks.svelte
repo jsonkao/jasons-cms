@@ -46,8 +46,8 @@
 	}
 
 	onMount(() => {
-		startHMRListening(contentEl);
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
+		startHMRListening(contentEl);
 		return doc.destroy;
 	});
 

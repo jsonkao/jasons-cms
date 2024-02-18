@@ -1,7 +1,7 @@
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import * as Y from 'yjs';
-import { BLOCKS_KEY, PAGE_FILES_KEY } from './constants.js';
+import { BLOCKS_KEY, PAGE_FILES_KEY, DEFAULT_CODE_BLOCK } from './constants.js';
 import { readableArray } from './readable-array.js';
 import { readableMap } from './readable-map.js';
 
@@ -114,22 +114,7 @@ export class SharedDoc {
 	insertGraphicSandwich(index, { name, textBefore, textAfter }) {
 		const newElements = [
 			makeTextBlock(textBefore),
-			makeCodingBlock(
-				name,
-				[
-					'<div>',
-					'\t<!-- Your code here -->',
-					'</div>',
-					'',
-					'<style>',
-					'\tdiv {',
-					'\t\theight: 300px;',
-					'\t\twidth: 100%;',
-					'\t\tbackground: #6495ed66;',
-					'\t}',
-					'</style>\n'
-				].join('\n')
-			),
+			makeCodingBlock(name, DEFAULT_CODE_BLOCK),
 			makeTextBlock(textAfter)
 		];
 

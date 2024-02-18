@@ -9,7 +9,7 @@
 
 	$: files = [
 		{ label: 'visual', filename: $openComponentName },
-		{ label: 'data', filename: '+page.server.js' },
+		{ label: 'data', filename: '+page.server.js' }
 	];
 </script>
 
@@ -17,6 +17,7 @@
 	{#each files as { label, filename }}
 		<button
 			class:current={filename === openFile}
+			disabled={filename === null}
 			on:click={() => openGlobalFile.set(label === 'visual' ? null : filename)}
 		>
 			{label}

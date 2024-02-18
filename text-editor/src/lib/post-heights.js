@@ -29,7 +29,9 @@ export function startHMRListening(contentElement) {
  * @param {HTMLElement} contentElement
  */
 export function postHeights(contentElement) {
-	/** @type {BlockHeights} */
+	if (!contentElement) return;
+
+	/** @type {import('$shared').BlockHeights} */
 	const blockHeights = {};
 
 	Array.from(contentElement.children).forEach((div) => {

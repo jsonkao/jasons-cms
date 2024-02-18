@@ -124,6 +124,8 @@
 				}
 			}
 		);
+		// For some reason this always focuses the first text block, which is great.
+		focus();
 	});
 
 	onDestroy(() => {
