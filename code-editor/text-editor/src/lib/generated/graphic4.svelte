@@ -1,8 +1,9 @@
 <script>
-	import { easeCircleIn, easeCircleInOut } from 'd3-ease';
-	import { onMount } from 'svelte';
-
+	// SEED REMOVE START
 	export let data; data;
+	// SEED REMOVE END
+
+	import { onMount } from 'svelte';
 
 	let oilData = [];
 	let maxCost = 1;

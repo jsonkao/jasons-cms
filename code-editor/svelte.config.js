@@ -9,7 +9,7 @@ const config = {
 
 	kit: {
 		alias: {
-			$shared: '../text-editor/shared'
+			$shared: 'shared'
 		},
 		csrf: {
 			checkOrigin: false
