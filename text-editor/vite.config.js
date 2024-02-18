@@ -2,22 +2,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [
-		sveltekit(),
-		importResolve(),
-		{
-			name: 'add-cors',
-
-			configureServer(server) {
-				server.middlewares.use((_req, res, next) => {
-					res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-					res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-					res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-					next();
-				});
-			}
-		}
-	],
+	plugins: [sveltekit(), importResolve()],
 	optimizeDeps: {
 		include: [
 			'prosemirror-state',
@@ -76,5 +61,24 @@ function parseNpmSpecifier(specifier) {
 		name: ranged > 0 ? namerange.slice(0, ranged) : namerange,
 		range: ranged > 0 ? namerange.slice(ranged + 1) : undefined,
 		path: parts.length > 0 ? parts.join('/') : undefined
+	};
+}
+
+/**
+ * A Vite plugin that adds CORS according to webcontainer troubleshooting docs
+ * @returns {import('vite').Plugin}
+ */
+function addCors() {
+	return {
+		name: 'add-cors',
+
+		configureServer(server) {
+			server.middlewares.use((_req, res, next) => {
+				res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+				res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+				res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+				next();
+			});
+		}
 	};
 }
