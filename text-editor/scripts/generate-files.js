@@ -34,7 +34,9 @@ async function main() {
 		importLines + '\n\nexport default ' + exportLines + ';\n'
 	);
 
-	throw new Error('something u gotta do: dynamically generate page-level files like +page.server.js')
+	throw new Error(
+		'something u gotta do: dynamically generate page-level files like +page.server.js'
+	);
 }
 
 /**
@@ -48,8 +50,10 @@ async function generateFiles(liveblocks, generatedPath, slug) {
 	const update = await liveblocks.getYjsDocumentAsBinaryUpdate(slug);
 	Y.applyUpdate(ydoc, new Uint8Array(update));
 
-	const blocks = ydoc.getArray('blocks').toJSON();
-	const graphicBlocks = blocks.filter(({ type }) => type === 'graphic');
+	const blocks = /** @type {import('$shared').Block[]} */ (ydoc.getArray('blocks').toJSON());
+	const graphicBlocks = /** @type {import('$shared').GraphicBlock[]} */ (
+		blocks.filter(({ type }) => type === 'graphic')
+	);
 
 	const path = resolve(generatedPath, slug);
 	if (!existsSync(path)) await fs.mkdir(path, { recursive: true });

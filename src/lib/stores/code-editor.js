@@ -21,7 +21,7 @@ const defaultPosition = browser && window.innerWidth < 800 ? 'bottom' : 'left';
 export const codeEditorPosition = writable(defaultPosition);
 
 /**
- * @type {import('svelte/store').Writable<Array<{ user: string, color: string }>}
+ * @type {import('svelte/store').Writable<Array<{ user: string, color: string }>>}
  * The other people coding
  */
 export const otherCoders = writable([]);

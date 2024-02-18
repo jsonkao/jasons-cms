@@ -56,7 +56,7 @@
 	}
 
 	/** Tracks the timeout id of the last time the change event was dispatched
-	 * @type {number}
+	 * @type {ReturnType<setTimeout>}
 	 */
 	let dispatchLastEditTimeout;
 

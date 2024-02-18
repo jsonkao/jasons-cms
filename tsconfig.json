@@ -16,12 +16,12 @@
 		".svelte-kit/ambient.d.ts",
 		".svelte-kit/non-ambient.d.ts",
 		".svelte-kit/types/**/$types.d.ts",
-		"ambient.d.ts",
 		"vite.config.js",
 		"src/**/*.js",
 		"src/**/*.ts",
 		"src/**/*.svelte",
-		"scripts/**/*.js"
+		"scripts/**/*.js",
+		"shared/**/*.js"
 	]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//

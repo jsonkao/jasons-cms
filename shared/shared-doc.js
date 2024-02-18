@@ -5,6 +5,8 @@ import { BLOCKS_KEY, PAGE_FILES_KEY } from './constants.js';
 import { readableArray } from './readable-array.js';
 import { readableMap } from './readable-map.js';
 
+/** @typedef {import('./index.d.ts').BlockMap} BlockMap */
+
 export class SharedDoc {
 	/** @type {import('y-protocols/awareness').Awareness} */
 	awareness;
@@ -193,24 +195,33 @@ export function makeCodingBlock(name, code) {
 	ymap.set('type', 'graphic');
 	ymap.set('name', name);
 	ymap.set('code', new Y.Text(code));
+
+	const proseMap = new Y.Map();
+	ymap.set('prose', proseMap);
+
 	return ymap;
 }
 
 /**
- * TODO: dedupe
  * @param {string} initialContent
  * @param {string} [headline]
- * @returns {import('yjs').XmlFragment}
+ * @returns {Y.XmlFragment}
  */
-export function makeFragment(initialContent, headline = '') {
+export function makeFragment(initialContent, headline) {
 	const yxmlFragment = new Y.XmlFragment();
-	const yxmlElement = new Y.XmlElement('paragraph');
-	yxmlElement.insert(0, [new Y.XmlText(initialContent)]);
-	yxmlFragment.insert(0, [yxmlElement]);
+	yxmlFragment.insert(0, initialContent.split('\n').map(makeElement));
+
 	if (headline) {
 		const yxmlElement = new Y.XmlElement('headline');
 		yxmlElement.insert(0, [new Y.XmlText(headline)]);
 		yxmlFragment.insert(0, [yxmlElement]);
 	}
 	return yxmlFragment;
+}
+
+/** @param {string} str */
+function makeElement(str) {
+	const yxmlElement = new Y.XmlElement('paragraph');
+	yxmlElement.insert(0, [new Y.XmlText(str)]);
+	return yxmlElement;
 }

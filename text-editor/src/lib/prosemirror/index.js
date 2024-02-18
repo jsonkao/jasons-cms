@@ -55,7 +55,7 @@ export class SharedDocForProsemirror extends SharedDoc {
 
 	/** @param {BlockInsertionParams} params */
 	insertGraphic({ docNode, cursorPosition, activeYXmlFragment }) {
-		const currentBlockMap = /** @type {BlockMap} */ (activeYXmlFragment.parent);
+		const currentBlockMap = /** @type {import('$shared').BlockMap} */ (activeYXmlFragment.parent);
 		const ymapIndex = this.indexOf(currentBlockMap);
 		if (ymapIndex === -1) throw new Error('Could not find the current block map');
 
@@ -73,11 +73,14 @@ export const doc = new SharedDocForProsemirror();
 
 /**
  * Uses internal ID to create a unique key for each block
- * @param {import('yjs').Map<any> | import('yjs').XmlFragment} yjsThing
+ * @param {import('yjs').Map<any> | import('yjs').XmlFragment | import('$shared').BlockMap} yjsThing
  */
 export function getId(yjsThing) {
-	if (yjsThing._item === null) throw new Error('I thought Y.Map._item would never be null');
-	return Object.values(yjsThing._item.id).join('_');
+	// @ts-ignore
+	const { _item } = yjsThing;
+
+	if (_item === null) throw new Error('I thought Y.Map._item would never be null');
+	return Object.values(_item.id).join('_');
 }
 
 /**

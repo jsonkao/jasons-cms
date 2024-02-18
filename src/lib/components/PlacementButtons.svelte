@@ -1,11 +1,13 @@
-<script>
+<script lang="ts">
 	import { codeEditorPosition } from '$lib/stores/code-editor.js';
+
+	const positions = ['center', 'left', 'bottom'] as const;
 </script>
 
 <div class="footer">
 	<p title="Updates the page">cmd+s saves</p>
 	<div class="placement-buttons">
-		{#each ['center', 'left', 'bottom'] as position}
+		{#each positions as position}
 			<button class="position-{position}" on:click={() => codeEditorPosition.set(position)} />
 		{/each}
 	</div>

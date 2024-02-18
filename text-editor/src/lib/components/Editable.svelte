@@ -19,20 +19,23 @@
 	/** @type {string | undefined} */
 	export let key = undefined;
 
-	if (!fragment) {
-		if (prose !== undefined && key !== undefined) {
-			if (typeof key !== 'string') throw new Error('key must be a string');
+	/** @type {import('yjs').XmlFragment} */
+	let finalFragment;
 
-			if (!prose.has(key)) prose.set(key, makeFragment('Write here...'));
-			fragment = prose.get(key);
-		} else {
-			throw new Error('fragment or prose and key must be provided');
-		}
+	if (fragment) {
+		finalFragment = fragment;
+	} else if (prose !== undefined && key !== undefined) {
+		if (typeof key !== 'string') throw new Error('key must be a string');
+
+		if (!prose.has(key)) prose.set(key, makeFragment('Write here...'));
+		finalFragment = prose.get(key);
+	} else {
+		throw new Error('fragment or prose and key must be provided');
 	}
 </script>
 
 <ProsemirrorEditor
-	bind:this={pmEditors[getId(fragment)]}
-	on:blur={() => lastTextFocused.set(getId(fragment))}
-	editorStateCreator={() => doc.createEditorForBlock(fragment, { hasFloatingMenu })}
+	bind:this={pmEditors[getId(finalFragment)]}
+	on:blur={() => lastTextFocused.set(getId(finalFragment))}
+	editorStateCreator={() => doc.createEditorForBlock(finalFragment, { hasFloatingMenu })}
 />

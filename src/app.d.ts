@@ -1,3 +1,5 @@
+/// <reference path="./shared/index.d.ts" />
+
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {

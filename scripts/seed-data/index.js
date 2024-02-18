@@ -4,7 +4,8 @@ import LiveblocksProvider from '@liveblocks/yjs';
 import fs from 'fs/promises';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
-import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../../text-editor/shared/constants.js';
+import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../shared/constants.js';
+import { makeCodingBlock, makeFragment, makeTextBlock } from '../../shared/shared-doc.js';
 
 /** @typedef {'louisiana-fifth-circuit' | 'oil-wells' | 'tutorial'} RoomName */
 /** @typedef {{text: string, hed?: string}} TextSeedData */
@@ -121,7 +122,7 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 		const blockMaps = await Promise.all(
 			contents.map(async (c) => {
 				if ('graphic' in c) return makeCodingBlockFromLocalFile(c.graphic);
-				return makeTextBlock(c.text, c.hed);
+				return makeTextBlockFromString(c.text, c.hed);
 			})
 		);
 		yarray.insert(0, blockMaps);
@@ -153,57 +154,12 @@ async function makeCodingBlockFromLocalFile(name) {
 }
 
 /**
- * @param {string} name
- * @param {string} code
- * @returns {BlockMap}
- */
-function makeCodingBlock(name, code) {
-	const ymap = new Y.Map();
-	ymap.set('type', 'graphic');
-	ymap.set('name', name);
-	ymap.set('code', new Y.Text(code));
-
-	const proseMap = new Y.Map();
-	ymap.set('prose', proseMap);
-
-	return ymap;
-}
-
-/** @param {string} str */
-function makeElement(str) {
-	const yxmlElement = new Y.XmlElement('paragraph');
-	yxmlElement.insert(0, [new Y.XmlText(str)]);
-	return yxmlElement;
-}
-
-/**
- * @param {string} initialContent
- * @param {string} [headline]
- * @returns {Y.XmlFragment}
- */
-function makeFragment(initialContent, headline) {
-	const yxmlFragment = new Y.XmlFragment();
-	yxmlFragment.insert(0, initialContent.split('\n').map(makeElement));
-
-	if (headline) {
-		const yxmlElement = new Y.XmlElement('headline');
-		yxmlElement.insert(0, [new Y.XmlText(headline)]);
-		yxmlFragment.insert(0, [yxmlElement]);
-	}
-	return yxmlFragment;
-}
-
-/**
  * @param {string} initialContent
  * @param {string | undefined} headline
- * @returns {Y.Map<Y.XmlFragment>}
+ * @returns {import('../../shared').BlockMap}
  */
-function makeTextBlock(initialContent, headline) {
-	const ymap = new Y.Map();
-	ymap.set('type', 'text');
-	ymap.set('text', makeFragment(initialContent, headline || ''));
-
-	return ymap;
+function makeTextBlockFromString(initialContent, headline = '') {
+	return makeTextBlock(makeFragment(initialContent, headline));
 }
 
 /**
