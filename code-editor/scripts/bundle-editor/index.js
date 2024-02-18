@@ -14,12 +14,8 @@ const cwd = '../text-editor';
 
 console.time('install');
 if (!!process.env.VERCEL) {
-	// Delete symlink to shared package (COMMENTED OUT BC WE'RE NOT USING SHARED ANYMORE)
-	// execSync('npm uninstall shared');
 	// Omitting prettier dev dependencies reduces bundle size by 2MB lol (is now 7MB).
 	execSync('rm -rf node_modules package-lock.json && npm i --omit=dev', { cwd });
-	// Install shared package as real local package (COMMENTED OUT BC WE'RE NOT USING SHARED ANYMORE)
-	// execSync('npm install $(npm pack ../shared | tail -1)', { cwd });
 } else if (!fs.existsSync(cwd + '/node_modules')) {
 	execSync('npm ci', { cwd });
 }
@@ -72,29 +68,6 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 		continue;
 	}
 	if (file.endsWith('.ts') && file.startsWith('node_modules/')) {
-		continue;
-	}
-
-	if (file === 'node_modules/shared') {
-		const packageFiles = fs.readdirSync(fs.realpathSync(`${cwd}/${file}`), {
-			recursive: true,
-			withFileTypes: true
-		});
-
-		for (const packageFile of packageFiles) {
-			if (packageFile.path.includes('/node_modules')) continue;
-
-			const packageFilePath =
-				`${cwd}/${file}` + packageFile.path.split('shared')[1] + '/' + packageFile.name;
-
-			if (packageFile.isFile()) {
-				console.log(`Adding ${packageFilePath}`);
-				zip.addFile(
-					packageFilePath.replace('../text-editor/', ''),
-					fs.readFileSync(packageFilePath)
-				);
-			}
-		}
 		continue;
 	}
 

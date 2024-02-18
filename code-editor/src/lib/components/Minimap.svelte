@@ -3,7 +3,7 @@
 	import { openComponentName } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher } from 'svelte';
 
-	/** @type {Array<import('shared').BlockMap>} */
+	/** @type {Array<BlockMap>} */
 	export let blocks;
 
 	const SCALAR = 1 / 10;
@@ -40,7 +40,7 @@
 	{#each blocks as b}
 		{#if b.get('type') === 'text' && fragmentIsNotEmpty(/** @type {import('yjs').XmlFragment} */ (b.get('text')))}
 			<div>
-				{#each Array.from({ length: Math.max(2, b.get('text').length) }) as _}
+				{#each Array.from({ length: Math.max(2, b.get('text')?.length || 0) }) as _}
 					<div class="mini-text-line" />
 				{/each}
 			</div>

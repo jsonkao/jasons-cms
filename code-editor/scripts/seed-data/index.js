@@ -4,7 +4,7 @@ import LiveblocksProvider from '@liveblocks/yjs';
 import fs from 'fs/promises';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
-import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../src/lib/shared/constants.js';
+import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../../text-editor/shared/constants.js';
 
 /** @typedef {'louisiana-fifth-circuit' | 'oil-wells' | 'tutorial'} RoomName */
 /** @typedef {{text: string, hed?: string}} TextSeedData */

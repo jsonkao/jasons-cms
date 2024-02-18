@@ -8,6 +8,9 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
+		alias: {
+			$shared: '../text-editor/shared'
+		},
 		csrf: {
 			checkOrigin: false
 		},

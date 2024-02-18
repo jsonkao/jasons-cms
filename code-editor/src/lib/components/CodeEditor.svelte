@@ -1,7 +1,7 @@
 <script>
 	import { svelte } from '@replit/codemirror-lang-svelte';
 	// import { javascript } from '@codemirror/lang-javascript'; // importing this causes a weird bug
-	import { SharedDoc } from '$lib/shared/shared-doc.js';
+	import { SharedDoc } from '$shared/shared-doc.js';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
 
