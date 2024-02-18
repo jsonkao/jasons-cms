@@ -1,6 +1,7 @@
 <script>
 	// SEED REMOVE START
-	export let data; data;
+	export let data;
+	data;
 	// SEED REMOVE END
 
 	import { onMount } from 'svelte';

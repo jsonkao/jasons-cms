@@ -5,10 +5,10 @@ export const BLOCKS_KEY = 'blocks';
 export const PAGE_FILES_KEY = 'page-files';
 
 export const DEFAULT_CODE_BLOCK = [
-  '<script>',
-  '\t// Your code here',
-  '</script>',
-  '',
+	'<script>',
+	'\t// Your code here',
+	'</script>',
+	'',
 	'<div>',
 	'\t<!-- Your code here -->',
 	'</div>',

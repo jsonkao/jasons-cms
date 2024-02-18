@@ -22,10 +22,10 @@ The first live demo of Jason's CMS was released on YouTube on January 22, 2024 (
 
 ## People who have said this is cool
 
-* M(G)G
-* UU
-* AF
-* IH
-* AT
-* C(B)O(J)
-* HM
+- M(G)G
+- UU
+- AF
+- IH
+- AT
+- C(B)O(J)
+- HM
