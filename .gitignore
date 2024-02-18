@@ -13,5 +13,3 @@ vite.config.ts.timestamp-*
 *.zip
 unzip.cjs
 text-editor/src/routes/render/\[slug\]/generated
-
-code-editor/scripts/bundle-editor/test/

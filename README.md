@@ -10,11 +10,11 @@ This repo uses npm.
 npm run dev
 ```
 
-Requires a `code-editor/.env` with a `LIVEBLOCKS_SECRET_KEY` and a `LIVEBLOCKS_PUBLIC_KEY`.
+Requires a `.env` with a `LIVEBLOCKS_SECRET_KEY` and a `LIVEBLOCKS_PUBLIC_KEY`.
 
 ## Structure
 
-The main app is in `code-editor`, which provides code editing functionality for the Svelte components. Inside a WebContainer, the code editor runs a dev server for `text-editor`, which provides text editing functionality.
+The main app provides code editing functionality for the Svelte components. Inside a WebContainer, the code editor runs a dev server for the inner app `./text-editor`, which provides text editing functionality.
 
 ## Demos
 
@@ -28,3 +28,4 @@ The first live demo of Jason's CMS was released on YouTube on January 22, 2024 (
 * IH
 * AT
 * C(B)O(J)
+* HM
