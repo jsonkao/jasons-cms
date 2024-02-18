@@ -1,7 +1,7 @@
 <script>
 	import { lastTextFocused } from '$lib/stores.js';
 	import { doc, getId } from '$lib/prosemirror/index.js';
-	import { makeFragment } from '$lib/shared/shared-doc.js';
+	import { makeFragment } from '$shared/shared-doc.js';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
 	/** @type {boolean} */

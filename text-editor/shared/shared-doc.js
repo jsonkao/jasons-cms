@@ -1,15 +1,15 @@
-import { liveblocksRoom } from '$lib/generated/globals.js';
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import * as Y from 'yjs';
-import { BLOCKS_KEY } from './constants.js';
+import { BLOCKS_KEY, PAGE_FILES_KEY } from './constants.js';
 import { readableArray } from './readable-array.js';
+import { readableMap } from './readable-map.js';
 
 export class SharedDoc {
-	/** @type {import('y-protocols').Awareness} */
+	/** @type {import('y-protocols/awareness').Awareness} */
 	awareness;
 
-	/** @type {import('./readable-array.js').YReadableArray<BlockMap>} */
+	/** @type {import('./index').YReadableArray<BlockMap>} */
 	yarrayStore;
 
 	/** @type {Y.Array<BlockMap>} */
@@ -23,20 +23,23 @@ export class SharedDoc {
 
 	/**
 	 * @param {{ color: string, name: string }} user
+	 * @param {string} slug
 	 */
-	constructor(user) {
+	constructor(user, slug) {
 		const client = createClient({
 			publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
 		});
-		const { room, leave } = client.enterRoom(liveblocksRoom, { initialPresence: {} });
+		const { room, leave } = client.enterRoom(slug, { initialPresence: {} });
 		this.leave = leave;
 
 		this.ydoc = new Y.Doc();
+		// @ts-ignore
 		this.awareness = new LiveblocksProvider(room, this.ydoc).awareness;
 		this.awareness.setLocalStateField('user', user);
 
 		this.yarray = this.ydoc.getArray(BLOCKS_KEY);
 		this.yarrayStore = readableArray(this.yarray);
+		this.yPageFilesStore = readableMap(this.ydoc.getMap(PAGE_FILES_KEY));
 
 		this.transactionOrigin = this.ydoc.clientID;
 
@@ -77,12 +80,8 @@ export class SharedDoc {
 			throw new Error(`Could not find index of component to delete, ${name}`);
 
 		// This should all work because we enforce having blank text before and after all components
-		const textBlockBefore = /** @type {import('shared').BlockMap} */ (
-			this.yarrayStore.y.get(componentIndex - 1)
-		);
-		const textBlockAfter = /** @type {import('shared').BlockMap} */ (
-			this.yarrayStore.y.get(componentIndex + 1)
-		);
+		const textBlockBefore = /** @type {BlockMap} */ (this.yarrayStore.y.get(componentIndex - 1));
+		const textBlockAfter = /** @type {BlockMap} */ (this.yarrayStore.y.get(componentIndex + 1));
 		if (textBlockBefore.get('type') !== 'text' || textBlockAfter.get('type') !== 'text')
 			throw new Error('Expected text before and after component');
 

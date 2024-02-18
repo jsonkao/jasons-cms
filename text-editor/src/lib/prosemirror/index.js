@@ -2,12 +2,12 @@
  * This file contains helper functions for creating ProseMirror state and schema
  */
 
-import { userColor, userName } from '$lib/generated/globals.js';
+import { userColor, userName, liveblocksRoom } from '$lib/generated/globals.js';
 
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Plugin } from 'prosemirror-state';
 import { smartQuotes, ellipsis, inputRules } from 'prosemirror-inputrules';
-import { IndestructibleUndoManager, SharedDoc } from '$lib/shared/shared-doc.js';
+import { IndestructibleUndoManager, SharedDoc } from '$shared/shared-doc.js';
 import {
 	redo,
 	undo,
@@ -24,7 +24,7 @@ import { richTextSchema } from './schema.ts';
 
 export class SharedDocForProsemirror extends SharedDoc {
 	constructor() {
-		super({ color: userColor, name: userName });
+		super({ color: userColor, name: userName }, liveblocksRoom);
 
 		this.undoManager = new /** @type {typeof import('yjs').UndoManager} */ (
 			IndestructibleUndoManager
