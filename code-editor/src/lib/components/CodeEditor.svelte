@@ -1,6 +1,6 @@
 <script>
 	import { svelte } from '@replit/codemirror-lang-svelte';
-	import { javascript } from '@codemirror/lang-javascript';
+	// import { javascript } from '@codemirror/lang-javascript'; // importing this causes a weird bug
 	import { SharedDoc } from '$lib/shared/shared-doc.js';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { coolGlow } from 'thememirror';
@@ -37,7 +37,8 @@
 	/** @type {HTMLElement} */
 	let codeEditorElement;
 
-	let language = svelte();
+	/** @type {import('@codemirror/language').LanguageSupport}*/
+	let language;
 
 	/**
 	 * Create Y.Text
@@ -86,10 +87,13 @@
 			}
 		}
 
+		console.log(componentName, globalFile, foundYtext)
+
 		if (foundYtext !== undefined) {
 			ytext = foundYtext;
 			yExtension = yCollab(ytext, doc.awareness);
-			language = globalFile ? javascript() : svelte();
+			// language = globalFile ? javascript() : svelte();
+			language = svelte();
 		}
 	}
 
@@ -141,7 +145,6 @@
 	on:keydown={onKeyDown}
 >
 	<div class="code-mirror-container">
-		<Tabs />
 		{#if ytext && yExtension}
 			<CodeMirror
 				value={ytext.toString()}
@@ -161,6 +164,7 @@
 		{/if}
 	</div>
 	<div class="overlay">
+		<Tabs />
 		<PlacementButtons />
 		<Minimap on:select-graphic on:delete-graphic={deleteComponent} blocks={$yarrayStore} />
 	</div>

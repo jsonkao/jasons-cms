@@ -2,8 +2,7 @@ import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import * as Y from 'yjs';
 import { BLOCKS_KEY, PAGE_FILES_KEY } from './constants.js';
-import { readableArray } from './readable-array.js';
-import { readableMap } from './readable-map.ts';
+import { readableArray, readableMap } from 'shared';
 
 export class SharedDoc {
 	/** @type {import('y-protocols').Awareness} */

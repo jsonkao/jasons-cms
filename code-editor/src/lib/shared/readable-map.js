@@ -42,23 +42,25 @@
 
 /**
  * @template T
- * @typedef {Readable<Array<T>> & { y: import('yjs').Array<T> }} YReadableArray<T>
+ * @typedef {Readable<Map<string, T>> & { y: import('yjs').Map<T> }} YReadableArray<T>
  */
 
 /**
  * @template T
- * @param {import('yjs').Array<T>} arr
+ * @param {import('yjs').Map<T>} map
  * @returns {YReadableArray<T>}
  */
-export function readableArray(arr) {
-	let value = arr.toArray();
+export function readableMap(map) {
+	/** @type {Map<string, T>} */
+	let value = new Map(Object.entries(map.toJSON()));
 
-	/** @type {Array<Subscriber<Array<T>>>} */
+	/** @type {Array<Subscriber<Map<string, T>>>} */
 	let subs = [];
 
-	/** @param {Array<T>} newValue */
+	/** @param {Map<string, T>} newValue */
 	const setValue = (newValue) => {
 		if (value === newValue) return;
+
 		// update stored value so new subscribers can get the initial value
 		value = newValue;
 
@@ -66,14 +68,14 @@ export function readableArray(arr) {
 		subs.forEach((sub) => sub(value));
 	};
 
-	/** @param {import('yjs').YArrayEvent<T>} event */
+	/** @param {import('yjs').YMapEvent<T>} event */
 	const observer = (event) => {
-		const target = /** @type {import('yjs').Array<T>} */ (event.target);
-		setValue(target.toArray());
+		const target = /** @type {import('yjs').Map<T>} */ (event.target);
+		setValue(new Map(Object.entries(target.toJSON())));
 	};
 
 	/**
-	 * @param {Subscriber<Array<T>>} handler
+	 * @param {Subscriber<Map<string, T>>} handler
 	 * @returns {Unsubscriber}
 	 */
 	const subscribe = (handler) => {
@@ -81,9 +83,9 @@ export function readableArray(arr) {
 
 		if (subs.length === 1) {
 			// update current value to latest that yjs has since we haven't been observing
-			value = arr.toArray();
+			value = new Map(Object.entries(map.toJSON()));
 			// set an observer to call all handlers whenever there is a change
-			arr.observe(observer);
+			map.observe(observer);
 		}
 
 		// call just this handler once when it first subscribes
@@ -93,10 +95,10 @@ export function readableArray(arr) {
 		return () => {
 			subs = subs.filter((sub) => sub !== handler);
 			if (subs.length === 0) {
-				arr.unobserve(observer);
+				map.unobserve(observer);
 			}
 		};
 	};
 
-	return { subscribe, y: arr };
+	return { subscribe, y: map };
 }
