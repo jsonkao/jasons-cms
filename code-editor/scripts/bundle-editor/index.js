@@ -10,7 +10,7 @@ import fs from 'fs';
 import glob from 'tiny-glob/sync.js';
 import { fileURLToPath } from 'url';
 
-const cwd = '../text-editor';
+const cwd = './text-editor';
 
 console.time('install');
 if (!!process.env.VERCEL) {
@@ -20,6 +20,9 @@ if (!!process.env.VERCEL) {
 	execSync('npm ci', { cwd });
 }
 console.timeEnd('install');
+
+// Copy the shared folder into the text-editor folder (remove it at the end)
+execSync('cp -r ../shared .', { cwd });
 
 const zip = new AdmZip();
 
@@ -71,10 +74,16 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 		continue;
 	}
 
-	zip.addFile(
-		file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'),
-		fs.readFileSync(`${cwd}/${file}`)
-	);
+	let contents = fs.readFileSync(`${cwd}/${file}`);
+
+	if (file === 'svelte.config.js') {
+		console.log(file);
+		contents = Buffer.from(
+			contents.toString('utf-8').replace(`$shared: '../shared'`, `$shared: 'shared'`)
+		);
+	}
+
+	zip.addFile(file.replace('node_modules/esbuild-wasm/', 'node_modules/esbuild/'), contents);
 }
 console.timeEnd('zip.addFile');
 
@@ -93,6 +102,9 @@ console.timeEnd('writing zip');
 // console log the file size of out in megabytes
 console.log();
 console.log(`Zip file is ${Math.round((fs.statSync(outfile).size / 1024 / 1024) * 100) / 100}MB`);
+
+// Remove the copied shared folder
+execSync('rm -r shared', { cwd });
 
 // bundle unzip script so we can use it in the webcontainer
 esbuild.buildSync({
