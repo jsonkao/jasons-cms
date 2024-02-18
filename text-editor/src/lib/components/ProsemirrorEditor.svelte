@@ -16,6 +16,7 @@
 
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { EditorView } from 'prosemirror-view';
+	import { TextSelection } from 'prosemirror-state';
 
 	const dispatch = createEventDispatcher();
 
@@ -47,7 +48,20 @@
 
 	/** Focus the content-editable div */
 	export function focus() {
-		view && view.focus();
+		if (view) {
+			view.focus();
+
+			/* Trying to set the cursor at the beginning of the document, but not working */
+
+			const doc = view.state.doc;
+			const selection = TextSelection.atStart(doc);
+			const { tr } = view.state;
+
+			tr.setSelection(new TextSelection(selection.$anchor));
+			view.dispatch(tr);
+
+			setTimeout(() => view?.dispatch(tr), 1000);
+		}
 	}
 
 	/** Blur the content-editable div */
