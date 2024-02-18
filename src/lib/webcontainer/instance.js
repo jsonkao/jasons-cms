@@ -24,12 +24,12 @@ let currentProcess;
 if (import.meta.hot) {
 	// On HMR, first clean up the current process
 	import.meta.hot.dispose(() => {
-		console.log('[HMR] dispose');
+		console.log('[HMR] Dispose');
 		killCurrentProcess();
 	});
 
 	import.meta.hot.accept(() => {
-		console.log('[HMR] accept');
+		console.log('[HMR] Accept');
 	});
 }
 

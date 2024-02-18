@@ -132,7 +132,7 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 		pageLevelFiles.forEach(async (filename) =>
 			yFilesMap.set(
 				filename,
-				new Y.Text(await useLocalFile(`../text-editor/src/routes/${filename}`))
+				new Y.Text(await useLocalFile(`./text-editor/src/routes/${filename}`))
 			)
 		);
 	}
@@ -149,7 +149,7 @@ async function populateRoomWithData(liveblocksRoom, contents) {
  * @param {string} name
  */
 async function makeCodingBlockFromLocalFile(name) {
-	const code = await useLocalFile(`../text-editor/src/lib/generated/${name}.svelte`);
+	const code = await useLocalFile(`./text-editor/src/lib/generated/${name}.svelte`);
 	return makeCodingBlock(name, code);
 }
 

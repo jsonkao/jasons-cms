@@ -77,7 +77,6 @@ for (const file of glob('**', { cwd, filesOnly: true, dot: true }).map((file) =>
 	let contents = fs.readFileSync(`${cwd}/${file}`);
 
 	if (file === 'svelte.config.js') {
-		console.log(file);
 		contents = Buffer.from(
 			contents.toString('utf-8').replace(`$shared: '../shared'`, `$shared: 'shared'`)
 		);
