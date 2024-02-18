@@ -87,8 +87,6 @@
 			}
 		}
 
-		console.log(componentName, globalFile, foundYtext)
-
 		if (foundYtext !== undefined) {
 			ytext = foundYtext;
 			yExtension = yCollab(ytext, doc.awareness);
