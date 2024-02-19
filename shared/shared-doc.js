@@ -48,8 +48,7 @@ export class SharedDoc {
 		this.destroy = this.destroy.bind(this);
 
 		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
-		// persistence for? (e.g. Blocks.svelte, but not +page.server.js)
-		// TODO: Create a ydoc top-level map for non-block files we do want persistance for (e.g. +page.server.js)
+		// persistence for? (e.g. Blocks.svelte, but not page level files)
 	}
 
 	destroy() {

@@ -1,6 +1,6 @@
 import type { EditorState } from 'prosemirror-state';
 import type { Node } from 'prosemirror-model';
-import type { XmlFragment } from 'yjs';
+import type * as Y from 'yjs';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -18,7 +18,7 @@ declare global {
 	type BlockInsertionParams = {
 		docNode: Node;
 		cursorPosition: number;
-		activeYXmlFragment: XmlFragment;
+		activeYXmlFragment: Y.XmlFragment;
 	};
 }
 

@@ -1,15 +1,12 @@
 <script>
-	/**
-	 * This component is currently unused. Need to figure out how to integrate global files
-	 * with YDoc.
-	 */
 	import { openComponentName, openGlobalFile } from '$lib/stores/code-editor.js';
+	import { PAGE_LEVEL_FILES } from '$lib/constants.js';
 
 	$: openFile = $openGlobalFile || $openComponentName;
 
 	$: files = [
 		{ label: 'visual', filename: $openComponentName },
-		{ label: 'data', filename: '+page.server.js' }
+		{ label: 'data', filename: PAGE_LEVEL_FILES.data }
 	];
 </script>
 

@@ -55,6 +55,7 @@ export class SharedDocForProsemirror extends SharedDoc {
 
 	/** @param {BlockInsertionParams} params */
 	insertGraphic({ docNode, cursorPosition, activeYXmlFragment }) {
+		// @ts-ignore
 		const currentBlockMap = /** @type {import('$shared').BlockMap} */ (activeYXmlFragment.parent);
 		const ymapIndex = this.indexOf(currentBlockMap);
 		if (ymapIndex === -1) throw new Error('Could not find the current block map');
@@ -63,7 +64,9 @@ export class SharedDocForProsemirror extends SharedDoc {
 
 		this.insertGraphicSandwich(ymapIndex, {
 			name: 'graphic' + idAboutToBeDeleted,
+			// @ts-ignore
 			textBefore: prosemirrorToYXmlFragment(docNode.cut(0, cursorPosition - 1)),
+			// @ts-ignore
 			textAfter: prosemirrorToYXmlFragment(docNode.cut(cursorPosition + 1))
 		});
 	}

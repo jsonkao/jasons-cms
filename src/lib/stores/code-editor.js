@@ -9,7 +9,7 @@ export const openComponentName = writable(null);
 
 /**
  * @type {import('svelte/store').Writable<string | null>}
- * The file in focus that isn't a component (e.g. +page.server.js)
+ * The page-level (non-component) file in focus
  */
 export const openGlobalFile = writable(null);
 

@@ -4,6 +4,7 @@ import LiveblocksProvider from '@liveblocks/yjs';
 import fs from 'fs/promises';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
+import { PAGE_LEVEL_FILES } from '../../src/lib/constants.js';
 import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../shared/constants.js';
 import { makeCodingBlock, makeFragment, makeTextBlock } from '../../shared/shared-doc.js';
 
@@ -128,7 +129,7 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 		yarray.insert(0, blockMaps);
 
 		const yFilesMap = ydoc.getMap(PAGE_FILES_KEY);
-		const pageLevelFiles = ['+page.server.js'];
+		const pageLevelFiles = Object.values(PAGE_LEVEL_FILES);
 		pageLevelFiles.forEach(async (filename) =>
 			yFilesMap.set(
 				filename,

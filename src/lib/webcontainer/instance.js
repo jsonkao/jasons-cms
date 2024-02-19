@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
-import { GENERATED_PATH, STEPS } from '$lib/constants.js';
+import { GENERATED_PATH, PAGE_LEVEL_FILES, STEPS } from '$lib/constants.js';
 import { iframeUrl, currentStep } from '$lib/stores/status.js';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { WebContainer } from '@webcontainer/api';
@@ -46,8 +46,8 @@ export async function initialize() {
 
 	const promises = [];
 
-	// Reuse the same webcontainer in dev HMR
 	if (import.meta.hot?.data.webcontainer) {
+		// Reuse the same webcontainer in dev HMR
 		webcontainer = import.meta.hot.data.webcontainer;
 	} else {
 		promises.push(boot());
@@ -151,6 +151,7 @@ export async function initializeWebContainerPageFiles(pageFiles) {
  *
  */
 export async function syncWebContainerFileSystem(yarray) {
+	if (yarray.length === 0) return;
 	await ready;
 
 	const currentGraphics = await webcontainer.fs.readdir(GENERATED_PATH);
@@ -172,9 +173,7 @@ export async function syncWebContainerFileSystem(yarray) {
 	);
 
 	// If there's no open component, set the first one
-	if (allGraphics.length === 0) {
-		openComponentName.set(null);
-	} else if (
+	if (
 		get(openComponentName) === null ||
 		graphicsToDelete.includes(get(openComponentName) + '.svelte')
 	) {
@@ -207,20 +206,18 @@ export async function syncWebContainerFileSystem(yarray) {
 
 /**
  * Handles saving a componennt
- * @param {string | null} componentNameOrGlobalFile - The name of the component to save
+ * @param {string | null} fileOrComponent - The name of the component to save or a page-level file
  * @param {string} content - The content of the component to save
  */
-export async function saveComponentOrGlobalFile(componentNameOrGlobalFile, content) {
-	if (componentNameOrGlobalFile === null) {
+export async function saveComponentOrGlobalFile(fileOrComponent, content) {
+	if (fileOrComponent === null) {
 		throw new Error('Attempted to save a component or global fille but filename is null');
 	}
 
-	if (componentNameOrGlobalFile === '+page.server.js') {
-		// Global file
-		await writeFile(`/src/routes/${componentNameOrGlobalFile}`, content);
+	if (Object.values(PAGE_LEVEL_FILES).includes(fileOrComponent)) {
+		await writeFile(`/src/routes/${fileOrComponent}`, content);
 	} else {
-		// Normal component
-		await writeFile(`${GENERATED_PATH}/${componentNameOrGlobalFile}.svelte`, content);
+		await writeFile(`${GENERATED_PATH}/${fileOrComponent}.svelte`, content);
 	}
 }
 

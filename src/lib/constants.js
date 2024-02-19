@@ -1,10 +1,4 @@
-import { get } from 'svelte/store';
-import { page } from '$app/stores';
-import { browser } from '$app/environment';
-
-/**
- * Steps for progress
- */
+/** Steps for progress */
 export const STEPS = {
 	INITIALIZING: { number: 0, label: 'welcome' },
 	BOOTING: { number: 1, label: 'booting' },
@@ -15,19 +9,19 @@ export const STEPS = {
 	EDITOR_READY: { number: 6, label: 'editor ready' }
 };
 
-/**
- * The base path for dynamically created files in the webcontainer fs
- */
+/** All page-level (non-component) files */
+export const PAGE_LEVEL_FILES = {
+	data: '+page.server.js'
+};
+
+/** The base path for dynamically created files in the webcontainer fs */
 export const GENERATED_PATH = '/src/lib/generated';
 
-/**
- * User attributes
- */
+/* User attributes */
 
 const names = ['Jason', 'Hurubie', 'Chudi Jr.', 'Ben', 'Heidi', 'Liz'];
+const colors = ['#A32251', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
 /** The name for both CodeMirror and ProseMirror's collaborative cursors */
 export const userName = names[Math.floor(Math.random() * names.length)];
-
-const colors = ['#A32251', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
 /** The color for both CodeMirror and ProseMirror's collaborative cursors */
 export const userColor = colors[Math.floor(Math.random() * colors.length)];

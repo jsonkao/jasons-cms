@@ -59,8 +59,6 @@
 
 			tr.setSelection(new TextSelection(selection.$anchor));
 			view.dispatch(tr);
-
-			setTimeout(() => view?.dispatch(tr), 1000);
 		}
 	}
 
