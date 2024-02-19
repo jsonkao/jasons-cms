@@ -14,13 +14,13 @@
 		</div>
 		<div class="label">
 			{#key $currentStep.label}
-				<p out:fade in:slide>
+				<p out:fade in:slide={{ duration: 700 }}>
 					{$currentStep.label}
 				</p>
 			{/key}
 		</div>
 
-		<div class="tips">
+		<div class="tips" style="opacity: {+($currentStep.number > STEPS.BOOTING.number)}">
 			<p>cmd+e opens the code editor</p>
 			<p>cmd+s saves files</p>
 		</div>
@@ -68,15 +68,21 @@
 	.progress-container {
 		width: 10rem;
 		height: 5px;
-		background: #eee;
+		background: #f1f1f1;
 		border-radius: 2.5px;
 	}
 
 	.progress-bar {
 		height: 100%;
-		background: rgba(255, 0, 255, 0.3);
+		background: rgba(255, 0, 255, 0.25);
 		border-radius: 2.5px;
 		transition: width 0.2s ease-out;
+	}
+
+	.tips {
+		display: none;
+		opacity: 0;
+		transition: opacity 0.4s;
 	}
 
 	.tips p {

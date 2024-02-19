@@ -44,9 +44,9 @@
 	 * Create Y.Text
 	 */
 
-	/** @type {import('@codemirror/state').Extension} */
+	/** @type {import('@codemirror/state').Extension | undefined} */
 	let yExtension;
-	/** @type {import('yjs').Text} */
+	/** @type {import('yjs').Text | undefined} */
 	let ytext;
 
 	const doc = new SharedDoc(user, slug);
@@ -73,7 +73,11 @@
 	 * @param {string | null} globalFile
 	 */
 	function setComponentInEditor(componentName, globalFile) {
-		if (componentName === null && globalFile === null) return;
+		if (componentName === null && globalFile === null) {
+			ytext = undefined;
+			yExtension = undefined;
+			return;
+		}
 
 		/** @type {import('yjs').Text | undefined} Find the Y.Text for the requested component name */
 		let foundYtext;
@@ -90,7 +94,6 @@
 		if (foundYtext !== undefined) {
 			ytext = foundYtext;
 			yExtension = yCollab(ytext, doc.awareness);
-			// language = globalFile ? javascript() : svelte();
 			language = svelte();
 		}
 	}
@@ -128,7 +131,7 @@
 	 * @param {KeyboardEvent} e
 	 */
 	function onKeyDown(e) {
-		if (e.metaKey && e.key === 's') {
+		if (e.metaKey && e.key === 's' && ytext) {
 			e.preventDefault();
 			saveComponentOrGlobalFile($openGlobalFile || $openComponentName, ytext.toString());
 		}
@@ -138,7 +141,7 @@
 <div
 	class="code-editor position-{$codeEditorPosition}"
 	bind:this={codeEditorElement}
-	class:show-editor={$codeEditorPosition !== 'center' || showCodeEditor}
+	class:show-editor={showCodeEditor}
 	role="none"
 	on:keydown={onKeyDown}
 >
@@ -162,10 +165,17 @@
 		{/if}
 	</div>
 	<div class="overlay">
-		<Tabs />
+		{#if ytext && yExtension}
+			<Tabs />
+		{/if}
 		<PlacementButtons />
 		<Minimap on:select-graphic on:delete-graphic={deleteComponent} blocks={$yarrayStore} />
 	</div>
+	{#if !ytext || !yExtension}
+		<div class="no-component-message">
+			<p>no visuals yet :o</p>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -226,7 +236,43 @@
 		pointer-events: none;
 	}
 
-	.overlay > :global(*) {
+	.code-editor.show-editor .overlay > :global(*) {
 		pointer-events: all;
+	}
+
+	.no-component-message {
+		grid-area: 1 / 1;
+		width: 100%;
+		height: 100%;
+		/* background: #f6f6f6; */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, 0.25);
+	}
+
+	.position-center .no-component-message {
+		box-shadow: 0 1px 3px #0003;
+		border-radius: 6px;
+	}
+
+	.no-component-message p {
+		color: white;
+		margin: 0;
+		opacity: 0;
+		transition: opacity 0.2s;
+		white-space: pre;
+	}
+
+	.code-editor:not(.position-center) .no-component-message p {
+		width: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.show-editor .no-component-message p {
+		width: auto;
+		opacity: 1;
 	}
 </style>

@@ -151,7 +151,6 @@ export async function initializeWebContainerPageFiles(pageFiles) {
  *
  */
 export async function syncWebContainerFileSystem(yarray) {
-	if (yarray.length === 0) return;
 	await ready;
 
 	const currentGraphics = await webcontainer.fs.readdir(GENERATED_PATH);
@@ -172,8 +171,10 @@ export async function syncWebContainerFileSystem(yarray) {
 		(filename) => filename.endsWith('.svelte') && !allGraphics.some((b) => b.filename === filename)
 	);
 
-	// If there's no open component, set the first one
-	if (
+	// If there's no open component, set the first one as the open component
+	if (allGraphics.length === 0) {
+		openComponentName.set(null);
+	} else if (
 		get(openComponentName) === null ||
 		graphicsToDelete.includes(get(openComponentName) + '.svelte')
 	) {

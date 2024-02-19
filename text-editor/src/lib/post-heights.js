@@ -39,6 +39,8 @@ export function postHeights(contentElement) {
 		if (name) blockHeights[name] = div.clientHeight;
 	});
 
+	console.log(blockHeights)
+
 	// Notify the parent window of the new dimensions
 	window.parent.postMessage({ type: 'blockHeights', blockHeights }, '*');
 }
