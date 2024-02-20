@@ -20,3 +20,8 @@ export const DEFAULT_CODE_BLOCK = [
 	'\t}',
 	'</style>\n'
 ].join('\n');
+
+/** All page-level (non-component) files */
+export const PAGE_LEVEL_FILES = {
+	data: '+page.server.js'
+};

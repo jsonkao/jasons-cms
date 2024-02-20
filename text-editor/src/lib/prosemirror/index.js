@@ -2,20 +2,26 @@
  * This file contains helper functions for creating ProseMirror state and schema
  */
 
-import { userColor, userName, liveblocksRoom } from '$lib/generated/globals.js';
+import { liveblocksRoom, userColor, userName } from '$lib/generated/globals.js';
 
+import { DEFAULT_CODE_BLOCK } from '$shared/constants.js';
+import {
+	IndestructibleUndoManager,
+	SharedDoc,
+	makeCodingBlock,
+	makeTextBlock
+} from '$shared/shared-doc.js';
+import { ellipsis, inputRules, smartQuotes } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Plugin } from 'prosemirror-state';
-import { smartQuotes, ellipsis, inputRules } from 'prosemirror-inputrules';
-import { IndestructibleUndoManager, SharedDoc } from '$shared/shared-doc.js';
 import {
+	prosemirrorToYXmlFragment,
 	redo,
 	undo,
 	yCursorPlugin,
 	ySyncPlugin,
 	ySyncPluginKey,
-	yUndoPlugin,
-	prosemirrorToYXmlFragment
+	yUndoPlugin
 } from 'y-prosemirror';
 
 import { FloatingMenuPlugin } from './floating-menu.js';
@@ -60,15 +66,24 @@ export class SharedDocForProsemirror extends SharedDoc {
 		const ymapIndex = this.indexOf(currentBlockMap);
 		if (ymapIndex === -1) throw new Error('Could not find the current block map');
 
-		const idAboutToBeDeleted = getId(this.yarrayStore.y.get(ymapIndex));
+		const idAboutToBeDeleted = getId(this.yarray.get(ymapIndex));
 
-		this.insertGraphicSandwich(ymapIndex, {
-			name: 'graphic' + idAboutToBeDeleted,
+		const name = 'graphic' + idAboutToBeDeleted;
+		const textBefore = prosemirrorToYXmlFragment(docNode.cut(0, cursorPosition - 1));
+		const textAfter = prosemirrorToYXmlFragment(docNode.cut(cursorPosition + 1));
+
+		const newElements = [
 			// @ts-ignore
-			textBefore: prosemirrorToYXmlFragment(docNode.cut(0, cursorPosition - 1)),
+			makeTextBlock(textBefore),
+			makeCodingBlock(name, DEFAULT_CODE_BLOCK),
 			// @ts-ignore
-			textAfter: prosemirrorToYXmlFragment(docNode.cut(cursorPosition + 1))
-		});
+			makeTextBlock(textAfter)
+		];
+
+		this.ydoc.transact(() => {
+			this.yarray.delete(ymapIndex);
+			this.yarray.insert(ymapIndex, newElements);
+		}, this.transactionOrigin);
 	}
 }
 

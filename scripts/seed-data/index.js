@@ -4,7 +4,7 @@ import LiveblocksProvider from '@liveblocks/yjs';
 import fs from 'fs/promises';
 import WebSocket from 'ws';
 import * as Y from 'yjs';
-import { PAGE_LEVEL_FILES } from '../../src/lib/constants.js';
+import { PAGE_LEVEL_FILES } from '../../shared/constants.js';
 import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../shared/constants.js';
 import { makeCodingBlock, makeFragment, makeTextBlock } from '../../shared/shared-doc.js';
 

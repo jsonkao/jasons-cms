@@ -1,6 +1,6 @@
 <script>
 	import { openComponentName, openGlobalFile } from '$lib/stores/code-editor.js';
-	import { PAGE_LEVEL_FILES } from '$lib/constants.js';
+	import { PAGE_LEVEL_FILES } from '$shared/constants.js';
 
 	$: openFile = $openGlobalFile || $openComponentName;
 

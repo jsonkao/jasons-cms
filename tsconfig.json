@@ -21,7 +21,8 @@
 		"src/**/*.ts",
 		"src/**/*.svelte",
 		"scripts/**/*.js",
-		"shared/**/*.js"
+		"shared/**/*.js",
+		"text-editor/**/*.js"
 	]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//

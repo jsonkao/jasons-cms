@@ -1,16 +1,3 @@
-body {
-	margin: 0;
-	-webkit-font-smoothing: antialiased;
-	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-	font-size: 1.1rem;
-	line-height: 1.5;
-	color: #121212;
-}
-
-p {
-	margin: 0;
-}
-
 /* Styles for internal prosemirror DOM elements */
 
 .content > .ui-editor:not(.editor_empty):first-child,

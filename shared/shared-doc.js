@@ -1,7 +1,7 @@
 import { createClient } from '@liveblocks/client';
 import LiveblocksProvider from '@liveblocks/yjs';
 import * as Y from 'yjs';
-import { BLOCKS_KEY, PAGE_FILES_KEY, DEFAULT_CODE_BLOCK } from './constants.js';
+import { BLOCKS_KEY, PAGE_FILES_KEY } from './constants.js';
 import { readableArray } from './readable-array.js';
 import { readableMap } from './readable-map.js';
 
@@ -57,39 +57,23 @@ export class SharedDoc {
 	}
 
 	/**
-	 * Finds the index of the element in the Yjs array with a graphic name.
-	 * @param {string} name
-	 * @returns {number}
-	 */
-	findGraphic(name) {
-		let i = 0;
-		for (const element of this.yarrayStore.y.toArray()) {
-			if (element.get('name') === name) return i;
-			i++;
-		}
-		return -1;
-	}
-
-	/**
 	 * Delete a componet with the given name
 	 * @param {string} name
 	 */
 	deleteComponent(name) {
-		// First, find the index for the requested component name
-		const componentIndex = this.findGraphic(name);
-		if (componentIndex === -1)
+		const indexOfComponent = this.indexOfName(name);
+		if (indexOfComponent === -1)
 			throw new Error(`Could not find index of component to delete, ${name}`);
 
 		// This should all work because we enforce having blank text before and after all components
-		const textBlockBefore = /** @type {BlockMap} */ (this.yarrayStore.y.get(componentIndex - 1));
-		const textBlockAfter = /** @type {BlockMap} */ (this.yarrayStore.y.get(componentIndex + 1));
+		const textBlockBefore = /** @type {BlockMap} */ (this.yarray.get(indexOfComponent - 1));
+		const textBlockAfter = /** @type {BlockMap} */ (this.yarray.get(indexOfComponent + 1));
 		if (textBlockBefore.get('type') !== 'text' || textBlockAfter.get('type') !== 'text')
 			throw new Error('Expected text before and after component');
 
 		// Clone textBlockBefore to create a new Y.XmlFragment
 		const textBefore = /** @type {Y.XmlFragment} */ (textBlockBefore.get('text'));
 		const textAfter = /** @type {Y.XmlFragment} */ (textBlockAfter.get('text'));
-
 		const newXmlFragment = new Y.XmlFragment();
 		for (let i = 0; i < textBefore.length; i++) newXmlFragment.push([textBefore.get(i).clone()]);
 		for (let i = 0; i < textAfter.length; i++) newXmlFragment.push([textAfter.get(i).clone()]);
@@ -100,27 +84,9 @@ export class SharedDoc {
 
 		// Then, delete the component from the array
 		this.ydoc.transact(() => {
-			this.yarrayStore.y.insert(componentIndex - 1, [newMap]);
-			this.yarrayStore.y.delete(componentIndex, 3);
+			this.yarray.insert(indexOfComponent - 1, [newMap]);
+			this.yarray.delete(indexOfComponent, 3);
 		});
-	}
-
-	/**
-	 * Insert a new graphic
-	 * @param {number} index
-	 * @param {{ name: string, textBefore: Y.XmlFragment, textAfter: Y.XmlFragment }} configuration
-	 */
-	insertGraphicSandwich(index, { name, textBefore, textAfter }) {
-		const newElements = [
-			makeTextBlock(textBefore),
-			makeCodingBlock(name, DEFAULT_CODE_BLOCK),
-			makeTextBlock(textAfter)
-		];
-
-		this.ydoc.transact(() => {
-			this.yarrayStore.y.delete(index);
-			this.yarrayStore.y.insert(index, newElements);
-		}, this.transactionOrigin);
 	}
 
 	/**
@@ -130,8 +96,21 @@ export class SharedDoc {
 	 */
 	indexOf(targetElement) {
 		let i = 0;
-		for (const element of this.yarrayStore.y) {
+		for (const element of this.yarray) {
 			if (element === targetElement) return i;
+			i++;
+		}
+		return -1;
+	}
+
+	/**
+	 * Finds the index of the graphic element in the Yjs blocks array with name
+	 * @param {string} name
+	 */
+	indexOfName(name) {
+		let i = 0;
+		for (const element of this.yarray) {
+			if (element.get('name') === name) return i;
 			i++;
 		}
 		return -1;

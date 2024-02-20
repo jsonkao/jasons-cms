@@ -1,11 +1,12 @@
 import { browser } from '$app/environment';
-import { get } from 'svelte/store';
-import { GENERATED_PATH, PAGE_LEVEL_FILES, STEPS } from '$lib/constants.js';
-import { iframeUrl, currentStep } from '$lib/stores/status.js';
-import { openComponentName } from '$lib/stores/code-editor.js';
-import { WebContainer } from '@webcontainer/api';
-import { fetchTemplateFiles, writeGlobals } from './files.js';
 import { page } from '$app/stores';
+import { GENERATED_PATH, STEPS } from '$lib/constants.js';
+import { openComponentName } from '$lib/stores/code-editor.js';
+import { currentStep, iframeUrl } from '$lib/stores/status.js';
+import { PAGE_LEVEL_FILES } from '$shared/constants.js';
+import { WebContainer } from '@webcontainer/api';
+import { get } from 'svelte/store';
+import { fetchTemplateFiles, writeGlobals } from './files.js';
 
 /** @type {WebContainer} The WebContainer instance. */
 let webcontainer;

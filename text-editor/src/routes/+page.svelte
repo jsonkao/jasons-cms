@@ -1,7 +1,6 @@
 <script>
 	import { browser } from '$app/environment';
-	import './prosemirror.css';
-	import './styles.css';
+	import './cursor.css';
 
 	/** @type {import('./$types').PageData} */
 	export let data;

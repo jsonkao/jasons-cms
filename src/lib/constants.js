@@ -9,11 +9,6 @@ export const STEPS = {
 	EDITOR_READY: { number: 6, label: 'editor ready' }
 };
 
-/** All page-level (non-component) files */
-export const PAGE_LEVEL_FILES = {
-	data: '+page.server.js'
-};
-
 /** The base path for dynamically created files in the webcontainer fs */
 export const GENERATED_PATH = '/src/lib/generated';
 
