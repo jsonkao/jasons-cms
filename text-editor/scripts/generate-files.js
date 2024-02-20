@@ -16,8 +16,10 @@ const __dirname = dirname(__filename);
  */
 async function main() {
 	const { LIVEBLOCKS_SECRET_KEY } = process.env;
-	if (LIVEBLOCKS_SECRET_KEY === undefined)
-		throw new Error('LIVEBLOCKS_SECRET_KEY environment variable is not set');
+	if (LIVEBLOCKS_SECRET_KEY === undefined) {
+		console.error('LIVEBLOCKS_SECRET_KEY environment variable is not set');
+		return;
+	}
 
 	const liveblocks = new LiveblocksNode({
 		secret: LIVEBLOCKS_SECRET_KEY
@@ -31,19 +33,47 @@ async function main() {
 	const svelteFiles = await Promise.all(
 		rooms.map(({ id }) => generateFiles(liveblocks, generatedFilesPath, id))
 	);
-	const componentImports = svelteFiles.map(({ components: { imports } }) => imports).join('\n');
-	const componentExports =
-		'{\n\t' + svelteFiles.map(({ components: { exports } }) => exports).join(',\n\t') + '\n}';
 
 	await fs.writeFile(
 		join(generatedFilesPath, 'components.js'),
-		componentImports + '\n\nexport default ' + componentExports + ';\n'
+		generateComponentLookup(svelteFiles)
 	);
 
 	await fs.writeFile(
 		join(generatedFilesPath, 'page-server-functions.js'),
 		svelteFiles.map(({ pageServerFunctionExport }) => pageServerFunctionExport).join('\n')
 	);
+}
+
+/**
+ * Generates an index file for all Svelte components
+ * @param {Array<Awaited<ReturnType<generateFiles>>>} svelteFiles
+ */
+export function generateComponentLookup(svelteFiles) {
+	/**
+	 * Generates name of component to be imported and exported
+	 * @param {string} slug
+	 * @param {string} name
+	 */
+
+	const exportName = (slug, name) => `${slug.replaceAll('-', '_')}_${name.replaceAll('-', '_')}`;
+	const componentImports = svelteFiles
+		.map(({ slug, graphicNames }) =>
+			graphicNames
+				.map((name) => `import ${exportName(slug, name)} from './${slug}/${name}.svelte';`)
+				.join('\n')
+		)
+		.join('\n');
+	const componentExports =
+		'{\n\t' +
+		svelteFiles
+			.map(
+				({ slug, graphicNames }) =>
+					`'${slug}': {${graphicNames.map((name) => `'${name}': ${exportName(slug, name)}`).join(', ')}}`
+			)
+			.join(',\n\t') +
+		'\n}';
+	return componentImports + '\n\nexport default ' + componentExports + ';\n';
 }
 
 /**
@@ -62,8 +92,10 @@ async function generateFiles(liveblocks, generatedPath, slug) {
 
 	/* Save all Svelte components to disk */
 
-	const blocks = /** @type {import('$shared').Block[]} */ (ydoc.getArray(BLOCKS_KEY).toJSON());
-	const graphicBlocks = /** @type {import('$shared').GraphicBlock[]} */ (
+	const blocks = /** @type {import('$shared/types').Block[]} */ (
+		ydoc.getArray(BLOCKS_KEY).toJSON()
+	);
+	const graphicBlocks = /** @type {import('$shared/types').GraphicBlock[]} */ (
 		blocks.filter(({ type }) => type === 'graphic')
 	);
 	await Promise.all(
@@ -80,20 +112,9 @@ async function generateFiles(liveblocks, generatedPath, slug) {
 			fs.writeFile(join(path, file), pageFiles.get(file).toString())
 		)
 	);
-
-	/**
-	 * Generates name of component to be imported and exported
-	 * @param {string} slug
-	 * @param {string} name
-	 */
-	const exportName = (slug, name) => `${slug.replaceAll('-', '_')}_${name}`;
 	return {
-		components: {
-			imports: graphicBlocks
-				.map(({ name }) => `import ${exportName(slug, name)} from './${slug}/${name}.svelte';`)
-				.join('\n'),
-			exports: `'${slug}': {${graphicBlocks.map(({ name }) => `${name}: ${exportName(slug, name)}`).join(', ')}}`
-		},
+		graphicNames: graphicBlocks.map(({ name }) => name),
+		slug,
 		pageServerFunctionExport: `export { load as ${slug.replaceAll('-', '_')} } from './${slug}/+page.server.js';`
 	};
 }
