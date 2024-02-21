@@ -3,7 +3,7 @@
 	import { openComponentName } from '$lib/stores/code-editor.js';
 	import { createEventDispatcher } from 'svelte';
 
-	/** @type {Array<import('$shared').BlockMap>} */
+	/** @type {Array<import('$shared/types').BlockMap>} */
 	export let blocks;
 
 	const SCALAR = 1 / 10;
@@ -12,8 +12,8 @@
 
 	/**
 	 * Compute the height of a single graphic block
-	 * @param {import('$shared').BlockMap} b
-	 * @param {import('$shared').BlockHeights} $blockHeights
+	 * @param {import('$shared/types').BlockMap} b
+	 * @param {import('$shared/types').BlockHeights} $blockHeights
 	 */
 	function getHeight(b, $blockHeights) {
 		if (Object.keys($blockHeights).length === 0) return DEFAULT_BLOCK_HEIGHT;

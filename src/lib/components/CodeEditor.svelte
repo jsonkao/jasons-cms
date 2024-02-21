@@ -1,13 +1,4 @@
 <script>
-	import { svelte } from '@replit/codemirror-lang-svelte';
-	// import { javascript } from '@codemirror/lang-javascript'; // importing this causes a weird bug
-	import { SharedDoc } from '$shared/shared-doc.js';
-	import CodeMirror from 'svelte-codemirror-editor';
-	import { coolGlow } from 'thememirror';
-
-	// @ts-ignore
-	import { yCollab } from 'y-codemirror.next';
-
 	import { browser } from '$app/environment';
 	import { userColor, userName } from '$lib/constants.js';
 	import {
@@ -17,11 +8,18 @@
 		otherCoders
 	} from '$lib/stores/code-editor.js';
 	import {
+		initializeWebContainerPageFiles,
 		saveComponentOrGlobalFile,
-		syncWebContainerFileSystem,
-		initializeWebContainerPageFiles
+		syncWebContainerFileSystem
 	} from '$lib/webcontainer/instance.js';
+	import { setupProvider } from '$shared/provider';
+	import { SharedDoc } from '$shared/shared-doc.js';
+	import { svelte } from '@replit/codemirror-lang-svelte';
 	import { onDestroy } from 'svelte';
+	import CodeMirror from 'svelte-codemirror-editor';
+	import { coolGlow } from 'thememirror';
+	// @ts-ignore
+	import { yCollab } from 'y-codemirror.next';
 	import Minimap from './Minimap.svelte';
 	import PlacementButtons from './PlacementButtons.svelte';
 	import Tabs from './Tabs.svelte';
@@ -49,7 +47,7 @@
 	/** @type {import('yjs').Text | undefined} */
 	let ytext;
 
-	const doc = new SharedDoc(user, slug);
+	const doc = new SharedDoc(setupProvider(user, slug));
 	const { yarrayStore, yPageFilesStore } = doc;
 	doc.awareness.on('change', () =>
 		otherCoders.set(

@@ -6,7 +6,7 @@ import WebSocket from 'ws';
 import * as Y from 'yjs';
 import { PAGE_LEVEL_FILES } from '../../shared/constants.js';
 import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../shared/constants.js';
-import { makeCodingBlock, makeFragment, makeTextBlock } from '../../shared/shared-doc.js';
+import { makeCodingBlock, makeTextFragment, makeTextBlock } from '../../shared/shared-doc.js';
 
 /** @typedef {'louisiana-fifth-circuit' | 'oil-wells' | 'tutorial'} RoomName */
 /** @typedef {{text: string, hed?: string}} TextSeedData */
@@ -157,10 +157,10 @@ async function makeCodingBlockFromLocalFile(name) {
 /**
  * @param {string} initialContent
  * @param {string | undefined} headline
- * @returns {import('../../shared').BlockMap}
+ * @returns {import('../../shared/types.js').BlockMap}
  */
 function makeTextBlockFromString(initialContent, headline = '') {
-	return makeTextBlock(makeFragment(initialContent, headline));
+	return makeTextBlock(makeTextFragment(initialContent, headline));
 }
 
 /**

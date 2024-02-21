@@ -148,7 +148,7 @@ export async function initializeWebContainerPageFiles(pageFiles) {
  * Given a Yjs array of blocks, make sure that the WebContainer's file system is synced (i.e. Svelte components exist
  * for all components, and Svelte components are deleted for components that have been removed).
  * Also generate an `index.js` file that imports and exports all the graphic components.
- * @param {Array<import('$shared').BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
+ * @param {Array<import('$shared/types').BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
  *
  */
 export async function syncWebContainerFileSystem(yarray) {
