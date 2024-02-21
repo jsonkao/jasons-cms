@@ -4,13 +4,13 @@
 	/** @type {string} */
 	export let name;
 
-	/** @type {import('../../../routes/$types').PageData} */
+	/** @type {{ slug: string }} */
 	export let data;
 
-	const component = components[data.slug][name];
-	if (!component) {
-		throw new Error(`Component not found. Slug: ${data.slug}. Name: ${data.name}`);
+	if (!(data.slug in components) || !(name in components[data.slug])) {
+		throw new Error(`Component not found. Slug: ${data.slug}. Name: ${name}`);
 	}
+	const component = components[data.slug][name];
 </script>
 
 <div>

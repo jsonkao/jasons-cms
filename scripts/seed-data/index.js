@@ -6,7 +6,7 @@ import WebSocket from 'ws';
 import * as Y from 'yjs';
 import { PAGE_LEVEL_FILES } from '../../shared/constants.js';
 import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../shared/constants.js';
-import { makeCodingBlock, makeTextFragment, makeTextBlock } from '../../shared/shared-doc.js';
+import { makeCodingBlock, makeTextFragment, makeTextBlock } from '../../shared/make-types.js';
 
 /** @typedef {'louisiana-fifth-circuit' | 'oil-wells' | 'tutorial'} RoomName */
 /** @typedef {{text: string, hed?: string}} TextSeedData */

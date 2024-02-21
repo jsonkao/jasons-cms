@@ -6,12 +6,8 @@ import { liveblocksRoom, userColor, userName } from '$lib/generated/globals.js';
 
 import { DEFAULT_CODE_BLOCK } from '$shared/constants.js';
 import { setupProvider } from '$shared/provider.js';
-import {
-	IndestructibleUndoManager,
-	SharedDoc,
-	makeCodingBlock,
-	makeTextBlock
-} from '$shared/shared-doc.js';
+import { IndestructibleUndoManager, SharedDoc } from '$shared/shared-doc.js';
+import { makeCodingBlock, makeTextBlock } from '$shared/make-types.js';
 import { EditorState } from 'prosemirror-state';
 import {
 	prosemirrorToYXmlFragment,

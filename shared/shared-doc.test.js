@@ -1,27 +1,28 @@
-import { expect, test, describe, beforeAll, afterAll } from 'vitest';
-import { makeTextFragment } from './shared-doc.js';
-import * as Y from 'yjs';
-import { BLOCKS_KEY } from './constants.js';
+import { expect, test, beforeAll } from 'vitest';
+import { SharedDoc } from './shared-doc';
+import { makeCodingBlock, makeTextBlock, makeTextFragment } from './make-types';
 
-describe('yjs types', () => {
-	/** @type {Y.Array<Y.XmlFragment>} */
-	let yarray;
+/** @type {SharedDoc} */
+let doc;
 
-	beforeAll(() => {
-		const ydoc = new Y.Doc();
-		yarray = ydoc.getArray(BLOCKS_KEY);
-	});
+beforeAll(() => {
+	/** @type {ReturnType<import('./provider').setupProvider>} */
+	let provider = { leave: () => {}, instantiate: () => {} };
 
-	test('makeTextFragment with headline', () => {
-		const yxmlFragment = makeTextFragment('Text', 'Headline');
-		yarray.insert(0, [yxmlFragment]);
-		expect(yxmlFragment.get(0).toString()).toBe('<headline>Headline</headline>');
-		expect(yxmlFragment.get(1).toString()).toBe('<paragraph>Text</paragraph>');
-	});
+	doc = new SharedDoc(provider);
+	doc.yarray.insert(0, [
+		makeTextBlock(makeTextFragment('foo')),
+		makeCodingBlock('graphic1', '<p>hello</p>'),
+		makeTextBlock(makeTextFragment('bar'))
+	]);
 
-	test('makeTextFragment without headline', () => {
-		const yxmlFragment = makeTextFragment('Foo');
-		yarray.insert(0, [yxmlFragment]);
-		expect(yxmlFragment.get(0).toString()).toBe('<paragraph>Foo</paragraph>');
-	});
+	return () => doc.destroy();
+});
+
+test('delete', () => {
+	doc.deleteComponent('graphic1');
+	expect(doc.yarray.length).toBe(1);
+	expect(doc.yarray.get(0).get('text').toString()).toBe(
+		'<paragraph>foo</paragraph><paragraph>bar</paragraph>'
+	);
 });

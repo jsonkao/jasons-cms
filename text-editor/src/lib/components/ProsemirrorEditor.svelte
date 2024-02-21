@@ -155,7 +155,6 @@
 	bind:this={editor}
 	on:focus
 	on:blur={() => dispatch('blur')}
-	on:custom={onCustomEvent}
 ></div>
 
 <style>
