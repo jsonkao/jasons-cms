@@ -20,7 +20,7 @@ import {
 	ySyncPluginKey,
 	yUndoPlugin
 } from 'y-prosemirror';
-import { corePlugins } from './plugins.js';
+import { corePlugins } from './plugins/index.js';
 import { richTextSchema } from './schema.ts';
 
 export class SharedDocForProsemirror extends SharedDoc {
