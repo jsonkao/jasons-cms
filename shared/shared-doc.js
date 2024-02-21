@@ -1,17 +1,14 @@
-import { createClient } from '@liveblocks/client';
-import LiveblocksProvider from '@liveblocks/yjs';
 import * as Y from 'yjs';
 import { BLOCKS_KEY, PAGE_FILES_KEY } from './constants.js';
-import { readableArray } from './readable-array.js';
-import { readableMap } from './readable-map.js';
+import { readableArray, readableMap } from './stores/index.js';
 
-/** @typedef {import('./index.d.ts').BlockMap} BlockMap */
+/** @typedef {import('./types').BlockMap} BlockMap */
 
 export class SharedDoc {
 	/** @type {import('y-protocols/awareness').Awareness} */
 	awareness;
 
-	/** @type {import('./index').YReadableArray<BlockMap>} */
+	/** @type {import('./stores/Readable').YReadableArray<BlockMap>} */
 	yarrayStore;
 
 	/** @type {Y.Array<BlockMap>} */
@@ -24,20 +21,14 @@ export class SharedDoc {
 	transactionOrigin;
 
 	/**
-	 * @param {{ color: string, name: string }} user
-	 * @param {string} slug
+	 * @param {ReturnType<import('./provider').setupProvider>} provider
 	 */
-	constructor(user, slug) {
-		const client = createClient({
-			publicApiKey: 'pk_dev_1iisK8HmLpmVOreEDPQqeruOVvHWUPlchIagQpCKP-VIRyGkCF4DDymphQiiVJ6A'
-		});
-		const { room, leave } = client.enterRoom(slug, { initialPresence: {} });
-		this.leave = leave;
+	constructor(provider) {
+		this.leave = provider.leave;
 
 		this.ydoc = new Y.Doc();
 		// @ts-ignore
-		this.awareness = new LiveblocksProvider(room, this.ydoc).awareness;
-		this.awareness.setLocalStateField('user', user);
+		this.awareness = provider.instantiate(this.ydoc);
 
 		this.yarray = this.ydoc.getArray(BLOCKS_KEY);
 		this.yarrayStore = readableArray(this.yarray);
@@ -46,9 +37,6 @@ export class SharedDoc {
 		this.transactionOrigin = this.ydoc.clientID;
 
 		this.destroy = this.destroy.bind(this);
-
-		// TODO: Create a different ydoc under a normal WebRTC connection for the files we dont want
-		// persistence for? (e.g. Blocks.svelte, but not page level files)
 	}
 
 	destroy() {
@@ -170,7 +158,7 @@ export function makeCodingBlock(name, code) {
  * @param {string} [headline]
  * @returns {Y.XmlFragment}
  */
-export function makeFragment(initialContent, headline) {
+export function makeTextFragment(initialContent, headline) {
 	const yxmlFragment = new Y.XmlFragment();
 	yxmlFragment.insert(0, initialContent.split('\n').map(makeElement));
 
