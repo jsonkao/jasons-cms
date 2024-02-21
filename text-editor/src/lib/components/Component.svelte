@@ -4,7 +4,7 @@
 	/** @type {string} */
 	export let name;
 
-	/** @type {import('$shared').BlockMap} */
+	/** @type {import('$shared/types').BlockMap} */
 	export let blockMap;
 
 	/** @type {import('../../routes/$types').PageData} */

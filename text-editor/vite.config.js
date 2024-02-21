@@ -24,7 +24,7 @@ export default defineConfig({
 		fs: {
 			strict: false
 		}
-	}
+	},
 });
 
 /**
@@ -38,9 +38,17 @@ function importResolve() {
 		resolveId: (specifier, importer) => {
 			if (!importer) return;
 
+			if (specifier.startsWith('vite/preload-helper') || specifier.includes('vite/preload-helper'))
+				return;
+
 			if (importer.endsWith('.svelte') || importer.endsWith('.js')) {
 				const { name, range, path = '+esm' } = parseNpmSpecifier(specifier);
-				return { id: `https://cdn.jsdelivr.net/npm/${name}${range ? `@${range}` : ''}/${path}` };
+				return {
+					id: `https://cdn.jsdelivr.net/npm/${name}${range ? `@${range}` : ''}/${path}`.replaceAll(
+						'\x00',
+						''
+					)
+				};
 			}
 		}
 	};

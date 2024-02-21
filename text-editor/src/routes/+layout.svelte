@@ -1,5 +1,5 @@
 <script>
-	import '$shared/index.css';
+	import '$shared/styles.css';
 	import './prosemirror.css';
 </script>
 

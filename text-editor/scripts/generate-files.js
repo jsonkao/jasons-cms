@@ -55,25 +55,29 @@ export function generateComponentLookup(svelteFiles) {
 	 * @param {string} slug
 	 * @param {string} name
 	 */
+	const getName = (slug, name) => `${slug.replaceAll('-', '_')}_${name.replaceAll('-', '_')}`;
 
-	const exportName = (slug, name) => `${slug.replaceAll('-', '_')}_${name.replaceAll('-', '_')}`;
-	const componentImports = svelteFiles
-		.map(({ slug, graphicNames }) =>
+	/** @type {string[]} */
+	const componentImports = [];
+	/** @type {string[]} */
+	const componentExports = [];
+
+	svelteFiles.forEach(({ slug, graphicNames }) => {
+		componentImports.push(
 			graphicNames
-				.map((name) => `import ${exportName(slug, name)} from './${slug}/${name}.svelte';`)
+				.map((name) => `import ${getName(slug, name)} from './${slug}/${name}.svelte';`)
 				.join('\n')
-		)
-		.join('\n');
-	const componentExports =
-		'{\n\t' +
-		svelteFiles
-			.map(
-				({ slug, graphicNames }) =>
-					`'${slug}': {${graphicNames.map((name) => `'${name}': ${exportName(slug, name)}`).join(', ')}}`
-			)
-			.join(',\n\t') +
-		'\n}';
-	return componentImports + '\n\nexport default ' + componentExports + ';\n';
+		);
+		componentExports.push(
+			`'${slug}': {${graphicNames.map((name) => `'${name}': ${getName(slug, name)}`).join(', ')}}`
+		);
+	});
+	return (
+		componentImports.join('\n') +
+		'\n\nexport default {\n\t' +
+		componentExports.join(',\n\t') +
+		'\n};\n'
+	);
 }
 
 /**

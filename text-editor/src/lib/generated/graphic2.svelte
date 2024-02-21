@@ -1,5 +1,5 @@
 <script>
-	import { easeCircleIn, easeQuadOut, easeSinIn } from 'd3-ease';
+	import { easeCircleIn, easeQuadOut, easeSinIn } from 'https://cdn.jsdelivr.net/npm/d3-ease/+esm';
 
 	const array = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
 </script>

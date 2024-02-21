@@ -9,7 +9,8 @@ const liveblocks = new LiveblocksNode({
 });
 
 /** @type {import('./$types').PageServerLoad} */
-export async function load({ params }) {
+export async function load(everything) {
+	const { params } = everything;
 	const ydoc = new Y.Doc();
 	const update = await liveblocks.getYjsDocumentAsBinaryUpdate(params.slug);
 	Y.applyUpdate(ydoc, new Uint8Array(update));
@@ -18,7 +19,7 @@ export async function load({ params }) {
 	return {
 		blocks,
 		slug: params.slug,
-		...(await pageServerLoadFunctions[params.slug.replaceAll('-', '_')]())
+		...(await pageServerLoadFunctions[params.slug.replaceAll('-', '_')](everything))
 	};
 }
 
@@ -28,5 +29,4 @@ export async function entries() {
 	return rooms.data.map((room) => ({ slug: room.id }));
 }
 
-export const prerender = false;
-export const ssr = false;
+export const prerender = true;

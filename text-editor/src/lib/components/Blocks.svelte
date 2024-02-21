@@ -53,7 +53,7 @@
 		return doc.destroy;
 	});
 
-	/** @param {import('$shared').BlockMap} blockMap */
+	/** @param {import('$shared/types').BlockMap} blockMap */
 	const getName = (blockMap) => /** @type {string} */ (blockMap.get('name'));
 </script>
 

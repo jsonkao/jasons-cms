@@ -5,32 +5,30 @@
 import { liveblocksRoom, userColor, userName } from '$lib/generated/globals.js';
 
 import { DEFAULT_CODE_BLOCK } from '$shared/constants.js';
+import { setupProvider } from '$shared/provider.js';
 import {
 	IndestructibleUndoManager,
 	SharedDoc,
 	makeCodingBlock,
 	makeTextBlock
 } from '$shared/shared-doc.js';
-import { ellipsis, inputRules, smartQuotes } from 'prosemirror-inputrules';
-import { keymap } from 'prosemirror-keymap';
-import { EditorState, Plugin } from 'prosemirror-state';
+import { EditorState } from 'prosemirror-state';
 import {
 	prosemirrorToYXmlFragment,
-	redo,
-	undo,
 	yCursorPlugin,
 	ySyncPlugin,
 	ySyncPluginKey,
 	yUndoPlugin
 } from 'y-prosemirror';
-
-import { FloatingMenuPlugin } from './floating-menu.js';
-import { richTextKeyMap } from './keymap.js';
+import { corePlugins } from './plugins.js';
 import { richTextSchema } from './schema.ts';
 
 export class SharedDocForProsemirror extends SharedDoc {
-	constructor() {
-		super({ color: userColor, name: userName }, liveblocksRoom);
+	/**
+	 * @param {ReturnType<import('$shared/provider').setupProvider>} provider
+	 */
+	constructor(provider) {
+		super(provider);
 
 		this.undoManager = new /** @type {typeof import('yjs').UndoManager} */ (
 			IndestructibleUndoManager
@@ -49,20 +47,25 @@ export class SharedDocForProsemirror extends SharedDoc {
 	 * @param {import('yjs').XmlFragment} fragment
 	 * @param {{ hasFloatingMenu?: boolean }} [options]
 	 */
-	createEditorForBlock(fragment, { hasFloatingMenu = false } = {}) {
-		const yPlugins = [
+	createEditor(fragment, { hasFloatingMenu = false } = {}) {
+		const yPlugins = () => [
 			ySyncPlugin(fragment),
 			yCursorPlugin(this.awareness, { cursorBuilder, selectionBuilder }),
 			yUndoPlugin({ undoManager: this.undoManager })
 		];
-		if (hasFloatingMenu) yPlugins.push(FloatingMenuPlugin());
-		return createEditor(yPlugins);
+
+		return EditorState.create({
+			schema: richTextSchema,
+			plugins: [...yPlugins(), ...corePlugins(hasFloatingMenu)]
+		});
 	}
 
 	/** @param {BlockInsertionParams} params */
 	insertGraphic({ docNode, cursorPosition, activeYXmlFragment }) {
 		// @ts-ignore
-		const currentBlockMap = /** @type {import('$shared').BlockMap} */ (activeYXmlFragment.parent);
+		const currentBlockMap = /** @type {import('$shared/types').BlockMap} */ (
+			activeYXmlFragment.parent
+		);
 		const ymapIndex = this.indexOf(currentBlockMap);
 		if (ymapIndex === -1) throw new Error('Could not find the current block map');
 
@@ -87,11 +90,13 @@ export class SharedDocForProsemirror extends SharedDoc {
 	}
 }
 
-export const doc = new SharedDocForProsemirror();
+export const doc = new SharedDocForProsemirror(
+	setupProvider({ color: userColor, name: userName }, liveblocksRoom)
+);
 
 /**
  * Uses internal ID to create a unique key for each block
- * @param {import('yjs').Map<any> | import('yjs').XmlFragment | import('$shared').BlockMap} yjsThing
+ * @param {import('yjs').Map<any> | import('yjs').XmlFragment | import('$shared/types').BlockMap} yjsThing
  */
 export function getId(yjsThing) {
 	// @ts-ignore
@@ -99,27 +104,6 @@ export function getId(yjsThing) {
 
 	if (_item === null) throw new Error('I thought Y.Map._item would never be null');
 	return Object.values(_item.id).join('_');
-}
-
-/**
- * A helper function to create a minimal rich text editor.
- * @param {Plugin[]} plugins
- * @returns {EditorState}
- */
-export function createEditor(plugins) {
-	return EditorState.create({
-		schema: richTextSchema,
-		plugins: [
-			...plugins,
-			keymap({
-				'Mod-z': undo,
-				'Mod-y': redo,
-				'Mod-Shift-z': redo
-			}),
-			richTextKeyMap(richTextSchema),
-			inputRules({ rules: smartQuotes.concat(ellipsis) })
-		]
-	});
 }
 
 /**

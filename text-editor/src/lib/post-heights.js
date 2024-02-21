@@ -31,15 +31,13 @@ export function startHMRListening(contentElement) {
 export function postHeights(contentElement) {
 	if (!contentElement) return;
 
-	/** @type {import('$shared').BlockHeights} */
+	/** @type {import('$shared/types').BlockHeights} */
 	const blockHeights = {};
 
 	Array.from(contentElement.children).forEach((div) => {
 		const name = div.getAttribute('data-name');
 		if (name) blockHeights[name] = div.clientHeight;
 	});
-
-	console.log(blockHeights)
 
 	// Notify the parent window of the new dimensions
 	window.parent.postMessage({ type: 'blockHeights', blockHeights }, '*');

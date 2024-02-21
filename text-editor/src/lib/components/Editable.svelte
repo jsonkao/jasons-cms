@@ -1,7 +1,7 @@
 <script>
 	import { lastTextFocused } from '$lib/stores.js';
 	import { doc, getId } from '$lib/prosemirror/index.js';
-	import { makeFragment } from '$shared/shared-doc.js';
+	import { makeTextFragment } from '$shared/shared-doc.js';
 	import ProsemirrorEditor from './ProsemirrorEditor.svelte';
 
 	/** @type {boolean} */
@@ -27,7 +27,7 @@
 	} else if (prose !== undefined && key !== undefined) {
 		if (typeof key !== 'string') throw new Error('key must be a string');
 
-		if (!prose.has(key)) prose.set(key, makeFragment('Write here...'));
+		if (!prose.has(key)) prose.set(key, makeTextFragment('Write here...'));
 		finalFragment = prose.get(key);
 	} else {
 		throw new Error('fragment or prose and key must be provided');
@@ -37,5 +37,5 @@
 <ProsemirrorEditor
 	bind:this={pmEditors[getId(finalFragment)]}
 	on:blur={() => lastTextFocused.set(getId(finalFragment))}
-	editorStateCreator={() => doc.createEditorForBlock(finalFragment, { hasFloatingMenu })}
+	editorStateCreator={() => doc.createEditor(finalFragment, { hasFloatingMenu })}
 />
