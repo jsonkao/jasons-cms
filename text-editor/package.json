@@ -9,7 +9,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"generate-files": "touch .env && node --env-file=.env scripts/generate-files.js",
+		"generate-files": "touch .env && node --env-file=.env scripts/generate-files",
 		"test": "vitest"
 	},
 	"devDependencies": {
