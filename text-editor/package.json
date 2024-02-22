@@ -13,7 +13,6 @@
 		"test": "vitest"
 	},
 	"devDependencies": {
-		"@rollup/plugin-auto-install": "^3.0.5",
 		"@types/node": "^20.11.17",
 		"prettier": "^3.2.4",
 		"prettier-plugin-svelte": "^3.1.2",
@@ -25,6 +24,7 @@
 		"@liveblocks/client": "^1.9.7",
 		"@liveblocks/node": "^1.9.7",
 		"@liveblocks/yjs": "^1.9.7",
+		"@rollup/plugin-auto-install": "^3.0.5",
 		"@sveltejs/adapter-static": "^3.0.1",
 		"@sveltejs/kit": "^2.5.0",
 		"esbuild-wasm": "^0.20.0",
