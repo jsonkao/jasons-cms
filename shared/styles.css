@@ -10,3 +10,11 @@ body {
 p {
 	margin: 0;
 }
+
+button {
+	border: none;
+	background: none;
+	cursor: pointer;
+	user-select: none;
+	padding: 0;
+}

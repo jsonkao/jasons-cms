@@ -45,8 +45,6 @@
 		postHeights(contentEl);
 	}
 
-	$: console.log($yarrayStore);
-
 	onMount(() => {
 		window.parent.postMessage({ type: 'editorMounted' }, '*');
 		startHMRListening(contentEl);

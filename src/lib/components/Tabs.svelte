@@ -33,10 +33,6 @@
 	}
 
 	button {
-		background: none;
-		padding: 0;
-		cursor: pointer;
-		border: none;
 		display: block;
 		margin-right: 7px;
 		color: white;

@@ -30,9 +30,6 @@
 
 	p,
 	button {
-		padding: 0;
-		border: none;
-		background: none;
 		color: #aaa;
 		margin: 0;
 		font-size: inherit;

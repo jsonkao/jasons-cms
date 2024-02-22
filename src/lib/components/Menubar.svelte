@@ -102,7 +102,6 @@
 		font-size: inherit;
 		color: inherit;
 		border-bottom: 1px solid #bbb;
-		padding: 0;
 		padding-bottom: 2px;
 	}
 
@@ -113,8 +112,6 @@
 
 	button {
 		background-color: #fff;
-		border: none;
-		cursor: pointer;
 	}
 
 	.helper-container button {

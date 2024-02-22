@@ -210,6 +210,7 @@
 		align-self: center;
 		border-radius: 6px;
 		position: relative;
+		font-size: 14px;
 	}
 
 	.code-mirror-container > :global(*) {

@@ -78,12 +78,9 @@
 
 	button {
 		padding: 0;
-		border: none;
-		background: none;
 		display: block;
 		transition: border 0.25s;
 		box-sizing: border-box;
-		cursor: pointer;
 	}
 
 	.mini-graphic > button {

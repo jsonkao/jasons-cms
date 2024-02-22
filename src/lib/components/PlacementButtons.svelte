@@ -45,11 +45,8 @@
 		width: var(--size);
 		height: var(--size);
 		display: block;
-		cursor: pointer;
 		border: 1px solid white;
-		background: none;
 		position: relative;
-		padding: 0;
 		opacity: 0.5;
 		transition: opacity 0.3s;
 		border-radius: 1px;
