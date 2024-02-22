@@ -22,7 +22,7 @@
 		"src/**/*.js",
 		"src/**/*.ts",
 		"src/**/*.svelte",
-		"scripts/*.js"
+		"scripts/**/*.js"
 	],
 	"exclude": [
 		"node_modules/**",

@@ -1,5 +1,5 @@
 <script>
-	import components from '$lib/generated/index.js';
+	import * as components from '$lib/generated/index.js';
 
 	/** @type {string} */
 	export let name;
