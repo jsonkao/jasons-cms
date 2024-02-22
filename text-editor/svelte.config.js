@@ -6,7 +6,7 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		alias: {
-			$shared: '../shared'
+			$shared: !!process.env.VERCEL ? './shared' : '../shared'
 		},
 
 		// For the tutorial, we need to disable CSRF protection.
