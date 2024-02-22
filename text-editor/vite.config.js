@@ -1,8 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import auto from '@rollup/plugin-auto-install';
 
 export default defineConfig({
-	plugins: [sveltekit(), importResolve()],
+	plugins: [sveltekit()],
 	optimizeDeps: {
 		include: [
 			'prosemirror-state',
@@ -24,6 +25,11 @@ export default defineConfig({
 		fs: {
 			strict: false
 		}
+	},
+	build: {
+		rollupOptions: {
+			plugins: [auto()]
+		}
 	}
 });
 
@@ -44,7 +50,7 @@ function importResolve() {
 			if (importer.endsWith('.svelte') || importer.endsWith('.js')) {
 				const { name, range, path = '+esm' } = parseNpmSpecifier(specifier);
 				return {
-					id: `https://cdn.jsdelivr.net/npm/${name}${range ? `@${range}` : ''}/${path}`.replaceAll(
+					id: `http://cdn.jsdelivr.net/npm/${name}${range ? `@${range}` : ''}/${path}`.replaceAll(
 						'\x00',
 						''
 					)
