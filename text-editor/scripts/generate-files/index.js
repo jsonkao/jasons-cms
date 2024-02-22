@@ -24,7 +24,7 @@ async function main() {
 		secret: LIVEBLOCKS_SECRET_KEY
 	});
 
-	const generatedFilesPath = resolve(__dirname, `../src/routes/render/[slug]/generated`);
+	const generatedFilesPath = resolve(__dirname, `../../src/routes/render/[slug]/generated`);
 	const rooms = (await liveblocks.getRooms()).data;
 
 	/* Generate Svelte components and index.js file */
