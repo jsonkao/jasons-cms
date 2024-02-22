@@ -46,13 +46,17 @@
 
 	const doc = new SharedDoc(setupProvider(user, slug));
 	const { yarrayStore, yPageFilesStore } = doc;
-	doc.awareness.on('change', () =>
+	doc.awareness.on('change', () => {
+		const states = doc.awareness.getStates();
+		const otherClients = [...states.keys()].filter(
+			(clientID) => clientID !== doc.awareness.clientID
+		);
 		otherCoders.set(
-			[...doc.awareness.getStates().values()]
-				.map((state) => state.user)
+			otherClients
+				.map((clientID) => states.get(clientID)?.user)
 				.filter((user) => user && user.coding)
-		)
-	);
+		);
+	});
 
 	onDestroy(() => doc.destroy());
 
