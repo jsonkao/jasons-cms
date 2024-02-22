@@ -47,7 +47,7 @@ export async function initialize() {
 
 	const promises = [];
 
-	if (import.meta.hot?.data.webcontainer) {
+	if (import.meta.hot?.data?.webcontainer) {
 		// Reuse the same webcontainer in dev HMR
 		webcontainer = import.meta.hot.data.webcontainer;
 	} else {
@@ -55,13 +55,13 @@ export async function initialize() {
 	}
 
 	// Reuse the same template files in dev HMR
-	if (import.meta.hot?.data.templateFiles) {
+	if (import.meta.hot?.data?.templateFiles) {
 		templateFiles = import.meta.hot.data.templateFiles;
 	} else {
 		promises.push(
 			fetchTemplateFiles().then((files) => {
 				templateFiles = files;
-				if (import.meta.hot) import.meta.hot.data.templateFiles = templateFiles;
+				if (import.meta.hot?.data) import.meta.hot.data.templateFiles = templateFiles;
 			})
 		);
 	}
@@ -79,7 +79,7 @@ export async function initialize() {
  */
 async function boot() {
 	webcontainer = await WebContainer.boot();
-	if (import.meta.hot) import.meta.hot.data.webcontainer = webcontainer;
+	if (import.meta.hot?.data) import.meta.hot.data.webcontainer = webcontainer;
 
 	webcontainer.on('server-ready', (port, url) => {
 		currentStep.set(STEPS.SERVER_READY);
