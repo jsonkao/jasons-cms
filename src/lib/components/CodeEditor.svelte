@@ -7,11 +7,8 @@
 		openGlobalFile,
 		otherCoders
 	} from '$lib/stores/code-editor.js';
-	import {
-		initializeWebContainerPageFiles,
-		saveComponentOrGlobalFile,
-		syncWebContainerFileSystem
-	} from '$lib/webcontainer/instance.js';
+	import { createWebContainer } from '$lib/webcontainer/create';
+	import { createWebContainerManager } from '$lib/webcontainer/manager';
 	import { setupProvider } from '$shared/provider';
 	import { SharedDoc } from '$shared/shared-doc.js';
 	import { svelte } from '@replit/codemirror-lang-svelte';
@@ -58,6 +55,9 @@
 	);
 
 	onDestroy(() => doc.destroy());
+
+	const { initializeWebContainerPageFiles, saveComponentOrGlobalFile, syncWebContainerFileSystem } =
+		createWebContainerManager(createWebContainer);
 
 	$: syncWebContainerFileSystem($yarrayStore);
 	$: initializeWebContainerPageFiles($yPageFilesStore);

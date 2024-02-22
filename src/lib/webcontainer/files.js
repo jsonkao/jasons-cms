@@ -1,4 +1,3 @@
-import { GENERATED_PATH, userColor, userName } from '$lib/constants.js';
 import zipped from './files.zip?url';
 import unzip from './unzip.cjs?url';
 
@@ -20,19 +19,4 @@ export async function fetchTemplateFiles() {
 			file: { contents: result[1] }
 		}
 	};
-}
-
-/**
- * Write a globals file with constants that should be shared between the Svelte app and the WebContainer, e.g. cursor name/color
- * @param {import('@webcontainer/api').WebContainer} webcontainerInstance - The WebContainer instance
- * @param {string} liveblocksRoom - The Liveblocks room ID
- */
-export function writeGlobals(webcontainerInstance, liveblocksRoom) {
-	const variables = { userName, userColor, liveblocksRoom };
-	return webcontainerInstance.fs.writeFile(
-		`${GENERATED_PATH}/globals.js`,
-		Object.keys(variables)
-			.map((key) => `export const ${key} = "${variables[/** @type {keyof variables} */ (key)]}";`)
-			.join('\n')
-	);
 }

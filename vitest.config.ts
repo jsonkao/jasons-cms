@@ -9,10 +9,7 @@ export default defineConfig({
 		alias: {
 			$shared: resolve('./shared'),
 			$lib: resolve('./src/lib'),
-			'$app/environment': resolve('./mocks/app-environment.js'),
-			'$app/stores': resolve('./mocks/app-stores.js'),
-      '@webcontainer/api': resolve('./mocks/webcontainer-api.js'),
-      './files.js': resolve('./mocks/files.js'),
+			'$app/environment': resolve('./mocks/app-environment.js')
 		}
 	}
 });
