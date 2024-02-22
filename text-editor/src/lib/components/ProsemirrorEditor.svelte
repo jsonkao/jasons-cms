@@ -46,19 +46,23 @@
 	/** Initial EditorView props */
 	export let editorViewProps = {};
 
+	let firstFocus = true;
+
 	/** Focus the content-editable div */
 	export function focus() {
 		if (view) {
 			view.focus();
 
 			/* Trying to set the cursor at the beginning of the document, but not working */
+			if (firstFocus) {
+				const doc = view.state.doc;
+				const selection = TextSelection.atStart(doc);
+				const { tr } = view.state;
 
-			const doc = view.state.doc;
-			const selection = TextSelection.atStart(doc);
-			const { tr } = view.state;
-
-			tr.setSelection(new TextSelection(selection.$anchor));
-			view.dispatch(tr);
+				tr.setSelection(new TextSelection(selection.$anchor));
+				view.dispatch(tr);
+				firstFocus = false;
+			}
 		}
 	}
 
@@ -93,17 +97,6 @@
 		if (isDirty) {
 			dispatch('change', { editorState });
 			isDirty = false;
-		}
-	};
-
-	/**
-	 * Captures custom events from plugins and dispatches them with a new event type (based on event.detail.type)
-	 * @param event {CustomEvent}
-	 */
-	const onCustomEvent = (event) => {
-		if (event.detail) {
-			const { type, ...detail } = event.detail;
-			dispatch(type || 'custom', detail);
 		}
 	};
 
