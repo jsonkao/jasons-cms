@@ -3,7 +3,7 @@
  */
 
 import { page } from '$app/stores';
-import { GENERATED_PATH, STEPS, userColor, userName } from '$lib/constants.js';
+import { GENERATED_PATH, STEPS, user } from '$lib/constants.js';
 import { currentStep, iframeUrl } from '$lib/stores/status';
 import { WebContainer } from '@webcontainer/api';
 import { get } from 'svelte/store';
@@ -51,7 +51,7 @@ export async function createWebContainer() {
 		currentStep.set(STEPS.SERVER_READY);
 		// Invalidate previous base URL because the URL might be the same, but we want to re-source the iframe.
 		// I'm not exactly sure what's going on but this makes it work
-		iframeUrl.set({ url, timeUpdated: Date.now() });
+		iframeUrl.set(`${url}?updated=${Date.now()}`);
 	});
 	webcontainer.on('error', ({ message }) => {
 		console.error('WebContainer error:', message);
@@ -104,11 +104,14 @@ export async function createWebContainer() {
 	 * @param {string} liveblocksRoom - The Liveblocks room ID
 	 */
 	function writeGlobals(liveblocksRoom) {
-		const variables = { userName, userColor, liveblocksRoom };
+		const variables = { user, liveblocksRoom };
 		return webcontainer.fs.writeFile(
 			`${GENERATED_PATH}/globals.js`,
 			Object.keys(variables)
-				.map((key) => `export const ${key} = "${variables[/** @type {keyof variables} */ (key)]}";`)
+				.map(
+					(key) =>
+						`export const ${key} = ${JSON.stringify(variables[/** @type {keyof variables} */ (key)])};`
+				)
 				.join('\n')
 		);
 	}

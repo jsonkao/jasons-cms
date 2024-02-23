@@ -76,7 +76,7 @@
 		left: 0;
 		display: flex;
 		flex-direction: column-reverse;
-		gap: 4px;
+		gap: 8px;
 	}
 
 	.manual-container {

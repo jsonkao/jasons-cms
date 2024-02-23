@@ -3,11 +3,12 @@ import { GENERATED_PATH } from '$lib/constants.js';
 import { openComponentName } from '$lib/stores/code-editor.js';
 import { PAGE_LEVEL_FILES } from '$shared/constants.js';
 import { get } from 'svelte/store';
+import { createWebContainer as defaultCreateWebContainer } from './create.js';
 
 /**
- * @param {import('./create.js').createWebContainer} createWebContainer - The WebContainer instance.
+ * @param {import('./create.js').createWebContainer} [createWebContainer] - The WebContainer instance.
  */
-export function createWebContainerManager(createWebContainer) {
+export function createWebContainerManager(createWebContainer = defaultCreateWebContainer) {
 	if (!browser) throw new Error('This module should only be imported in the browser');
 
 	/** @type {import('@webcontainer/api').WebContainer} The WebContainer instance. */
@@ -20,35 +21,40 @@ export function createWebContainerManager(createWebContainer) {
 
 	let pageFilesInitialized = false;
 
+	/**
+	 * Initializes page-level files of a webcontainer. Should only be run once.
+	 * @param {Map<string, string>} pageFiles
+	 */
+	async function initializeWebContainerPageFiles(pageFiles) {
+		if (pageFilesInitialized) return;
+		if (pageFiles.size === 0) return;
+
+		await ready;
+
+		await Promise.all(
+			[...pageFiles.entries()].map(([filename, contents]) =>
+				writeFile(`/src/routes/${filename}`, contents)
+			)
+		);
+
+		pageFilesInitialized = true;
+	}
+
 	return {
-		/**
-		 * Initializes page-level files of a webcontainer. Should only be run once.
-		 * @param {Map<string, string>} pageFiles
-		 */
-		async initializeWebContainerPageFiles(pageFiles) {
-			if (pageFilesInitialized) return;
-			if (pageFiles.size === 0) return;
-
-			await ready;
-
-			await Promise.all(
-				[...pageFiles.entries()].map(([filename, contents]) =>
-					writeFile(`/src/routes/${filename}`, contents)
-				)
-			);
-
-			pageFilesInitialized = true;
-		},
-
 		/**
 		 * Given a Yjs array of blocks, make sure that the WebContainer's file system is synced (i.e. Svelte components exist
 		 * for all components, and Svelte components are deleted for components that have been removed).
 		 * Also generate an `index.js` file that imports and exports all the graphic components.
-		 * @param {Array<import('$shared/types').BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
 		 *
+		 * Also, initializes page-level files if they haven't been initialized yet.
+		 *
+		 * @param {Array<import('$shared/types').BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
+		 * @param {Map<string, string>} pageFiles - A map of page-level files
 		 */
-		async syncWebContainerFileSystem(yarray) {
+		async syncWebContainerFileSystem(yarray, pageFiles) {
 			await ready;
+
+			initializeWebContainerPageFiles(pageFiles);
 
 			const currentGraphics = await webcontainer.fs.readdir(GENERATED_PATH);
 

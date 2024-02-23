@@ -1,17 +1,12 @@
 <script>
-	import { browser } from '$app/environment';
 	import { trackOtherCoders } from '$lib/awareness';
-	import { userColor, userName } from '$lib/constants.js';
+	import { user } from '$lib/constants.js';
 	import {
 		codeEditorPosition,
 		openComponentName,
 		openGlobalFile
 	} from '$lib/stores/code-editor.js';
-	import {
-		initializeWebContainerPageFiles,
-		saveComponentOrGlobalFile,
-		syncWebContainerFileSystem
-	} from '$lib/webcontainer/index.js';
+	import { createWebContainerManager } from '$lib/webcontainer/manager.js';
 	import { setupProvider } from '$shared/provider';
 	import { SharedDoc } from '$shared/shared-doc.js';
 	import { onDestroy } from 'svelte';
@@ -23,72 +18,36 @@
 
 	/** @type {string} */
 	export let slug;
-
-	if (!browser) throw new Error('This component should only be used in the browser.');
-
 	export let showCodeEditor = false;
-	const user = { color: userColor, name: userName };
 
 	/** @type {HTMLElement} */
 	let codeEditorElement;
 
-	/**
-	 * Create Y.Text
-	 */
-
-	/** @type {import('@codemirror/state').Extension | undefined} */
-	let yExtension;
 	/** @type {import('yjs').Text | undefined} */
 	let ytext;
 
+	/* Setup shared doc */
 	const doc = new SharedDoc(setupProvider(user, slug));
-	const { yarrayStore, yPageFilesStore } = doc;
-	trackOtherCoders(doc.awareness);
+	const { yarrayStore, yPageFilesStore, awareness } = doc;
+	trackOtherCoders(awareness);
+	onDestroy(doc.destroy);
 
-	onDestroy(() => doc.destroy());
+	/* Setup webcontainer and its manager */
+	const { syncWebContainerFileSystem, saveComponentOrGlobalFile } = createWebContainerManager();
+	$: ytext = doc.findYText($openComponentName, $openGlobalFile);
+	$: syncWebContainerFileSystem($yarrayStore, $yPageFilesStore);
 
-	$: syncWebContainerFileSystem($yarrayStore);
-	$: initializeWebContainerPageFiles($yPageFilesStore);
-	$: setComponentInEditor($openComponentName, $openGlobalFile);
-	$: updateCodingPresence(showCodeEditor);
-
-	/**
-	 * Set the ytext and ycollab extension for the open component or global file
-	 * @param {string | null} componentName
-	 * @param {string | null} globalFile
-	 */
-	function setComponentInEditor(componentName, globalFile) {
-		if (componentName === null && globalFile === null) {
-			ytext = yExtension = undefined;
-			return;
-		}
-
-		const foundYtext = doc.findYText(componentName, globalFile);
-		if (foundYtext !== undefined) {
-			ytext = foundYtext;
-			yExtension = yCollab(ytext, doc.awareness);
-		}
-	}
-
-	/**
-	 * Focuses the code editor when it's shown; and update doc awareness
-	 * @param {boolean} showCodeEditor
-	 */
-	function updateCodingPresence(showCodeEditor) {
+	/* Focus the editor when it's shown; and keep other clients updated */
+	$: {
 		if (showCodeEditor) {
 			/** @type {HTMLElement} */
 			(codeEditorElement?.querySelector('[contenteditable=true]'))?.focus();
 		}
-		doc.awareness.setLocalStateField('user', { ...user, coding: showCodeEditor });
+		awareness.setLocalStateField('user', { ...user, coding: showCodeEditor });
 	}
 
-	/**
-	 * Delete a component from the yarray
-	 * @param {CustomEvent} e
-	 */
-	function deleteComponent(e) {
-		doc.deleteComponent(e.detail);
-	}
+	/** @param {CustomEvent} e */
+	const deleteComponent = (e) => doc.deleteComponent(e.detail);
 
 	/**
 	 * Save the component when the user presses cmd+s
@@ -110,15 +69,19 @@
 	role="none"
 >
 	<div class="code-mirror-container">
-		{#if ytext && yExtension}
-			<CodeMirror value={ytext.toString()} extensions={[yExtension]} {...codemirrorProps} />
+		{#if ytext}
+			<CodeMirror
+				value={ytext.toString()}
+				extensions={[yCollab(ytext, awareness)]}
+				{...codemirrorProps}
+			/>
 		{/if}
 	</div>
 
 	<CodingOverlay
 		{showCodeEditor}
 		on:delete-graphic={deleteComponent}
-		componentIsPresent={!!(ytext && yExtension)}
+		componentIsPresent={!!ytext}
 		blocks={$yarrayStore}
 	/>
 </div>

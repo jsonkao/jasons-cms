@@ -25,7 +25,7 @@
 
 	$: {
 		if ($iframeUrl) {
-			if (iframeElement) iframeElement.src = $iframeUrl.url;
+			if (iframeElement) iframeElement.src = $iframeUrl;
 			else setSrcAfterMount = true;
 		}
 	}
@@ -67,7 +67,7 @@
 	}
 
 	onMount(() => {
-		if (setSrcAfterMount && $iframeUrl) iframeElement.src = $iframeUrl.url;
+		if (setSrcAfterMount && $iframeUrl) iframeElement.src = $iframeUrl;
 	});
 </script>
 

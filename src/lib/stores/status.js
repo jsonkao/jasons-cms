@@ -2,8 +2,8 @@ import { writable } from 'svelte/store';
 import { STEPS } from '$lib/constants.js';
 
 /**
- * A store for the iframe's src url. Uses a timeUpdated property in an attempt to invalidate/reload iframe on HMR update
- * @type {import('svelte/store').Writable<null | { url: string; timeUpdated: number }>}
+ * A store for the iframe's src url. Uses a timeUpdated URL param to invalidate/reload iframe on HMR update
+ * @type {import('svelte/store').Writable<null | string>}
  */
 export const iframeUrl = writable(null);
 

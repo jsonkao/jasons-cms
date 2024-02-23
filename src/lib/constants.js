@@ -20,3 +20,4 @@ const colors = ['#A32251', '#004F50', '#D91F25', '#0041FF', '#EBAB3D'];
 export const userName = names[Math.floor(Math.random() * names.length)];
 /** The color for both CodeMirror and ProseMirror's collaborative cursors */
 export const userColor = colors[Math.floor(Math.random() * colors.length)];
+export const user = { name: userName, color: userColor };

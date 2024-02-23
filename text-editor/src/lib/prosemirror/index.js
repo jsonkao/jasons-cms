@@ -2,7 +2,7 @@
  * This file contains helper functions for creating ProseMirror state and schema
  */
 
-import { liveblocksRoom, userColor, userName } from '$lib/generated/globals.js';
+import { liveblocksRoom, user } from '$lib/generated/globals.js';
 
 import { DEFAULT_CODE_BLOCK } from '$shared/constants.js';
 import { setupProvider } from '$shared/provider.js';
@@ -86,9 +86,7 @@ export class SharedDocForProsemirror extends SharedDoc {
 	}
 }
 
-export const doc = new SharedDocForProsemirror(
-	setupProvider({ color: userColor, name: userName }, liveblocksRoom)
-);
+export const doc = new SharedDocForProsemirror(setupProvider(user, liveblocksRoom));
 
 /**
  * Uses internal ID to create a unique key for each block
