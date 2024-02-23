@@ -72,10 +72,8 @@ export class SharedDocForProsemirror extends SharedDoc {
 		const textAfter = prosemirrorToYXmlFragment(docNode.cut(cursorPosition + 1));
 
 		const newElements = [
-			// @ts-ignore
 			makeTextBlock(textBefore),
 			makeCodingBlock(name, DEFAULT_CODE_BLOCK),
-			// @ts-ignore
 			makeTextBlock(textAfter)
 		];
 

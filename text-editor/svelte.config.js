@@ -8,7 +8,7 @@ const config = {
 		// Everywhere text-editor is deployed (Vercel and as a bundled zip in a webcontainer), we
 		// manually copied the ./shared folder to ./text-editor/shared.
 		alias: {
-			$shared: (process.env.VERCEL || process.env.WEBCONTAINER) ? './shared' : '../shared'
+			$shared: process.env.VERCEL || process.env.WEBCONTAINER ? './shared' : '../shared'
 		},
 
 		// For the tutorial, we need to disable CSRF protection.

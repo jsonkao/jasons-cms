@@ -2,8 +2,11 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import auto from '@rollup/plugin-auto-install';
 
+const plugins = [sveltekit()];
+if (process.env.NODE_ENV === 'development') plugins.push(importResolve());
+
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins,
 	optimizeDeps: {
 		include: [
 			'prosemirror-state',

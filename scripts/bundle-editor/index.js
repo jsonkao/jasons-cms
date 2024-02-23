@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 const cwd = './text-editor';
 
 console.time('install');
-if (!!process.env.VERCEL) {
+if (process.env.VERCEL) {
 	// Omitting prettier dev dependencies reduces bundle size by 2MB lol (is now 7MB).
 	execSync('rm -rf node_modules package-lock.json && npm i --omit=dev', { cwd });
 } else if (!fs.existsSync(cwd + '/node_modules')) {

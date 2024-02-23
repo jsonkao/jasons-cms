@@ -1,4 +1,6 @@
 <script>
+	// @ts-expect-error
+	import { yCollab } from 'y-codemirror.next';
 	import { trackOtherCoders } from '$lib/awareness';
 	import { user } from '$lib/constants.js';
 	import {
@@ -11,10 +13,8 @@
 	import { SharedDoc } from '$shared/shared-doc.js';
 	import { onDestroy } from 'svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
-	import codemirrorProps from './codemirror-props.js';
-	// @ts-ignore
-	import { yCollab } from 'y-codemirror.next';
 	import CodingOverlay from './CodingOverlay.svelte';
+	import codemirrorProps from './codemirror-props.js';
 
 	/** @type {string} */
 	export let slug;

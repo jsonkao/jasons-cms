@@ -22,10 +22,13 @@
 		"src/**/*.svelte",
 		"scripts/**/*.js",
 		"shared/**/*.js",
-		"text-editor/**/*.js"
+		"text-editor/src/**/*.js",
+		"text-editor/scripts/**/*.js"
+	],
+	"exclude": [
+		"node_modules/**",
+		"text-editor/src/lib/generated/**",
+		"text-editor/src/routes/render/[slug]/generated/**",
+		"text-editor/node_modules/**"
 	]
-	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
-	//
-	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
-	// from the referenced tsconfig.json - TypeScript does not merge them in
 }

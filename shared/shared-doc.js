@@ -27,7 +27,7 @@ export class SharedDoc {
 		this.leave = provider.leave;
 
 		this.ydoc = new Y.Doc();
-		// @ts-ignore
+		// @ts-expect-error
 		this.awareness = provider.instantiate(this.ydoc);
 
 		this.yarray = this.ydoc.getArray(BLOCKS_KEY);
@@ -129,7 +129,7 @@ export class SharedDoc {
  * This is a bit of a hack, but it works. See https://github.com/yjs/y-prosemirror/issues/114.
  */
 export class IndestructibleUndoManager extends Y.UndoManager {
-	// @ts-ignore
+	// @ts-expect-error
 	constructor(type, opts) {
 		super(type, opts);
 	}

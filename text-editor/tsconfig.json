@@ -24,10 +24,7 @@
 		"src/**/*.svelte",
 		"scripts/**/*.js"
 	],
-	"exclude": [
-		"node_modules/**",
-		"src/lib/generated/**"
-	]
+	"exclude": ["node_modules/**", "src/lib/generated/**"]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias and https://kit.svelte.dev/docs/configuration#files
 	//
 	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes

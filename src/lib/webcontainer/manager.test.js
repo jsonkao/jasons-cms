@@ -51,13 +51,11 @@ beforeAll(() => {
 	};
 });
 
-test('page files get initialized', async () => {
-	await manager.initializeWebContainerPageFiles(new Map([['+page.server.js', 'foo']]));
-	expect(webcontainer.fs.readFile('/src/routes/+page.server.js', 'utf-8')).resolves.toBe('foo');
-});
-
-test('components are created in the file system', async () => {
-	await manager.syncWebContainerFileSystem(doc.yarray.toArray());
+test('file system is being synced', async () => {
+	await manager.syncWebContainerFileSystem(
+		doc.yarray.toArray(),
+		new Map([['+page.server.js', 'foo']])
+	);
 
 	expect(webcontainer.fs.readdir('/src/lib/generated')).resolves.toEqual([
 		'graphic1.svelte',
@@ -67,6 +65,7 @@ test('components are created in the file system', async () => {
 	expect(webcontainer.fs.readFile('/src/lib/generated/index.js', 'utf-8')).resolves.toBe(
 		`export { default as graphic1 } from './graphic1.svelte';\nexport { default as graphic2 } from './graphic2.svelte';`
 	);
+	expect(webcontainer.fs.readFile('/src/routes/+page.server.js', 'utf-8')).resolves.toBe('foo');
 });
 
 test('files are saved in the correct places', async () => {

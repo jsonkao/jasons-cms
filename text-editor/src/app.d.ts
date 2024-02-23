@@ -1,4 +1,3 @@
-import type { EditorState } from 'prosemirror-state';
 import type { Node } from 'prosemirror-model';
 import type * as Y from 'yjs';
 
