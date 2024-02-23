@@ -1,14 +1,8 @@
-/* Styles for internal prosemirror DOM elements */
+/*
+ * Styles for internal prosemirror DOM elements
+ */
 
-.content > .ui-editor:not(.editor_empty):first-child,
-.content > .ui-editor.ProseMirror-focused:first-child {
-	margin-top: 60px;
-}
-
-.content > .ui-editor:not(.editor_empty):last-child,
-.content > .ui-editor.ProseMirror-focused:last-child {
-	padding-bottom: 60px;
-}
+/* Default styles and spacing for editor components */
 
 .ui-editor {
 	outline: none;
@@ -25,7 +19,7 @@
 	max-width: 520px;
 }
 
-.ui-editor h1 {
+.content > .ui-editor h1 {
 	font-size: 3.2rem;
 	max-width: 710px;
 	text-align: center;
@@ -33,19 +27,39 @@
 	letter-spacing: -0.04em;
 }
 
+/* Empty ui-editors should take up zero space */
+
+.content > .ui-editor.editor_empty:not(.ProseMirror-focused) p:not(:has(.cm-ySelectionCaret)) {
+	height: 0;
+	margin: 0;
+}
+
+/* ui-editors that aren't taking up zero space and are at the top or bottom set top/bottom margins for the page */
+
+.content > .ui-editor:not(.editor_empty):first-child,
+.content > .ui-editor.ProseMirror-focused:first-child {
+	margin-top: 60px;
+}
+
+.content > .ui-editor:not(.editor_empty):last-child,
+.content > .ui-editor.ProseMirror-focused:last-child {
+	padding-bottom: 60px;
+}
+
+/* Sometimes needed when text-editor is inside the iframe webcontainer */
+
+.ProseMirror > * {
+	cursor: text;
+}
+
 /*
- * Use CSS to create a placeholder inside of graphic Editables, which don't use the floating menu placeholder.
- * Also, this is better than Prosemirror's built in placeholder bc it accounts for multiline content 
+ * For ui-editors (<Editable />) inside custom components (<Component />), use CSS to create a placeholder.
+ * (Editables outside of components use the floating menu plugin for their placeholders).
+ * Also, this is better than Prosemirror's built in placeholder bc it accounts for multiline content .
  */
 div[data-name] .ui-editor.ProseMirror-focused p:has(br:only-child):before {
 	position: absolute;
 	content: 'Write something…';
 	pointer-events: none;
 	color: #aaa;
-}
-
-/* Empty ui-editors should take up zero space */
-.content > .ui-editor.editor_empty:not(.ProseMirror-focused) p:not(:has(.cm-ySelectionCaret)) {
-	height: 0;
-	margin: 0;
 }
