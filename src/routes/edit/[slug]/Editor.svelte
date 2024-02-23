@@ -24,7 +24,6 @@
 	let setSrcAfterMount = false;
 
 	$: {
-		// console.log($iframeUrl, iframeElement);
 		if ($iframeUrl) {
 			if (iframeElement) iframeElement.src = $iframeUrl.url;
 			else setSrcAfterMount = true;

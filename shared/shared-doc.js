@@ -78,6 +78,24 @@ export class SharedDoc {
 	}
 
 	/**
+	 * Find the Y.Text element for the given component name or global file.
+	 * The global file takes precedence.
+	 * @param {string | null} componentName
+	 * @param {string | null} globalFile
+	 * @returns {import('yjs').Text | undefined}
+	 */
+	findYText(componentName, globalFile) {
+		if (globalFile) {
+			return this.yPageFilesStore.y.get(globalFile);
+		} else if (componentName) {
+			for (const ymap of this.yarray.toArray()) {
+				if (ymap.get('name') === componentName)
+					return /** @type {import('yjs').Text} */ (ymap.get('code'));
+			}
+		}
+	}
+
+	/**
 	 * Get the index of a target element in an array
 	 * @param {BlockMap} targetElement
 	 * @returns {number}
@@ -123,4 +141,3 @@ export class IndestructibleUndoManager extends Y.UndoManager {
 		super.destroy();
 	}
 }
-
