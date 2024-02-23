@@ -84,7 +84,7 @@ export async function createWebContainer() {
 		currentStep.set(STEPS.MOUNTING);
 		await webcontainer.mount(templateFiles);
 
-		await spawn('node', ['unzip.cjs'], 'Failed to unzip files', true);
+		await spawn('node', ['unzip.cjs']);
 
 		// Clear the /src/lib/generated directory
 		await webcontainer.fs.rm(GENERATED_PATH, { recursive: true });
@@ -118,29 +118,28 @@ export async function createWebContainer() {
 	 */
 	async function startWebContainer() {
 		currentStep.set(STEPS.RUNNING);
-		await spawn('./node_modules/vite/bin/vite.js', ['dev'], 'Failed to start dev server', true);
+		await spawn('./node_modules/vite/bin/vite.js', ['dev'], { WEBCONTAINER: true });
 	}
 
 	/**
 	 * A helper to spawn a process in the WebContainer.
 	 * @param {string} command - The command to run
 	 * @param {string[]} args - The arguments to pass to the command
-	 * @param {string} errorMessage - The error message to log if the process fails
-	 * @param {boolean} [logOutput] - Whether to log the output of the process
+	 * @param {import('@webcontainer/api').SpawnOptions['env']} [env] - Optional environment variables to set
 	 */
-	async function spawn(command, args, errorMessage, logOutput = false) {
+	async function spawn(command, args, env) {
 		if (currentProcess)
 			throw new Error(`A process is already running. Had tried to spawn ${command} ${args}`);
 
-		const process = await webcontainer.spawn(command, args);
+		const process = await webcontainer.spawn(command, args, { env });
 		currentProcess = process;
 
-		if (logOutput) process.output.pipeTo(log_stream());
+		process.output.pipeTo(log_stream());
 
 		return process.exit.then((code) => {
 			if (currentProcess === process) currentProcess = undefined;
 			if (code !== 0) {
-				console.error(`Non-zero exit code in ${command} ${args}: ${errorMessage}`);
+				console.error(`Webcontainer process error (code ${code}) in ${command} ${args}`);
 			}
 		});
 	}

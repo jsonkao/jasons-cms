@@ -8,18 +8,17 @@ import { PAGE_LEVEL_FILES } from '../../shared/constants.js';
 import { BLOCKS_KEY, PAGE_FILES_KEY } from '../../shared/constants.js';
 import { makeCodingBlock, makeTextFragment, makeTextBlock } from '../../shared/make-types.js';
 
-/** @typedef {'louisiana-fifth-circuit' | 'oil-wells' | 'tutorial'} RoomName */
-/** @typedef {{text: string, hed?: string}} TextSeedData */
-/** @typedef {{graphic: string}} GraphicSeedData */
-/** @typedef {TextSeedData | GraphicSeedData} SeedData */
+const ROOMS = /** @type {const} */ (['louisiana-fifth-circuit', 'oil-wells', 'tutorial']);
 
-/** @type {Array<RoomName>} */
-const ROOMS = ['louisiana-fifth-circuit', 'oil-wells', 'tutorial'];
+/** @typedef {typeof ROOMS} RoomsTuple */
+/** @typedef {RoomsTuple[number]} RoomName All possible room names*/
 
-const TESTING = process.argv.includes('--test');
-if (!TESTING) await createRoom();
+/** @typedef {{ text: string, hed?: string }} TextSeedData Data provided for seeding a text block */
+/** @typedef {{ graphic: string }} GraphicSeedData Data provided for seeding a graphic block */
+/** @typedef {TextSeedData | GraphicSeedData} SeedData Data provided for seeding a block */
 
 /**
+ * Seeding data by room name
  * @type {Record<RoomName, Array<SeedData>>}
  */
 const seedingData = {
@@ -57,15 +56,21 @@ const seedingData = {
 	]
 };
 
-await Promise.all(ROOMS.map((room) => populateRoomWithData(room, seedingData[room])));
+async function main() {
+	await resetRooms();
+	await Promise.all(ROOMS.map((room) => populateRoomWithData(room, seedingData[room])));
+}
+
+await main();
 
 /**
- * Delete all rooms, then create a new one
+ * Delete all rooms, then create new ones
  */
-async function createRoom() {
-	const liveblocks = new LiveblocksNode({
-		secret: /** @type {string} */ (process.env.LIVEBLOCKS_SECRET_KEY)
-	});
+async function resetRooms() {
+	const { LIVEBLOCKS_SECRET_KEY } = process.env;
+	if (!LIVEBLOCKS_SECRET_KEY) throw new Error('LIVEBLOCKS_SECRET_KEY is required');
+
+	const liveblocks = new LiveblocksNode({ secret: LIVEBLOCKS_SECRET_KEY });
 
 	// Delete all rooms
 	const { data: rooms } = await liveblocks.getRooms();
@@ -94,10 +99,10 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 		throw new Error('First and last elements must be text');
 	}
 
-	const client = createClient({
-		publicApiKey: /** @type {string} */ (process.env.LIVEBLOCKS_PUBLIC_KEY),
-		polyfills: { WebSocket }
-	});
+	const { LIVEBLOCKS_PUBLIC_KEY } = process.env;
+	if (!LIVEBLOCKS_PUBLIC_KEY) throw new Error('LIVEBLOCKS_PUBLIC_KEY is required');
+
+	const client = createClient({ publicApiKey: LIVEBLOCKS_PUBLIC_KEY, polyfills: { WebSocket } });
 
 	const { room, leave } = client.enterRoom(liveblocksRoom, {
 		initialPresence: {}
@@ -107,7 +112,7 @@ async function populateRoomWithData(liveblocksRoom, contents) {
 	new LiveblocksProvider(room, ydoc);
 	const yarray = ydoc.getArray(BLOCKS_KEY);
 
-	if (!TESTING) await seedRoom();
+	await seedRoom();
 	await testArray();
 	leave();
 
