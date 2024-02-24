@@ -58,7 +58,6 @@ export class SharedDocForProsemirror extends SharedDoc {
 
 	/** @param {BlockInsertionParams} params */
 	insertGraphic({ docNode, cursorPosition, activeYXmlFragment }) {
-		// @ts-ignore
 		const currentBlockMap = /** @type {import('$shared/types').BlockMap} */ (
 			activeYXmlFragment.parent
 		);
@@ -91,7 +90,6 @@ export const doc = new SharedDocForProsemirror(setupProvider(user, liveblocksRoo
  * @param {import('yjs').Map<any> | import('yjs').XmlFragment | import('$shared/types').BlockMap} yjsThing
  */
 export function getId(yjsThing) {
-	// @ts-ignore
 	const { _item } = yjsThing;
 
 	if (_item === null) throw new Error('I thought Y.Map._item would never be null');

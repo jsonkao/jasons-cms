@@ -7,45 +7,16 @@ import { GENERATED_PATH, STEPS, user } from '$lib/constants.js';
 import { currentStep, iframeUrl } from '$lib/stores/status';
 import { WebContainer } from '@webcontainer/api';
 import { get } from 'svelte/store';
-import { fetchTemplateFiles } from './files.js';
+import { fetchTemplateFiles } from './fetch.js';
 
-export async function createWebContainer() {
-	/** @type {WebContainer} The WebContainer instance. */
-	let webcontainer;
-
-	/** @type {Awaited<ReturnType<typeof fetchTemplateFiles>>} The template files. */
-	let templateFiles;
-
-	let promises = [];
-
-	/** @type {import('@webcontainer/api').WebContainerProcess | undefined} The current process running in the WebContainer. */
-	let currentProcess;
-
+/** Get a webcontainer instance */
+async function bootWebContainer() {
 	if (import.meta.hot?.data?.webcontainer) {
-		webcontainer = import.meta.hot.data.webcontainer;
-	} else {
-		promises.push(
-			WebContainer.boot().then((instance) => {
-				webcontainer = instance;
-				if (import.meta.hot?.data) import.meta.hot.data.webcontainer = webcontainer;
-			})
-		);
-	}
-	if (import.meta.hot?.data?.templateFiles) {
-		templateFiles = import.meta.hot.data.templateFiles;
-	} else {
-		promises.push(
-			fetchTemplateFiles().then((files) => {
-				templateFiles = files;
-				if (import.meta.hot?.data) import.meta.hot.data.templateFiles = templateFiles;
-			})
-		);
+		return import.meta.hot.data.webcontainer;
 	}
 
-	if (promises.length > 0) {
-		await Promise.all(promises);
-		await mount();
-	}
+	const webcontainer = await WebContainer.boot();
+	if (import.meta.hot?.data) import.meta.hot.data.webcontainer = webcontainer;
 
 	webcontainer.on('server-ready', (port, url) => {
 		currentStep.set(STEPS.SERVER_READY);
@@ -57,7 +28,33 @@ export async function createWebContainer() {
 		console.error('WebContainer error:', message);
 	});
 
-	startWebContainer(); // Do not await this
+	return webcontainer;
+}
+
+async function getInitialFiles() {
+	if (import.meta.hot?.data?.templateFiles) {
+		return import.meta.hot.data.templateFiles;
+	}
+
+	const templateFiles = await fetchTemplateFiles();
+	if (import.meta.hot?.data) import.meta.hot.data.templateFiles = templateFiles;
+	return templateFiles;
+}
+
+export async function createWebContainer() {
+	/** @type {WebContainer} The WebContainer instance. */
+	let webcontainer;
+
+	/** @type {Awaited<ReturnType<typeof fetchTemplateFiles>>} The template files. */
+	let templateFiles;
+
+	[webcontainer, templateFiles] = await Promise.all([bootWebContainer(), getInitialFiles()]);
+
+	/** @type {import('@webcontainer/api').WebContainerProcess | undefined} The current process running in the WebContainer. */
+	let currentProcess;
+
+	await mount(); // Could repeat work if neither the WebContainer nor the template files have changed
+	startWebContainer(); // Do not await
 
 	/**
 	 * On HMR updates, kill the current process so we can safely start a new one.

@@ -21,14 +21,6 @@
 		"src/**/*.ts",
 		"src/**/*.svelte",
 		"scripts/**/*.js",
-		"shared/**/*.js",
-		"text-editor/src/**/*.js",
-		"text-editor/scripts/**/*.js"
-	],
-	"exclude": [
-		"node_modules/**",
-		"text-editor/src/lib/generated/**",
-		"text-editor/src/routes/render/[slug]/generated/**",
-		"text-editor/node_modules/**"
+		"shared/**/*.js"
 	]
 }

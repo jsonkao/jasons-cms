@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+import type * as Y from 'yjs';
+
 export type Subscriber<T> = (value: T) => void;
 export type Unsubscriber = () => void;
 export type Invalidator<T> = (value?: T) => void;

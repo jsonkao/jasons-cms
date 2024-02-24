@@ -27,7 +27,7 @@ export class SharedDoc {
 		this.leave = provider.leave;
 
 		this.ydoc = new Y.Doc();
-		// @ts-expect-error
+		// @ts-expect-error - y-protocols.Awareness and liveblocks/yjs.Awareness are slightly different
 		this.awareness = provider.instantiate(this.ydoc);
 
 		this.yarray = this.ydoc.getArray(BLOCKS_KEY);
@@ -129,7 +129,7 @@ export class SharedDoc {
  * This is a bit of a hack, but it works. See https://github.com/yjs/y-prosemirror/issues/114.
  */
 export class IndestructibleUndoManager extends Y.UndoManager {
-	// @ts-expect-error
+	// @ts-expect-error - Don't know how to get constructor types of Y.UndoManager, but they're supposed to be the same
 	constructor(type, opts) {
 		super(type, opts);
 	}

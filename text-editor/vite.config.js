@@ -2,6 +2,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import auto from '@rollup/plugin-auto-install';
 
+/** @type {import('vite').PluginOption[]} */
 const plugins = [sveltekit()];
 if (process.env.NODE_ENV === 'development') plugins.push(importResolve());
 

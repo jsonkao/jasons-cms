@@ -7,6 +7,7 @@ let doc;
 
 beforeAll(() => {
 	/** @type {ReturnType<import('./provider').setupProvider>} */
+	// @ts-expect-error Fake and empty instantiate method
 	let provider = { leave: () => {}, instantiate: () => {} };
 
 	doc = new SharedDoc(provider);
@@ -22,7 +23,7 @@ beforeAll(() => {
 test('delete', () => {
 	doc.deleteComponent('graphic1');
 	expect(doc.yarray.length).toBe(1);
-	expect(doc.yarray.get(0).get('text').toString()).toBe(
+	expect(doc.yarray.get(0)?.get('text')?.toString()).toBe(
 		'<paragraph>foo</paragraph><paragraph>bar</paragraph>'
 	);
 });

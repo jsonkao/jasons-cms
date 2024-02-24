@@ -1,5 +1,5 @@
 <script>
-	// @ts-expect-error
+	// @ts-expect-error - y-codemirror.next is not typed
 	import { yCollab } from 'y-codemirror.next';
 	import { trackOtherCoders } from '$lib/awareness';
 	import { user } from '$lib/constants.js';
@@ -33,9 +33,9 @@
 	onDestroy(doc.destroy);
 
 	/* Setup webcontainer and its manager */
-	const { syncWebContainerFileSystem, saveComponentOrGlobalFile } = createWebContainerManager();
+	const { syncFileSystem, saveFile } = createWebContainerManager();
 	$: ytext = doc.findYText($openComponentName, $openGlobalFile);
-	$: syncWebContainerFileSystem($yarrayStore, $yPageFilesStore);
+	$: syncFileSystem($yarrayStore, $yPageFilesStore);
 
 	/* Focus the editor when it's shown; and keep other clients updated */
 	$: {
@@ -56,7 +56,7 @@
 	function onKeyDown(e) {
 		if (e.metaKey && e.key === 's' && ytext) {
 			e.preventDefault();
-			saveComponentOrGlobalFile($openGlobalFile || $openComponentName, ytext.toString());
+			saveFile($openComponentName, $openGlobalFile, ytext.toString());
 		}
 	}
 </script>

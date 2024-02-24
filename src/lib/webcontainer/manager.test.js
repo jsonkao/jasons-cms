@@ -17,22 +17,12 @@ vol.mkdirSync('/src/routes', { recursive: true });
 let webcontainer;
 
 /** @returns {Promise<import('@webcontainer/api').WebContainer>} */
-const createTestWebContainer = async () =>
-	(webcontainer = {
-		on: () => {},
-		mount: () => {},
-		spawn: () => ({
-			output: {
-				pipeTo: () => {}
-			},
-			exit: Promise.resolve({ code: 0 })
-		}),
-
-		fs: fs.promises
-	});
+// @ts-expect-error - we don't need to implement the entire WebContainer interface
+const createTestWebContainer = async () => (webcontainer = { fs: fs.promises });
 
 beforeAll(() => {
 	/** @type {ReturnType<import('$shared/provider').setupProvider>} */
+	// @ts-expect-error - Fake and empty instantiate method
 	let provider = { leave: () => {}, instantiate: () => {} };
 
 	doc = new SharedDoc(provider);
@@ -52,10 +42,7 @@ beforeAll(() => {
 });
 
 test('file system is being synced', async () => {
-	await manager.syncWebContainerFileSystem(
-		doc.yarray.toArray(),
-		new Map([['+page.server.js', 'foo']])
-	);
+	await manager.syncFileSystem(doc.yarray.toArray(), new Map([['+page.server.js', 'foo']]));
 
 	expect(webcontainer.fs.readdir('/src/lib/generated')).resolves.toEqual([
 		'graphic1.svelte',
@@ -69,9 +56,9 @@ test('file system is being synced', async () => {
 });
 
 test('files are saved in the correct places', async () => {
-	await manager.saveComponentOrGlobalFile('graphic10', '<p>ok</p>');
+	await manager.saveFile('graphic10', null, '<p>ok</p>');
 	expect(webcontainer.fs.readdir('/src/lib/generated')).resolves.toContain('graphic10.svelte');
 
-	await manager.saveComponentOrGlobalFile('+page.server.js', 'foo');
+	await manager.saveFile('graphic10', '+page.server.js', 'foo');
 	expect(webcontainer.fs.readFile('/src/routes/+page.server.js', 'utf-8')).resolves.toBe('foo');
 });

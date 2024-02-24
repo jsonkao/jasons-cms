@@ -1,14 +1,14 @@
 import { browser } from '$app/environment';
 import { GENERATED_PATH } from '$lib/constants.js';
 import { openComponentName } from '$lib/stores/code-editor.js';
-import { PAGE_LEVEL_FILES } from '$shared/constants.js';
 import { get } from 'svelte/store';
-import { createWebContainer as defaultCreateWebContainer } from './create.js';
+import { createWebContainer as defaultWebContainer } from './create.js';
 
 /**
- * @param {import('./create.js').createWebContainer} [createWebContainer] - The WebContainer instance.
+ * Uses createWebContainer to create a web container. Returns functions that work with its file system.
+ * @param {import('./create.js').createWebContainer} [createWebContainer]
  */
-export function createWebContainerManager(createWebContainer = defaultCreateWebContainer) {
+export function createWebContainerManager(createWebContainer = defaultWebContainer) {
 	if (!browser) throw new Error('This module should only be imported in the browser');
 
 	/** @type {import('@webcontainer/api').WebContainer} The WebContainer instance. */
@@ -25,7 +25,7 @@ export function createWebContainerManager(createWebContainer = defaultCreateWebC
 	 * Initializes page-level files of a webcontainer. Should only be run once.
 	 * @param {Map<string, string>} pageFiles
 	 */
-	async function initializeWebContainerPageFiles(pageFiles) {
+	async function initializePageFiles(pageFiles) {
 		if (pageFilesInitialized) return;
 		if (pageFiles.size === 0) return;
 
@@ -42,19 +42,19 @@ export function createWebContainerManager(createWebContainer = defaultCreateWebC
 
 	return {
 		/**
-		 * Given a Yjs array of blocks, make sure that the WebContainer's file system is synced (i.e. Svelte components exist
-		 * for all components, and Svelte components are deleted for components that have been removed).
+		 * Given the blocks array and the page-level files map, make sure that the correct files exist
+		 * in the WebContainer's file system (i.e. Svelte components exist * for all components, and
+		 * Svelte components are deleted for components that have been removed).
 		 * Also generate an `index.js` file that imports and exports all the graphic components.
-		 *
-		 * Also, initializes page-level files if they haven't been initialized yet.
+		 * Also, initializes the content of page-level files.
 		 *
 		 * @param {Array<import('$shared/types').BlockMap>} yarray - An array of code files (not Y.Array because of readableArray store)
 		 * @param {Map<string, string>} pageFiles - A map of page-level files
 		 */
-		async syncWebContainerFileSystem(yarray, pageFiles) {
+		async syncFileSystem(yarray, pageFiles) {
 			await ready;
 
-			initializeWebContainerPageFiles(pageFiles);
+			initializePageFiles(pageFiles);
 
 			const currentGraphics = await webcontainer.fs.readdir(GENERATED_PATH);
 
@@ -116,19 +116,21 @@ export function createWebContainerManager(createWebContainer = defaultCreateWebC
 		},
 
 		/**
-		 * Handles saving a componennt
-		 * @param {string | null} fileOrComponent - The name of the component to save or a page-level file
+		 * Handles saving a component or page-level file
+		 * @param {string | null} componentName
+		 * @param {string | null} pageLevelFile
 		 * @param {string} content - The content of the component to save
 		 */
-		async saveComponentOrGlobalFile(fileOrComponent, content) {
-			if (fileOrComponent === null) {
-				throw new Error('Attempted to save a component or global fille but filename is null');
-			}
+		async saveFile(componentName, pageLevelFile, content) {
+			await ready;
 
-			if (Object.values(PAGE_LEVEL_FILES).includes(fileOrComponent)) {
-				await writeFile(`/src/routes/${fileOrComponent}`, content);
+			// It's important that page-level file takes precedence
+			if (pageLevelFile) {
+				await writeFile(`/src/routes/${pageLevelFile}`, content);
+			} else if (componentName) {
+				await writeFile(`${GENERATED_PATH}/${componentName}.svelte`, content);
 			} else {
-				await writeFile(`${GENERATED_PATH}/${fileOrComponent}.svelte`, content);
+				console.error('Attempted to save but both component and global file were null');
 			}
 		}
 	};
