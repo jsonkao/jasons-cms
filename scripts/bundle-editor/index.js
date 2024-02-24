@@ -46,7 +46,9 @@ const ignored_directories = [
 	'node_modules/esbuild',
 	'node_modules/@esbuild',
 
-	'node_modules/.vite'
+	'node_modules/.vite',
+
+	'build'
 ];
 
 const ignored_files = new Set([

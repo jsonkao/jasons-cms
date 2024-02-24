@@ -54,7 +54,7 @@ function importResolve() {
 			if (importer.endsWith('.svelte') || importer.endsWith('.js')) {
 				const { name, range, path = '+esm' } = parseNpmSpecifier(specifier);
 				return {
-					id: `http://cdn.jsdelivr.net/npm/${name}${range ? `@${range}` : ''}/${path}`.replaceAll(
+					id: `https://cdn.jsdelivr.net/npm/${name}${range ? `@${range}` : ''}/${path}`.replaceAll(
 						'\x00',
 						''
 					)

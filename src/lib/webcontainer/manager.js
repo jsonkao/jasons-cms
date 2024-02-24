@@ -4,11 +4,15 @@ import { openComponentName } from '$lib/stores/code-editor.js';
 import { get } from 'svelte/store';
 import { createWebContainer as defaultWebContainer } from './create.js';
 
+const manager = createWebContainerManager();
+export const syncFileSystem = manager.syncFileSystem;
+export const saveFile = manager.saveFile;
+
 /**
  * Uses createWebContainer to create a web container. Returns functions that work with its file system.
  * @param {import('./create.js').createWebContainer} [createWebContainer]
  */
-export function createWebContainerManager(createWebContainer = defaultWebContainer) {
+function createWebContainerManager(createWebContainer = defaultWebContainer) {
 	if (!browser) throw new Error('This module should only be imported in the browser');
 
 	/** @type {import('@webcontainer/api').WebContainer} The WebContainer instance. */

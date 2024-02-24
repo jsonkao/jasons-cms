@@ -8,7 +8,7 @@
 		openComponentName,
 		openGlobalFile
 	} from '$lib/stores/code-editor.js';
-	import { createWebContainerManager } from '$lib/webcontainer/manager.js';
+	import { syncFileSystem, saveFile } from '$lib/webcontainer/manager.js';
 	import { setupProvider } from '$shared/provider';
 	import { SharedDoc } from '$shared/shared-doc.js';
 	import { onDestroy } from 'svelte';
@@ -32,8 +32,7 @@
 	trackOtherCoders(awareness);
 	onDestroy(doc.destroy);
 
-	/* Setup webcontainer and its manager */
-	const { syncFileSystem, saveFile } = createWebContainerManager();
+	/* Setup webcontainer stuff */
 	$: ytext = doc.findYText($openComponentName, $openGlobalFile);
 	$: syncFileSystem($yarrayStore, $yPageFilesStore);
 
@@ -81,6 +80,7 @@
 	<CodingOverlay
 		{showCodeEditor}
 		on:delete-graphic={deleteComponent}
+		on:select-graphic
 		componentIsPresent={!!ytext}
 		blocks={$yarrayStore}
 	/>
