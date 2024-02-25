@@ -14,3 +14,9 @@
 <div data-name={name}>
 	<svelte:component this={components[name]} prose={blockMap.get('prose')} {data} />
 </div>
+
+<style>
+	div {
+		/* border: 1px solid red; */
+	}
+</style>

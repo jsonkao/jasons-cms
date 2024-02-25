@@ -31,17 +31,18 @@ class FloatingMenuView {
 	 */
 	constructor(editorView) {
 		this.editorView = editorView;
-		// On focus, also call update
+		// On focus, call update, and prevent blur from hiding the floating menu
 		editorView.dom.addEventListener('focus', this.focusHandler);
 		// On blur, hide the floating menu (in some cases)
 		editorView.dom.addEventListener('blur', this.blurHandler);
 		// On mousedown, prevent blur from hiding the floating menu
-		editorView.dom.addEventListener('mousedown', this.mousedownHandler, { capture: true });
+		editorView.dom.addEventListener('mousedown', this.mousedownHandler);
 	}
 
 	focusHandler = () => {
 		// Tiptap code says this `setTimeout` makes sure `selection` is already updated
 		setTimeout(() => this.update(this.editorView));
+		this.preventHide = true;
 	};
 
 	/**
@@ -62,9 +63,7 @@ class FloatingMenuView {
 		floatingMenuStore.set({ visible: false });
 	};
 
-	mousedownHandler = () => {
-		this.preventHide = true;
-	};
+	mousedownHandler = () => (this.preventHide = true);
 
 	/**
 	 * @param {EditorView} editorView

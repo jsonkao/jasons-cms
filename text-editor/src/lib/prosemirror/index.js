@@ -17,7 +17,7 @@ import {
 	yUndoPlugin
 } from 'y-prosemirror';
 import { corePlugins } from './plugins/index.js';
-import { richTextSchema } from './schema.ts';
+import { richTextSchema } from './schema.js';
 
 export class SharedDocForProsemirror extends SharedDoc {
 	/**
@@ -66,7 +66,7 @@ export class SharedDocForProsemirror extends SharedDoc {
 
 		const idAboutToBeDeleted = getId(this.yarray.get(ymapIndex));
 
-		const name = 'graphic' + idAboutToBeDeleted;
+		const name = 'graphic' + idAboutToBeDeleted; // use the id of the text block about to be deleted for the new graphic's unique id
 		const textBefore = prosemirrorToYXmlFragment(docNode.cut(0, cursorPosition - 1));
 		const textAfter = prosemirrorToYXmlFragment(docNode.cut(cursorPosition + 1));
 
@@ -133,8 +133,7 @@ export function cursorBuilder(user) {
 }
 
 /**
- * Took the default generator for the selection attributes and made it more transparent
- *
+ * The default selection builder but more transparent
  * @param {{ name: string, color: string }} user
  * @return {import('prosemirror-view').DecorationAttrs}
  */

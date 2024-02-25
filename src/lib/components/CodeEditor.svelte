@@ -14,7 +14,7 @@
 	import { onDestroy } from 'svelte';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import CodingOverlay from './CodingOverlay.svelte';
-	import codemirrorProps from './codemirror-props.js';
+	import codemirrorProps from '../codemirror-props.js';
 
 	/** @type {string} */
 	export let slug;

@@ -4,7 +4,6 @@
 	 * - Use an editor state creator function instead of a static editor state
 	 * - Clean up type annotations and styles
 	 * - Propogate blur events to parent (this might've not been needed)
-	 * - Import a custom CSS file
 	 *
 	 * And finally, there is a slight chance that prosemirror-svelte was causing a duplicate import of yjs.
 	 *

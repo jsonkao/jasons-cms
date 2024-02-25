@@ -18,7 +18,7 @@
 	<div class="popup" style="top: {$floatingMenuStore.top}px; left: {$floatingMenuStore.left}px">
 		<p>
 			Write or
-			<button on:click={handleClick}>code here</button>...
+			<button on:click={handleClick}>code a visual</button> here...
 		</p>
 	</div>
 {/if}
@@ -26,6 +26,7 @@
 <style>
 	.popup {
 		position: absolute;
+		pointer-events: none;
 	}
 
 	p,
@@ -38,5 +39,6 @@
 	button {
 		text-decoration: underline;
 		cursor: pointer;
+		pointer-events: all;
 	}
 </style>

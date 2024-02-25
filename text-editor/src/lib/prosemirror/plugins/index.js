@@ -3,7 +3,7 @@ import { keymap } from 'prosemirror-keymap';
 import { redo, undo } from 'y-prosemirror';
 import { FloatingMenuPlugin } from './floating-menu.js';
 import { richTextKeyMap } from './keymap.js';
-import { richTextSchema } from '../schema.ts';
+import { richTextSchema } from '../schema.js';
 
 /**
  * @param {boolean} hasFloatingMenu
