@@ -4,7 +4,7 @@
 </script>
 
 <div class="container">
-	<p>Stories</p>
+	<p class="title">Stories</p>
 	{#each data.slugs as slug}
 		<p><a href="/edit/{slug}" data-sveltekit-reload>{slug}</a></p>
 	{/each}
@@ -22,15 +22,16 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding-top: 9rem;
+		padding-top: 10rem;
 	}
 
 	p {
 		margin: 0;
 	}
 
-	p:first-child {
-		margin-bottom: 3rem;
+	.title {
+		margin-bottom: 2rem;
+		font-weight: bold;
 	}
 
 	a {
