@@ -5,6 +5,7 @@ export async function createDeployment() {
 			method: 'POST'
 		}
 	);
+	const jobData = await response.json();
 
-	console.log(await response.json(), response.status);
+	console.log(jobData, response.status);
 }
